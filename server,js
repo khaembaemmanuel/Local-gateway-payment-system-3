@@ -1,0 +1,16 @@
+// server.js
+const app = require('./app');
+const connectDB = require('./config/db'); // Ensure database connects on boot
+const env = require('./config/env');
+
+const PORT = env.port || 4000;
+
+// Connect to MongoDB first, then boot HTTP server
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running in ${env.nodeEnv || 'development'} mode on port ${PORT}`);
+  });
+}).catch((err) => {
+  console.error('❌ Failed to connect to MongoDB:', err.message);
+  process.exit(1);
+});

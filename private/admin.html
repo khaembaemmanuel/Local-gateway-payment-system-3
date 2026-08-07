@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Portal | Iber Capital Bank</title>
+
+  <!-- Google Fonts & FontAwesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Saira:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Saira', sans-serif; }
+    body { background-color: #f8fafc; color: #0f172a; min-height: 100vh; }
+    
+    .navbar {
+      background-color: #0f172a; color: white; padding: 16px 30px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .brand { font-size: 20px; font-weight: 700; color: #00b074; }
+    .badge-admin { background: #ef4444; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; text-transform: uppercase; margin-left: 8px; font-weight: 700; }
+    .logout-btn { background: #334155; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+    .logout-btn:hover { background: #475569; }
+
+    .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+    
+    .search-card, .user-card, .action-card {
+      background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 25px; margin-bottom: 25px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    }
+    
+    .card-title { font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+    
+    .input-group { display: flex; gap: 10px; }
+    .input-field {
+      flex: 1; padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 15px; outline: none;
+    }
+    .input-field:focus { border-color: #00b074; }
+    
+    .btn {
+      padding: 12px 20px; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s;
+    }
+    .btn-primary { background: #00b074; color: white; }
+    .btn-primary:hover { background: #009663; }
+    .btn-danger { background: #ef4444; color: white; }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-warning { background: #f59e0b; color: white; }
+    .btn-warning:hover { background: #d97706; }
+    .btn-secondary { background: #64748b; color: white; }
+    .btn-secondary:hover { background: #475569; }
+    
+    .user-info-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; background: #f8fafc;
+      padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #f1f5f9;
+    }
+    .info-item span { display: block; font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 700; }
+    .info-item strong { font-size: 16px; color: #0f172a; }
+
+    .status-badge {
+      display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase;
+    }
+    .status-active { background: #d1fae5; color: #065f46; }
+    .status-deactivated { background: #fee2e2; color: #991b1b; }
+
+    .action-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+
+    .alert-box {
+      display: none; padding: 12px 16px; border-radius: 6px; font-size: 14px; margin-top: 15px; font-weight: 500;
+    }
+    .alert-success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+    .alert-danger { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+
+    #userManagementSection { display: none; }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="brand">Iber Capital <span class="badge-admin">Single Admin Panel</span></div>
+    <button id="logoutBtn" class="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+  </nav>
+
+  <div class="container">
+    
+    <!-- Step 1: Search Account -->
+    <div class="search-card">
+      <div class="card-title">
+        <i class="fa-solid fa-magnifying-glass" style="color: #00b074;"></i> Account Search
+      </div>
+      <form id="searchForm" class="input-group">
+        <input type="text" id="searchQuery" class="input-field" placeholder="Enter Account Number or User Email..." required>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-search"></i> Search User</button>
+      </form>
+      <div id="searchAlert" class="alert-box"></div>
+    </div>
+
+    <!-- Step 2: User Control Section (Visible after search) -->
+    <div id="userManagementSection">
+      
+      <!-- User Overview Card -->
+      <div class="user-card">
+        <div class="card-title">
+          <i class="fa-solid fa-user-gear" style="color: #00b074;"></i> Target Account Profile
+        </div>
+        
+        <div class="user-info-grid">
+          <div class="info-item">
+            <span>Account Holder</span>
+            <strong id="displayFullName">--</strong>
+          </div>
+          <div class="info-item">
+            <span>Account Number</span>
+            <strong id="displayAccNum">--</strong>
+          </div>
+          <div class="info-item">
+            <span>Email</span>
+            <strong id="displayEmail">--</strong>
+          </div>
+          <div class="info-item">
+            <span>Current Balance</span>
+            <strong id="displayBalance" style="color: #00b074;">$0.00</strong>
+          </div>
+          <div class="info-item">
+            <span>Account Status</span>
+            <span id="displayStatus" class="status-badge status-active">ACTIVE</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Panel Grid -->
+      <div class="action-grid">
+
+        <!-- 1. Balance Controls (Add / Deduct) -->
+        <div class="action-card">
+          <div class="card-title">
+            <i class="fa-solid fa-wallet" style="color: #00b074;"></i> Balance Override
+          </div>
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 6px;">AMOUNT</label>
+            <input type="number" id="balanceAmount" class="input-field" style="width: 100%;" placeholder="0.00" min="1" step="0.01">
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <button id="addFundsBtn" class="btn btn-primary" style="flex: 1;"><i class="fa-solid fa-plus"></i> Add Amount</button>
+            <button id="deductFundsBtn" class="btn btn-warning" style="flex: 1;"><i class="fa-solid fa-minus"></i> Deduct Amount</button>
+          </div>
+          <div id="balanceAlert" class="alert-box"></div>
+        </div>
+
+        <!-- 2. Account Status & Deletion -->
+        <div class="action-card">
+          <div class="card-title">
+            <i class="fa-solid fa-shield-cat" style="color: #ef4444;"></i> Account Status & Restrictions
+          </div>
+          <p style="font-size: 13px; color: #64748b; margin-bottom: 20px;">
+            Deactivating blocks the user from accessing their dashboard. Deleting permanently wipes their account from the system.
+          </p>
+
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <button id="toggleStatusBtn" class="btn btn-secondary">
+              <i class="fa-solid fa-ban"></i> <span id="toggleStatusText">Deactivate Account</span>
+            </button>
+            
+            <button id="deleteAccountBtn" class="btn btn-danger">
+              <i class="fa-solid fa-trash-can"></i> Delete Account Permanently
+            </button>
+          </div>
+          <div id="accountAlert" class="alert-box"></div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    let activeTargetUser = null;
+    const token = localStorage.getItem('token') || localStorage.getItem('authToken') || localStorage.getItem('srcb_token');
+
+    // Authentication Guard
+    if (!token) {
+      window.location.replace('/login.html');
+    }
+
+    function showAlert(elementId, message, type = 'success') {
+      const alertBox = document.getElementById(elementId);
+      alertBox.textContent = message;
+      alertBox.className = `alert-box alert-${type}`;
+      alertBox.style.display = 'block';
+    }
+
+    function hideAlerts() {
+      document.querySelectorAll('.alert-box').forEach(el => el.style.display = 'none');
+    }
+
+    // 1. Search User
+    document.getElementById('searchForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideAlerts();
+
+      const query = document.getElementById('searchQuery').value.trim();
+      if (!query) return;
+
+      try {
+        const response = await fetch(`/admin/user/search?query=${encodeURIComponent(query)}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          activeTargetUser = data.user;
+          renderTargetUser(activeTargetUser);
+          document.getElementById('userManagementSection').style.display = 'block';
+        } else {
+          document.getElementById('userManagementSection').style.display = 'none';
+          showAlert('searchAlert', data.message || 'User not found.', 'danger');
+        }
+      } catch (err) {
+        showAlert('searchAlert', 'Network error while querying database.', 'danger');
+      }
+    });
+
+    // 2. Render Target User Data
+    function renderTargetUser(user) {
+      document.getElementById('displayFullName').textContent = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username;
+      document.getElementById('displayAccNum').textContent = user.accountNumber || 'N/A';
+      document.getElementById('displayEmail').textContent = user.email;
+      document.getElementById('displayBalance').textContent = `$${parseFloat(user.balance || 0).toFixed(2)}`;
+
+      const statusBadge = document.getElementById('displayStatus');
+      const toggleText = document.getElementById('toggleStatusText');
+
+      const isDeactivated = user.status === 'deactivated' || user.isDeactivated === true;
+
+      if (isDeactivated) {
+        statusBadge.textContent = 'DEACTIVATED';
+        statusBadge.className = 'status-badge status-deactivated';
+        toggleText.textContent = 'Reactivate Account';
+      } else {
+        statusBadge.textContent = 'ACTIVE';
+        statusBadge.className = 'status-badge status-active';
+        toggleText.textContent = 'Deactivate Account';
+      }
+    }
+
+    // 3. Add or Deduct Balance
+    async function handleBalanceAdjustment(action) {
+      hideAlerts();
+      const amountInput = document.getElementById('balanceAmount');
+      const amount = parseFloat(amountInput.value);
+
+      if (isNaN(amount) || amount <= 0) {
+        return showAlert('balanceAlert', 'Please enter a valid amount.', 'danger');
+      }
+
+      try {
+        const response = await fetch('/admin/adjust-balance', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            userId: activeTargetUser._id,
+            amount: amount,
+            action: action
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          activeTargetUser.balance = data.newBalance;
+          renderTargetUser(activeTargetUser);
+          showAlert('balanceAlert', data.message, 'success');
+          amountInput.value = '';
+        } else {
+          showAlert('balanceAlert', data.message || 'Balance update failed.', 'danger');
+        }
+      } catch (err) {
+        showAlert('balanceAlert', 'Network error processing balance update.', 'danger');
+      }
+    }
+
+    document.getElementById('addFundsBtn').addEventListener('click', () => handleBalanceAdjustment('add'));
+    document.getElementById('deductFundsBtn').addEventListener('click', () => handleBalanceAdjustment('deduct'));
+
+    // 4. Toggle Account Status (Activate/Deactivate)
+    document.getElementById('toggleStatusBtn').addEventListener('click', async () => {
+      hideAlerts();
+      const isDeactivated = activeTargetUser.status === 'deactivated' || activeTargetUser.isDeactivated === true;
+      const targetStatus = isDeactivated ? 'active' : 'deactivated';
+
+      try {
+        const response = await fetch('/admin/toggle-status', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            userId: activeTargetUser._id,
+            status: targetStatus
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          activeTargetUser.status = targetStatus;
+          activeTargetUser.isDeactivated = (targetStatus === 'deactivated');
+          renderTargetUser(activeTargetUser);
+          showAlert('accountAlert', data.message, 'success');
+        } else {
+          showAlert('accountAlert', data.message || 'Status toggle failed.', 'danger');
+        }
+      } catch (err) {
+        showAlert('accountAlert', 'Network error changing status.', 'danger');
+      }
+    });
+
+    // 5. Delete User Account Permanently
+    document.getElementById('deleteAccountBtn').addEventListener('click', async () => {
+      hideAlerts();
+      
+      const confirmDelete = confirm(`Are you absolutely sure you want to PERMANENTLY delete account ${activeTargetUser.email}? This action CANNOT be undone.`);
+      if (!confirmDelete) return;
+
+      try {
+        const response = await fetch(`/admin/delete-user/${activeTargetUser._id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          alert(data.message);
+          document.getElementById('userManagementSection').style.display = 'none';
+          document.getElementById('searchQuery').value = '';
+        } else {
+          showAlert('accountAlert', data.message || 'Failed to delete account.', 'danger');
+        }
+      } catch (err) {
+        showAlert('accountAlert', 'Network error deleting user account.', 'danger');
+      }
+    });
+
+    // Logout Button
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.clear();
+      window.location.replace('/login.html');
+    });
+  </script>
+</body>
+</html>

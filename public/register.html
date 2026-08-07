@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offshore International Banking Registration | Iber Capital Bank</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Saira:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Saira', sans-serif;
+    }
+
+    body {
+      background-color: #f8fafc;
+      color: #334155;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .registration-container {
+      background: #ffffff;
+      width: 100%;
+      max-width: 650px;
+      padding: 35px 40px;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      position: relative;
+    }
+
+    /* Close Icon */
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 20px;
+      color: #94a3b8;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .close-btn:hover {
+      color: #0f172a;
+    }
+
+    /* Title */
+    .registration-container h2 {
+      font-size: 32px;
+      color: #2b3a4a;
+      font-weight: 700;
+      margin-top: 15px;
+      margin-bottom: 30px;
+    }
+
+    /* Form Layout */
+    .form-row {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      align-items: center;
+      margin-bottom: 18px;
+      gap: 15px;
+    }
+
+    .form-row.textarea-row {
+      align-items: start;
+    }
+
+    .form-row label {
+      font-size: 15px;
+      color: #475569;
+      font-weight: 500;
+    }
+
+    .form-row input,
+    .form-row select,
+    .form-row textarea {
+      width: 100%;
+      padding: 10px 14px;
+      font-size: 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      outline: none;
+      color: #1e293b;
+      background-color: #ffffff;
+      transition: border-color 0.2s;
+    }
+
+    /* Phone Input Container */
+    .phone-input-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .phone-prefix {
+      background-color: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      padding: 10px 12px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #475569;
+      min-width: 65px;
+      text-align: center;
+      user-select: none;
+    }
+
+    .form-row input:focus,
+    .form-row select:focus,
+    .form-row textarea:focus {
+      border-color: #0284c7;
+    }
+
+    .form-row textarea {
+      height: 110px;
+      resize: vertical;
+    }
+
+    /* Register Button Container */
+    .btn-container {
+      display: flex;
+      justify-content: flex-start;
+      margin-top: 25px;
+    }
+
+    .btn-register {
+      background-color: #00b074;
+      color: #ffffff;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: background 0.2s;
+      text-transform: uppercase;
+    }
+
+    .btn-register:hover {
+      background-color: #009663;
+    }
+
+    /* Alert Message Box */
+    .alert-message {
+      display: none;
+      padding: 12px;
+      border-radius: 4px;
+      font-size: 14px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .alert-danger {
+      background-color: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    .alert-success {
+      background-color: #f0fdf4;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 580px) {
+      .form-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="registration-container">
+    
+    <!-- Close Button -->
+    <a href="/login.html" class="close-btn"><i class="fa-solid fa-xmark"></i></a>
+
+    <!-- Page Header -->
+    <h2>Online Banking Registration</h2>
+
+    <!-- Alert Box -->
+    <div id="alertBox" class="alert-message"></div>
+
+    <!-- Registration Form -->
+    <form id="registerForm">
+      
+      <!-- First Name -->
+      <div class="form-row">
+        <label for="firstName">First Name</label>
+        <input type="text" id="firstName" name="firstName" placeholder="Your First Name" required>
+      </div>
+
+      <!-- Last Name -->
+      <div class="form-row">
+        <label for="lastName">Last Name</label>
+        <input type="text" id="lastName" name="lastName" placeholder="Your last name.." required>
+      </div>
+
+      <!-- Email Address -->
+      <div class="form-row">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" placeholder="Your Email Address" required>
+      </div>
+
+      <!-- Country of Origin -->
+      <div class="form-row">
+        <label for="country">Country of Origin</label>
+        <select id="country" name="country" required>
+          <option value="" disabled selected>Select Country</option>
+          <option value="KE" data-code="+254">Kenya (+254)</option>
+          <option value="US" data-code="+1">United States (+1)</option>
+          <option value="GB" data-code="+44">United Kingdom (+44)</option>
+          <option value="UG" data-code="+256">Uganda (+256)</option>
+          <option value="TZ" data-code="+255">Tanzania (+255)</option>
+          <option value="ZA" data-code="+27">South Africa (+27)</option>
+        </select>
+      </div>
+
+      <!-- Phone Number -->
+      <div class="form-row">
+        <label for="phone">Phone Number</label>
+        <div class="phone-input-group">
+          <span class="phone-prefix" id="phonePrefix">+---</span>
+          <input type="tel" id="phone" name="phone" placeholder="712345678" maxlength="9" pattern="[0-9]{9}" title="Please enter 9 digits" required>
+        </div>
+      </div>
+
+      <!-- Gender -->
+      <div class="form-row">
+        <label for="gender">Gender</label>
+        <select id="gender" name="gender" required>
+          <option value="Male" selected>Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <!-- Date of Birth -->
+      <div class="form-row">
+        <label for="dob">Date of Birth</label>
+        <input type="date" id="dob" name="dob" required>
+      </div>
+
+      <!-- Full Home Address -->
+      <div class="form-row textarea-row">
+        <label for="address">Full Home Address</label>
+        <textarea id="address" name="address" placeholder="55 Trinity Ave SW # 1350, Atlanta, GA 30303, United States" required></textarea>
+      </div>
+
+      <!-- Account Type -->
+      <div class="form-row">
+        <label for="accountType">Account Type</label>
+        <select id="accountType" name="accountType" required>
+          <option value="" disabled selected>Account Type</option>
+          <option value="Savings">Savings Account</option>
+          <option value="Checking">Checking Account</option>
+          <option value="Business">Business Account</option>
+        </select>
+      </div>
+
+      <!-- Account Currency -->
+      <div class="form-row">
+        <label for="currency">Account Currency</label>
+        <select id="currency" name="currency" required>
+          <option value="" disabled selected>Select</option>
+          <option value="USD">USD ($)</option>
+          <option value="EUR">EUR (€)</option>
+          <option value="GBP">GBP (£)</option>
+          <option value="KES">KES (KSh)</option>
+        </select>
+      </div>
+
+      <!-- Choose Password -->
+      <div class="form-row">
+        <label for="password">Choose Password</label>
+        <input type="password" id="password" name="password" placeholder="***********" required>
+      </div>
+
+      <!-- Action Button -->
+      <div class="btn-container">
+        <button type="submit" class="btn-register" id="registerBtn">REGISTER</button>
+      </div>
+
+    </form>
+  </div>
+
+  <script>
+    const registerForm = document.getElementById('registerForm');
+    const alertBox = document.getElementById('alertBox');
+    const registerBtn = document.getElementById('registerBtn');
+    const countrySelect = document.getElementById('country');
+    const phonePrefix = document.getElementById('phonePrefix');
+    const phoneInput = document.getElementById('phone');
+
+    // Automatically update country code prefix when country changes
+    countrySelect.addEventListener('change', (e) => {
+      const selectedOption = countrySelect.options[countrySelect.selectedIndex];
+      const code = selectedOption.getAttribute('data-code');
+      phonePrefix.textContent = code || '+---';
+    });
+
+    // Enforce 9 numeric digits input
+    phoneInput.addEventListener('input', (e) => {
+      phoneInput.value = phoneInput.value.replace(/\D/g, '').slice(0, 9);
+    });
+
+    function showAlert(message, type = 'danger') {
+      alertBox.textContent = message;
+      alertBox.className = `alert-message alert-${type}`;
+      alertBox.style.display = 'block';
+    }
+
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      alertBox.style.display = 'none';
+
+      // Combine prefix + 9 digit number for submission
+      const rawPhone = phoneInput.value.trim();
+      const prefix = phonePrefix.textContent;
+      const fullPhoneNumber = prefix + rawPhone;
+
+      const formData = {
+        firstName: document.getElementById('firstName').value.trim(),
+        lastName: document.getElementById('lastName').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        country: countrySelect.value,
+        phone: fullPhoneNumber, // e.g. "+254712345678"
+        gender: document.getElementById('gender').value,
+        dob: document.getElementById('dob').value,
+        address: document.getElementById('address').value.trim(),
+        accountType: document.getElementById('accountType').value,
+        currency: document.getElementById('currency').value,
+        password: document.getElementById('password').value
+      };
+
+      registerBtn.disabled = true;
+      registerBtn.textContent = 'Processing...';
+
+      try {
+        const response = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          showAlert('Registration successful! Redirecting to login...', 'success');
+          setTimeout(() => {
+            window.location.href = '/login.html';
+          }, 1500);
+        } else {
+          showAlert(data.message || 'Registration failed. Please check your details.');
+          registerBtn.disabled = false;
+          registerBtn.textContent = 'REGISTER';
+        }
+      } catch (err) {
+        console.error('Registration Error:', err);
+        showAlert('Unable to connect to the server. Please try again later.');
+        registerBtn.disabled = false;
+        registerBtn.textContent = 'REGISTER';
+      }
+    });
+  </script>
+
+</body>
+</html>
