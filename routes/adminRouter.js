@@ -49,10 +49,18 @@ const requireSingleAdmin = async (req, res, next) => {
 // ------------------------------------------------------------------
 
 // SERVE PRIVATE ADMIN HTML DIRECTLY (GET /admin/dashboard)
-// Updated to serve the static file immediately so the browser loads the page. 
-// The frontend script inside `admin.html` will handle checking localStorage for the token.
 router.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, '../private/admin.html'));
+});
+
+// GET TOTAL REGISTERED USERS COUNT (GET /admin/users/count)
+router.get('/users/count', verifyToken, requireSingleAdmin, async (req, res) => {
+  try {
+    const count = await User.countDocuments();
+    return res.json({ success: true, count });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: 'Failed to fetch user count.' });
+  }
 });
 
 // SEARCH USER BY ACCOUNT NUMBER OR EMAIL (GET /admin/user/search?query=...)

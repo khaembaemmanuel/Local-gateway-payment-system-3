@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+require('dotenv').config(); // Load environment variables from .env
+
 const User = require('./models/User');
 const connectDB = require('./config/db');
 
@@ -7,8 +9,14 @@ const createAdminAccount = async () => {
   try {
     await connectDB();
 
-    const adminEmail = "admin@ibercapital.com";
-    
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPlainTextPassword = process.env.ADMIN_PASSWORD;
+
+    if (!adminEmail || !adminPlainTextPassword) {
+      console.error('❌ Error: ADMIN_EMAIL or ADMIN_PASSWORD is missing from your .env file!');
+      process.exit(1);
+    }
+
     const existingAdmin = await User.findOne({ email: adminEmail });
     if (existingAdmin) {
       console.log('⚠️ Admin account already exists in the database!');
@@ -16,7 +24,7 @@ const createAdminAccount = async () => {
     }
 
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash('AdminSecurePassword123!', salt);
+    const hashedPassword = await bcrypt.hash(adminPlainTextPassword, salt);
 
     const adminUser = new User({
       firstName: 'System',
@@ -34,7 +42,6 @@ const createAdminAccount = async () => {
     await adminUser.save();
     console.log('✅ Admin account created successfully!');
     console.log(`Email: ${adminEmail}`);
-    console.log(`Password: AdminSecurePassword123!`);
     
     process.exit(0);
   } catch (err) {

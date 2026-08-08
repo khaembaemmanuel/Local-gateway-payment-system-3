@@ -2,15 +2,88 @@
 const app = require('./app');
 const connectDB = require('./config/db'); // Ensure database connects on boot
 const env = require('./config/env');
+const mongoose = require('mongoose');
+
+// Catch unexpected synchronous errors
+process.on('uncaughtException', (err) => {
+    console.error('❌ UNCAUGHT EXCEPTION! Shutting down...');
+    console.error(err.name, err.message);
+    process.exit(1);
+});
+
+// Basic Authentication Middleware to restrict public access during staging
+app.use((req, res, next) => {
+    const authHeader = req.headers.authorization;
+
+    if (authHeader) {
+        try {
+            const auth = Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':');
+            const user = auth[0];
+            const pass = auth[1];
+
+            if (user === 'admin' && pass === process.env.DEPLOYMENT_PASSWORD) {
+                return next();
+            }
+        } catch (e) {
+            // Fall through to 401 if parsing fails
+        }
+    }
+
+    res.setHeader('WWW-Authenticate', 'Basic realm="Secure Area"');
+    res.status(401).send('Access denied. Private site under development.');
+});
 
 const PORT = env.port || 4000;
+let server;
 
 // Connect to MongoDB first, then boot HTTP server
 connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`🚀 Server running in ${env.nodeEnv || 'development'} mode on port ${PORT}`);
-  });
+    server = app.listen(PORT, () => {
+        console.log(`🚀 Server running in ${env.nodeEnv || 'development'} mode on port ${PORT}`);
+    });
 }).catch((err) => {
-  console.error('❌ Failed to connect to MongoDB:', err.message);
-  process.exit(1);
+    console.error('❌ Failed to connect to MongoDB:', err.message);
+    process.exit(1);
+});
+
+// Catch unhandled promise rejections
+process.on('unhandledRejection', (err) => {
+    console.error('❌ UNHANDLED REJECTION! Shutting down...');
+    console.error(err.name, err.message);
+    
+    if (server) {
+        server.close(async () => {
+            try {
+                await mongoose.connection.close(false);
+                console.log('🔒 Database connection closed gracefully.');
+                process.exit(1);
+            } catch (dbErr) {
+                console.error('❌ Error closing database:', dbErr.message);
+                process.exit(1);
+            }
+        });
+    } else {
+        process.exit(1);
+    }
+});
+
+// Handle Cloud Deployment Shutdown Signals (SIGTERM)
+process.on('SIGTERM', () => {
+    console.log('👋 SIGTERM SIGNAL RECEIVED. Starting graceful shutdown...');
+    
+    if (server) {
+        server.close(async () => {
+            console.log('🛑 HTTP server closed.');
+            try {
+                await mongoose.connection.close(false);
+                console.log('🔒 Database connection safely terminated.');
+                process.exit(0);
+            } catch (dbErr) {
+                console.error('❌ Error during database closure:', dbErr.message);
+                process.exit(1);
+            }
+        });
+    } else {
+        process.exit(0);
+    }
 });

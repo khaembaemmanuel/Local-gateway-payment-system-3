@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login | Iber Capital Bank</title>
+  <title>Login | Swift Royal Capital Bank</title>
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Saira:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -34,15 +34,27 @@
       padding: 20px;
     }
 
+    /* Bank Title Styling */
+    .bank-title {
+      text-align: center;
+      font-size: 22px;
+      font-weight: 700;
+      color: #1a365d;
+      margin-bottom: 15px;
+      letter-spacing: 0.5px;
+    }
+
     /* Logo Styling */
     .logo-container {
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 30px;
     }
 
     .logo-container img {
       max-width: 220px;
       height: auto;
+      display: block;
+      margin: 0 auto;
     }
 
     /* Header & Underline Accent */
@@ -186,10 +198,13 @@
 
   <div class="login-container">
     
+    <!-- Bank Name Header -->
+    <div class="bank-title">Swift Royal Capital Bank</div>
+
     <!-- Logo -->
     <div class="logo-container">
       <a href="/index.html">
-        <img src="/Frontend/images/logo-blue.png" alt="Iber Capital Bank Logo" onerror="this.src='/images/logo-blue.png'">
+        <img src="/images/logo-blue.png" alt="Swift Royal Capital Bank Logo" onerror="this.style.display='none'">
       </a>
     </div>
 
@@ -269,13 +284,11 @@
         if (response.ok) {
           showAlert('Login successful! Redirecting...', 'success');
           
-          // Save JWT in localStorage under both keys to ensure compatibility across pages
           if (data.token) {
             localStorage.setItem('authToken', data.token);
             localStorage.setItem('token', data.token);
           }
 
-          // Check if the logged-in user is the admin
           const loggedInEmail = data.user && data.user.email ? data.user.email.toLowerCase() : '';
           
           setTimeout(() => {

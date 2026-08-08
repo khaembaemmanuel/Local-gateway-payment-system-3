@@ -44,7 +44,28 @@ const userSchema = new mongoose.Schema({
     enum: ['Male', 'Female', 'Other'] 
   },
   dob: { 
-    type: Date 
+    type: Date,
+    required: [true, 'Date of birth is required'],
+    validate: {
+      validator: function (v) {
+        if (!v) return false;
+        
+        const today = new Date();
+        const birthDate = new Date(v);
+        
+        // Calculate exact age
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDifference = today.getMonth() - birthDate.getMonth();
+        
+        if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+          age--;
+        }
+        
+        // Enforce minimum age requirement of 23 years old
+        return age >= 23;
+      },
+      message: 'You must be at least 23 years old to register an account.'
+    }
   },
   address: { 
     type: String, 
@@ -83,5 +104,12 @@ const userSchema = new mongoose.Schema({
 }, { 
   timestamps: true 
 });
+
+// Security feature: Automatically remove the password hash whenever user data is sent as JSON
+userSchema.methods.toJSON = function () {
+  const userObject = this.toObject();
+  delete userObject.password;
+  return userObject;
+};
 
 module.exports = mongoose.model('User', userSchema);

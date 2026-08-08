@@ -2,14 +2,38 @@
 const mongoose = require('mongoose');
 const env = require('./env');
 
+// Enforce strict query mode for consistent data filtering
+mongoose.set('strictQuery', true);
+
 const connectDB = async () => {
-  try {
-    const conn = await mongoose.connect(env.mongoUri);
-    console.log(`✅ [Database] Connected to MongoDB: ${conn.connection.host}`);
-  } catch (err) {
-    console.error(`❌ [Database Error] ${err.message}`);
-    process.exit(1);
-  }
+    try {
+        // Production connection options
+        const options = {
+            serverSelectionTimeoutMS: 5000, // Timeout after 5 seconds if MongoDB is unreachable
+            socketTimeoutMS: 45000,          // Close inactive sockets after 45 seconds
+        };
+
+        const conn = await mongoose.connect(env.mongoUri, options);
+        console.log(`✅ [Database] Connected to MongoDB: ${conn.connection.host}`);
+
+        // Listen for runtime connection events (critical for cloud monitoring)
+        mongoose.connection.on('error', (err) => {
+            console.error(`❌ [Database Runtime Error]: ${err.message}`);
+        });
+
+        mongoose.connection.on('disconnected', () => {
+            console.warn('⚠️ [Database Warning] Lost connection to MongoDB. Attempting to reconnect...');
+        });
+
+        mongoose.connection.on('reconnected', () => {
+            console.log('🔄 [Database] Successfully reconnected to MongoDB.');
+        });
+
+    } catch (err) {
+        console.error(`❌ [Database Connection Error]: ${err.message}`);
+        // Throw the error so server.js catches it and safely terminates startup
+        throw err;
+    }
 };
 
 module.exports = connectDB;
