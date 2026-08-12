@@ -1,4 +1,4 @@
-// models/SystemConfig.js
+
 const mongoose = require('mongoose');
 
 const systemConfigSchema = new mongoose.Schema({
@@ -24,7 +24,6 @@ const systemConfigSchema = new mongoose.Schema({
   timestamps: true 
 });
 
-// Ensure only one configuration document exists globally
 systemConfigSchema.statics.getConfig = async function() {
   let config = await this.findOne();
   if (!config) {

@@ -1,11 +1,11 @@
-// config/mpesa.js
+
 const axios = require('axios');
 const env = require('./env');
 
 const BASE_URL = env.mpesa.baseUrl;
 
 /**
- * Fetch OAuth Access Token from Safaricom Daraja API
+ 
  * @returns {Promise<string>} Bearer Access Token
  */
 const getOAuthToken = async () => {
@@ -33,7 +33,7 @@ const getOAuthToken = async () => {
 };
 
 /**
- * Generate Daraja STK Push Password & YYYYMMDDHHmmss Timestamp
+ 
  * @returns {{ password: string, timestamp: string, shortCode: string }}
  */
 const generateStkPassword = () => {
@@ -58,15 +58,12 @@ const generateStkPassword = () => {
 };
 
 /**
- * Format local Kenyan phone numbers to international standard (254XXXXXXXXX)
- * Supports inputs like: 0712345678, 0112345678, +254712345678, 254712345678
  * @param {string} phone 
  * @returns {string} Formatted 12-digit phone number string
  */
 const formatPhoneNumber = (phone) => {
   if (!phone) return '';
 
-  // Strip all non-numeric characters
   let cleaned = phone.toString().replace(/\D/g, '');
 
   if (cleaned.startsWith('0')) {

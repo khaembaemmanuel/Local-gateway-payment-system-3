@@ -1,5 +1,3 @@
-// config/constants.js
-
 const ROLES = Object.freeze({
   USER: 'USER',
   ADMIN: 'ADMIN'
