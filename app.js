@@ -12,7 +12,22 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+// Maintenance Mode / Under Construction Middleware
+const maintenanceMode = (req, res, next) => {
+  // Allow health checks to bypass so Render's uptime monitor doesn't flag it as failed
+  if (req.path === '/health') {
+    return next();
+  }
 
+  // If the environment variable is set to true, show the maintenance page
+  if (process.env.MAINTENANCE_MODE === 'true') {
+    return res.status(503).sendFile(path.join(__dirname, 'public', 'maintenance.html'));
+  }
+
+  next();
+};
+
+app.use(maintenanceMode);
 // 2. Serve Static Frontend Files
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/register.html', (req, res) => {
