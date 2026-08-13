@@ -8,17 +8,7 @@ const PORT = process.env.PORT || 4000;
 const app = express();
 
 // 1. Core Middlewares
-app.use((req, res, next) => {
-  if (req.query.access === 'ManuchoManucho78?' || req.path === '/login') {
-    return next();
-  }
-  res.send(`
-    <div style="text-align: center; margin-top: 100px; font-family: sans-serif;">
-      <h1>Site Under Maintenance</h1>
-      <p>Swift Royal Capital Bank is coming soon. Please check back later.</p>
-    </div>
-  `);
-});
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
