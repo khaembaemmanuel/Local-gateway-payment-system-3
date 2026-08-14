@@ -4,8 +4,37 @@ const cors = require('cors');
 const path = require('path');
 const connectDB = require('./config/db');
 const PORT = process.env.PORT || 4000;
-
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const app = express();
+
+app.use(helmet());
+
+//avoiding asset restriction 
+app.use(
+    helmet.contentSecurityPolicy({
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "'unsafe-inline'", "cdnjs.cloudflare.com", "fonts.googleapis.com", "maps.google.com"],
+            styleSrc: ["'self'", "'unsafe-inline'", "fonts.googleapis.com"],
+            imgSrc: ["'self'", "data:", "images/"],
+            connectSrc: ["'self'"],
+        },
+    })
+);
+// 2. Define a Rate Limiter for Login/Auth routes to stop bot/brute-force attacks
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes window
+    max: 10, // Limit each IP to 10 requests per windowMs for login/signup
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    message: {
+        status: 429,
+        error: 'Too many login attempts from this IP, please try again after 15 minutes.'
+    }
+});
+app.use('/api/login', authLimiter);
+app.use('/api/register', authLimiter);
 
 // 1. Core Middlewares
 
@@ -19,7 +48,7 @@ app.get('/register.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'register.html'));
 });
 
-// 3. Register API Routers
+// 3. API routers
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/payment', require('./routes/payment'));
 app.use('/api/account', require('./routes/accountRouter'));
