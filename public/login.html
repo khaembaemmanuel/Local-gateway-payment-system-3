@@ -210,17 +210,15 @@
 
     <!-- Title -->
     <div class="login-header">
-      <h2>Login Form</h2>
+      <h2 id="formTitle">Login Form</h2>
       <div class="accent-bar"></div>
     </div>
 
     <!-- Feedback Message Box -->
     <div id="alertBox" class="alert-message"></div>
 
-    <!-- Login Form -->
+    <!-- 1. Login Form -->
     <form id="loginForm">
-      
-      <!-- Username / Email Field -->
       <div class="form-group">
         <label for="identifier">Username/Email</label>
         <div class="input-wrapper">
@@ -229,7 +227,6 @@
         </div>
       </div>
 
-      <!-- Password Field -->
       <div class="form-group">
         <label for="password">Password</label>
         <div class="input-wrapper">
@@ -238,21 +235,78 @@
         </div>
       </div>
 
-      <!-- Actions Bar -->
       <div class="actions-row">
         <button type="submit" class="btn-login" id="loginBtn">Log me in</button>
-        <a href="#" class="reset-link">Reset Login?</a>
+        <a href="#" id="showResetEmailForm" class="reset-link">Reset Login?</a>
         <a href="/register.html" class="btn-enroll">Enroll</a>
       </div>
-
     </form>
+
+    <!-- 2. Step 1: Reset Email Form -->
+    <form id="resetEmailForm" style="display: none;">
+      <div class="form-group">
+        <label for="resetEmail">Registered Email</label>
+        <div class="input-wrapper">
+          <i class="fa-regular fa-envelope"></i>
+          <input type="email" id="resetEmail" name="resetEmail" placeholder="Enter your account email" required>
+        </div>
+      </div>
+
+      <div class="actions-row">
+        <button type="submit" class="btn-login" id="sendOtpBtn">Confirm & Send OTP</button>
+        <a href="#" id="backToLoginFromEmail" class="reset-link">Back to Login</a>
+      </div>
+    </form>
+
+    <!-- 3. Step 2: OTP Verification Form -->
+    <form id="verifyOtpForm" style="display: none;">
+      <div class="form-group">
+        <label for="otpCode">Enter OTP (Expires in 2 mins)</label>
+        <div class="input-wrapper">
+          <i class="fa-solid fa-shield-keyhole"></i>
+          <input type="text" id="otpCode" name="otpCode" placeholder="Enter 6-digit OTP" maxlength="6" required>
+        </div>
+      </div>
+
+      <div class="actions-row">
+        <button type="submit" class="btn-login" id="verifyOtpBtn">Verify OTP</button>
+        <a href="#" id="backToEmailForm" class="reset-link">Back</a>
+      </div>
+    </form>
+
+    <!-- 4. Step 3: New Password Form -->
+    <form id="newPasswordForm" style="display: none;">
+      <div class="form-group">
+        <label for="newPassword">New Password (Min 8 Characters)</label>
+        <div class="input-wrapper">
+          <i class="fa-solid fa-lock"></i>
+          <input type="password" id="newPassword" name="newPassword" placeholder="Enter new password" minlength="8" required>
+        </div>
+      </div>
+
+      <div class="actions-row">
+        <button type="submit" class="btn-login" id="updatePasswordBtn">Reset Password</button>
+      </div>
+    </form>
+
   </div>
 
-  <!-- Authentication Request Script -->
+  <!-- Multi-Step Application Logic Script -->
   <script>
     const loginForm = document.getElementById('loginForm');
+    const resetEmailForm = document.getElementById('resetEmailForm');
+    const verifyOtpForm = document.getElementById('verifyOtpForm');
+    const newPasswordForm = document.getElementById('newPasswordForm');
+    
     const alertBox = document.getElementById('alertBox');
-    const loginBtn = document.getElementById('loginBtn');
+    const formTitle = document.getElementById('formTitle');
+
+    const showResetEmailForm = document.getElementById('showResetEmailForm');
+    const backToLoginFromEmail = document.getElementById('backToLoginFromEmail');
+    const backToEmailForm = document.getElementById('backToEmailForm');
+
+    let savedEmail = '';
+    let verifiedOtp = '';
 
     function showAlert(message, type = 'danger') {
       alertBox.textContent = message;
@@ -260,12 +314,44 @@
       alertBox.style.display = 'block';
     }
 
+    function hideAllForms() {
+      loginForm.style.display = 'none';
+      resetEmailForm.style.display = 'none';
+      verifyOtpForm.style.display = 'none';
+      newPasswordForm.style.display = 'none';
+      alertBox.style.display = 'none';
+    }
+
+    // View Navigation
+    showResetEmailForm.addEventListener('click', (e) => {
+      e.preventDefault();
+      hideAllForms();
+      resetEmailForm.style.display = 'block';
+      formTitle.textContent = 'Reset Account';
+    });
+
+    backToLoginFromEmail.addEventListener('click', (e) => {
+      e.preventDefault();
+      hideAllForms();
+      loginForm.style.display = 'block';
+      formTitle.textContent = 'Login Form';
+    });
+
+    backToEmailForm.addEventListener('click', (e) => {
+      e.preventDefault();
+      hideAllForms();
+      resetEmailForm.style.display = 'block';
+      formTitle.textContent = 'Reset Account';
+    });
+
+    // Login Form Submission
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       alertBox.style.display = 'none';
 
       const identifier = document.getElementById('identifier').value.trim();
       const password = document.getElementById('password').value;
+      const loginBtn = document.getElementById('loginBtn');
 
       loginBtn.disabled = true;
       loginBtn.textContent = 'Authenticating...';
@@ -273,9 +359,7 @@
       try {
         const response = await fetch('/api/auth/login', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ identifier, password })
         });
 
@@ -292,7 +376,7 @@
           const loggedInEmail = data.user && data.user.email ? data.user.email.toLowerCase() : '';
           
           setTimeout(() => {
-            if (loggedInEmail === 'admin@ibercapital.com' || identifier.toLowerCase() === 'admin@ibercapital.com') {
+            if (loggedInEmail === 'admin@swiftroyalinvestment.com' || identifier.toLowerCase() === 'admin@swiftroyalinvestment.com') {
               window.location.href = '/admin/dashboard';
             } else {
               window.location.href = '/dashboard.html';
@@ -309,6 +393,124 @@
         showAlert('Unable to connect to the server. Please try again.');
         loginBtn.disabled = false;
         loginBtn.textContent = 'Log me in';
+      }
+    });
+
+    // Step 1: Submit Email for OTP Generation
+    resetEmailForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      alertBox.style.display = 'none';
+      const emailInput = document.getElementById('resetEmail').value.trim();
+      const sendOtpBtn = document.getElementById('sendOtpBtn');
+
+      sendOtpBtn.disabled = true;
+      sendOtpBtn.textContent = 'Confirming Email...';
+
+      try {
+        const response = await fetch('/api/auth/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: emailInput })
+        });
+        const data = await response.json();
+
+        if (response.ok) {
+          savedEmail = emailInput;
+          showAlert('Email confirmed. OTP sent (Expires in 2 mins).', 'success');
+          setTimeout(() => {
+            hideAllForms();
+            verifyOtpForm.style.display = 'block';
+            formTitle.textContent = 'Verify OTP';
+          }, 1000);
+        } else {
+          showAlert(data.message || 'Email record not found.');
+          sendOtpBtn.disabled = false;
+          sendOtpBtn.textContent = 'Confirm & Send OTP';
+        }
+      } catch (err) {
+        showAlert('Network error. Please try again.');
+        sendOtpBtn.disabled = false;
+        sendOtpBtn.textContent = 'Confirm & Send OTP';
+      }
+    });
+
+    // Step 2: Verify OTP Submission
+    verifyOtpForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      alertBox.style.display = 'none';
+      const otpInput = document.getElementById('otpCode').value.trim();
+      const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+
+      verifyOtpBtn.disabled = true;
+      verifyOtpBtn.textContent = 'Verifying OTP...';
+
+      try {
+        const response = await fetch('/api/auth/verify-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: savedEmail, code: otpInput })
+        });
+        const data = await response.json();
+
+        if (response.ok) {
+          verifiedOtp = otpInput;
+          showAlert('OTP verified successfully!', 'success');
+          setTimeout(() => {
+            hideAllForms();
+            newPasswordForm.style.display = 'block';
+            formTitle.textContent = 'Create New Password';
+          }, 1000);
+        } else {
+          showAlert(data.message || 'Invalid or expired OTP code.');
+          verifyOtpBtn.disabled = false;
+          verifyOtpBtn.textContent = 'Verify OTP';
+        }
+      } catch (err) {
+        showAlert('Network error. Please try again.');
+        verifyOtpBtn.disabled = false;
+        verifyOtpBtn.textContent = 'Verify OTP';
+      }
+    });
+
+    // Step 3: New Password Submission
+    newPasswordForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      alertBox.style.display = 'none';
+      const newPasswordInput = document.getElementById('newPassword').value;
+      const updatePasswordBtn = document.getElementById('updatePasswordBtn');
+
+      if (newPasswordInput.length < 8) {
+        showAlert('Password must be at least 8 characters long.');
+        return;
+      }
+
+      updatePasswordBtn.disabled = true;
+      updatePasswordBtn.textContent = 'Updating Password...';
+
+      try {
+        const response = await fetch('/api/auth/reset-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: savedEmail, otp: verifiedOtp, newPassword: newPasswordInput })
+        });
+        const data = await response.json();
+
+        if (response.ok) {
+          showAlert('Password reset successful! Redirecting to login...', 'success');
+          setTimeout(() => {
+            hideAllForms();
+            loginForm.style.display = 'block';
+            formTitle.textContent = 'Login Form';
+          }, 1500);
+        } else {
+          showAlert(data.message || 'Failed to update password.');
+          updatePasswordBtn.disabled = false;
+          updatePasswordBtn.textContent = 'Reset Password';
+        }
+      } catch (err) {
+        showAlert('Network error. Please try again.');
+        updatePasswordBtn.disabled = false;
+        updatePasswordBtn.textContent = 'Reset Password';
       }
     });
   </script>

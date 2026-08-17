@@ -1,4 +1,3 @@
-// config/db.js
 const mongoose = require('mongoose');
 const env = require('./env');
 
@@ -9,8 +8,8 @@ const connectDB = async () => {
     try {
         // Production connection options
         const options = {
-            serverSelectionTimeoutMS: 5000, // Timeout after 5 seconds if MongoDB is unreachable
-            socketTimeoutMS: 45000,          // Close inactive sockets after 45 seconds
+            serverSelectionTimeoutMS: 5000, 
+            socketTimeoutMS: 45000,          
         };
 
         const conn = await mongoose.connect(env.mongoUri, options);

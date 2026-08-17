@@ -2,10 +2,10 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 const jwt = require('jsonwebtoken');
-const User = require('../models/User'); // Adjust path to your User model
+const User = require('../models/User'); 
 
 // Hardcoded Single Admin Email
-const ADMIN_EMAIL = "admin@ibercapital.com"; // Replace with your exact admin email
+const ADMIN_EMAIL = "emmanuelbarasa168@gmail.com"; //admin
 
 // 1. JWT Authentication Middleware
 const verifyToken = (req, res, next) => {
@@ -37,7 +37,7 @@ const requireSingleAdmin = async (req, res, next) => {
 
     return res.status(403).json({ 
       success: false, 
-      message: 'Access Denied: You are not authorized to access the admin portal.' 
+      message: 'Access Denied: You are not authorized here.' 
     });
   } catch (err) {
     return res.status(500).json({ success: false, message: 'Security check failed.' });

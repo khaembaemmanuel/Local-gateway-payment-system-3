@@ -26,35 +26,54 @@ const authenticateToken = (req, res, next) => {
 };
 
 // ==========================================
-// 1. REGISTER USER
+// 1. REGISTER USER (With 18+ Age Validation)
 // ==========================================
-router.post('/register', async (req, res) => {
+router.post('/register', async (req, res, next) => {
   try {
     const { 
       firstName, 
       lastName, 
+      username,
       email, 
+      password, 
       country, 
-      phone, 
+      phoneNumber, 
       gender, 
       dob, 
       address, 
       accountType, 
-      currency, 
-      password 
+      currency 
     } = req.body;
 
-    const username = req.body.username || (email ? email.split('@')[0] : null);
+    const generatedUsername = username || (email ? email.split('@')[0] : null);
 
-    if (!firstName || !lastName || !email || !password || !accountType || !currency) {
+    if (!firstName || !lastName || !email || !password || !accountType || !currency || !dob) {
       return res.status(400).json({ 
         success: false, 
-        message: 'Please complete all required fields.' 
+        message: 'Please complete all required fields including date of birth.' 
       });
     }
 
+    // AGE VALIDATION (Enforcing minimum age requirement of 18 years old)
+    const dobDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - dobDate.getFullYear();
+    const monthDiff = today.getMonth() - dobDate.getMonth();
+
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dobDate.getDate())) {
+      age--;
+    }
+
+    if (age < 18) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'You must be at least 18 years old to register an account.' 
+      });
+    }
+
+    // Check if user already exists
     const existingUser = await User.findOne({ 
-      $or: [{ email: email.toLowerCase() }, { username }] 
+      $or: [{ email: email.toLowerCase() }, { username: generatedUsername }] 
     });
     
     if (existingUser) {
@@ -64,30 +83,35 @@ router.post('/register', async (req, res) => {
       });
     }
 
+    // Hash password securely
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const accountNumber = 'SRCB' + Math.floor(100000 + Math.random() * 900000);
+    // Generate unique account number
+    const accountNumber = 'SRCB' + Math.floor(1000000000 + Math.random() * 9000000000);
 
+    // Create and save new user
     const newUser = new User({
       firstName,
       lastName,
-      username,
+      username: generatedUsername,
       email: email.toLowerCase(),
       password: hashedPassword,
       country: country || null,
-      phoneNumber: phone || req.body.phoneNumber || null,
+      phoneNumber: phoneNumber || req.body.phone || null,
       gender: gender || null,
-      dob: dob || null,
+      dob: dobDate,
       address: address || null,
       accountNumber,
       accountType: accountType || 'Savings',
       currency: currency || 'USD',
-      balance: 0.00
+      balance: 0.00,
+      role: 'USER'
     });
 
     await newUser.save();
 
+    // Generate JWT token upon successful registration
     const token = jwt.sign(
       { userId: newUser._id, accountNumber: newUser.accountNumber, role: newUser.role },
       env.jwtSecret || process.env.JWT_SECRET,
@@ -105,22 +129,23 @@ router.post('/register', async (req, res) => {
     };
 
     res.status(201).json({ 
-      success: true,
-      message: 'Account created successfully', 
+      success: true, 
+      message: 'Registration successful!', 
       token,
+      accountNumber,
       user: userPayload,
       account: userPayload
     });
   } catch (err) {
     console.error('Registration Error:', err);
-    res.status(500).json({ success: false, message: 'Server error', error: err.message });
+    next(err);
   }
 });
 
 // ==========================================
-// 2. DIRECT SINGLE-STEP LOGIN (NO OTP)
+// 2. DIRECT LOGIN ROUTE (With Deactivation Check)
 // ==========================================
-router.post('/login', async (req, res) => {
+router.post('/login', async (req, res, next) => {
   try {
     const { identifier, password } = req.body;
 
@@ -141,14 +166,13 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid credentials' });
     }
 
-    // --- NEW: BLOCK DEACTIVATED ACCOUNTS ---
+    // Block deactivated accounts
     if (user.status === 'deactivated' || user.isDeactivated === true) {
       return res.status(403).json({ 
         success: false, 
         message: 'Your account has been deactivated by the bank administrator. Please contact support.' 
       });
     }
-    // ---------------------------------------
 
     const token = jwt.sign(
       { userId: user._id, accountNumber: user.accountNumber, role: user.role },
@@ -175,14 +199,14 @@ router.post('/login', async (req, res) => {
     });
   } catch (err) {
     console.error('Login Error:', err);
-    res.status(500).json({ success: false, message: 'Server error', error: err.message });
+    next(err);
   }
 });
 
 // ==========================================
 // 3. FETCH USER PROFILE (/me)
 // ==========================================
-router.get('/me', authenticateToken, async (req, res) => {
+router.get('/me', authenticateToken, async (req, res, next) => {
   try {
     const user = await User.findById(req.userId).select('-password -otp');
     if (!user) {
@@ -202,14 +226,14 @@ router.get('/me', authenticateToken, async (req, res) => {
       }
     });
   } catch (err) {
-    res.status(500).json({ success: false, message: 'Server error', error: err.message });
+    next(err);
   }
 });
 
 // ==========================================
 // 4. DEPOSIT FUNDS
 // ==========================================
-router.post('/deposit', authenticateToken, async (req, res) => {
+router.post('/deposit', authenticateToken, async (req, res, next) => {
   try {
     const { amount } = req.body;
     const numericAmount = parseFloat(amount);
@@ -232,14 +256,14 @@ router.post('/deposit', authenticateToken, async (req, res) => {
       newBalance: user.balance
     });
   } catch (err) {
-    res.status(500).json({ success: false, message: 'Server error', error: err.message });
+    next(err);
   }
 });
 
 // ==========================================
 // 5. WITHDRAW FUNDS
 // ==========================================
-router.post('/withdraw', authenticateToken, async (req, res) => {
+router.post('/withdraw', authenticateToken, async (req, res, next) => {
   try {
     const { amount } = req.body;
     const numericAmount = parseFloat(amount);
@@ -266,7 +290,132 @@ router.post('/withdraw', authenticateToken, async (req, res) => {
       newBalance: user.balance
     });
   } catch (err) {
-    res.status(500).json({ success: false, message: 'Server error', error: err.message });
+    next(err);
+  }
+});
+
+// ==========================================
+// 6. FORGOT PASSWORD ROUTE (2-minute OTP)
+// ==========================================
+router.post('/forgot-password', async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({ success: false, message: 'Email is required' });
+    }
+
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
+    
+    // Explicitly check if user exists and return an error if not found
+    if (!user) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'User email not found' 
+      });
+    }
+
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 2 * 60 * 1000); // 2 minutes
+
+    user.otp = {
+      code: otpCode,
+      expiresAt: expiresAt,
+      isVerified: false
+    };
+    
+    user.resetOtp = otpCode;
+    user.resetOtpExpire = expiresAt;
+    
+    await user.save();
+
+    console.log(`[OTP SYSTEM] Password Reset OTP for ${email}: ${otpCode}`);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Password reset OTP sent to your email. It will expire in 2 minutes.'
+    });
+
+  } catch (err) {
+    next(err);
+  }
+});
+// ==========================================
+// 7. VERIFY OTP ROUTE
+// ==========================================
+router.post('/verify-otp', async (req, res, next) => {
+  try {
+    const { email, code } = req.body;
+
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
+    const isValidCode = (user && user.otp && user.otp.code === code) || (user && user.resetOtp === code);
+    
+    if (!user || !isValidCode) {
+      return res.status(400).json({ success: false, message: 'Invalid OTP code.' });
+    }
+
+    const expirationTime = user.otp?.expiresAt || user.resetOtpExpire;
+    if (expirationTime && Date.now() > new Date(expirationTime).getTime()) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'OTP has expired. Please request a new one.' 
+      });
+    }
+
+    if (user.otp) {
+      user.otp.isVerified = true;
+    }
+    await user.save();
+
+    return res.status(200).json({ 
+      success: true, 
+      message: 'OTP verified successfully. You can now reset your password.' 
+    });
+
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ==========================================
+// 8. RESET PASSWORD ROUTE (Min 8 characters)
+// ==========================================
+router.post('/reset-password', async (req, res, next) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+
+    if (!newPassword || newPassword.length < 8) {
+      return res.status(400).json({ success: false, message: 'Password must be at least 8 characters long.' });
+    }
+
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
+    const isValidCode = (user && user.otp && user.otp.code === otp) || (user && user.resetOtp === otp);
+    
+    if (!user || !isValidCode) {
+      return res.status(400).json({ success: false, message: 'Invalid session or OTP code.' });
+    }
+
+    const expirationTime = user.otp?.expiresAt || user.resetOtpExpire;
+    if (expirationTime && Date.now() > new Date(expirationTime).getTime()) {
+      return res.status(400).json({ success: false, message: 'Session expired. Please restart the reset process.' });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+
+    user.otp = { code: null, expiresAt: null, isVerified: false };
+    user.resetOtp = undefined;
+    user.resetOtpExpire = undefined;
+
+    await user.save();
+
+    return res.status(200).json({ 
+      success: true, 
+      message: 'Password reset successful! You can now log in with your new password.' 
+    });
+
+  } catch (err) {
+    next(err);
   }
 });
 

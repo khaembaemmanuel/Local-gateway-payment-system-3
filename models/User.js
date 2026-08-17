@@ -53,7 +53,6 @@ const userSchema = new mongoose.Schema({
         const today = new Date();
         const birthDate = new Date(v);
         
-        // Calculate exact age
         let age = today.getFullYear() - birthDate.getFullYear();
         const monthDifference = today.getMonth() - birthDate.getMonth();
         
@@ -100,15 +99,26 @@ const userSchema = new mongoose.Schema({
     code: { type: String, default: null },
     expiresAt: { type: Date, default: null },
     isVerified: { type: Boolean, default: false }
+  },
+  // Password Reset Fields (2-Minute OTP Workflow)
+  resetOtp: { 
+    type: String, 
+    default: null 
+  },
+  resetOtpExpire: { 
+    type: Date, 
+    default: null 
   }
 }, { 
   timestamps: true 
 });
 
-// Security feature: Automatically remove the password hash whenever user data is sent as JSON
+// Security feature: Automatically remove sensitive data hashes whenever user data is sent as JSON
 userSchema.methods.toJSON = function () {
   const userObject = this.toObject();
   delete userObject.password;
+  delete userObject.resetOtp;
+  delete userObject.resetOtpExpire;
   return userObject;
 };
 
