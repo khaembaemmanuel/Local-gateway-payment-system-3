@@ -441,8 +441,6 @@
         const data = await response.json();
 
         if (response.ok) {
-          showAlert('Login successful! Redirecting...', 'success');
-          
           if (data.token) {
             localStorage.setItem('authToken', data.token);
             localStorage.setItem('token', data.token);
@@ -450,13 +448,12 @@
 
           const loggedInEmail = data.user && data.user.email ? data.user.email.toLowerCase() : '';
           
-          setTimeout(() => {
-            if (loggedInEmail === 'admin@swiftroyalinvestment.com' || identifier.toLowerCase() === 'admin@swiftroyalinvestment.com') {
-              window.location.href = '/admin/dashboard';
-            } else {
-              window.location.href = '/dashboard.html';
-            }
-          }, 1200);
+          // Instant redirect without setTimeout delays
+          if (loggedInEmail === 'admin@swiftroyalinvestment.com' || identifier.toLowerCase() === 'admin@swiftroyalinvestment.com') {
+            window.location.href = '/admin/dashboard';
+          } else {
+            window.location.href = '/dashboard.html';
+          }
 
         } else {
           showAlert(data.message || 'Invalid username or password.');

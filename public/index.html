@@ -18,6 +18,7 @@
 <link href="/css/bootstrap.css" rel="stylesheet">
 <link href="/css/style.css" rel="stylesheet">
 <link href="/css/responsive.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <link rel="shortcut icon" href="/images/favicon.png" type="image/x-icon">
 <link rel="icon" href="/images/favicon.png" type="image/x-icon">
@@ -29,6 +30,9 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 
+<!-- Google reCAPTCHA API Script -->
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
 <!--[if lt IE 9]><script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script><![endif]-->
 <!--[if lt IE 9]><script src="js/respond.js"></script><![endif]-->
 </head>
@@ -37,13 +41,101 @@
         body h1{
             font-family: 'Saira' , serif;
         }
+
+        /* Security Gate reCAPTCHA Overlay */
+        .security-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 23, 42, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            padding: 20px;
+        }
+
+        .security-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 420px;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            font-family: 'Saira', sans-serif;
+        }
+
+        .security-card h3 {
+            color: #1a365d;
+            font-size: 20px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .security-card p {
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .recaptcha-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .btn-verify {
+            background-color: #003366;
+            color: #ffffff;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-verify:hover {
+            background-color: #002244;
+        }
+
+        .security-error {
+            color: #dc2626;
+            font-size: 12px;
+            margin-bottom: 12px;
+            display: none;
+        }
     </style>
+
+    <!-- Pre-load Security Gate reCAPTCHA Overlay -->
+    <div id="securityOverlay" class="security-overlay">
+        <div class="security-card">
+            <i class="fa-solid fa-shield-halved" style="color: #0b3c7b; font-size: 35px; margin-bottom: 10px;"></i>
+            <h3>Security Verification</h3>
+            <p>Please prove you are human before entering Swift Royal Investment Bank.</p>
+            
+            <form id="captchaForm" onsubmit="handleCaptchaSubmit(event)">
+                <!-- Google reCAPTCHA Widget  -->
+                <div class="recaptcha-container">
+                    <div class="g-recaptcha" data-sitekey="6LcWJIwtAAAAAMige81HZ-jAqmxMYqbCKJuHa_tI" data-callback="onCaptchaSuccess"></div>
+                </div>
+                
+                <div id="securityError" class="security-error">Please complete the CAPTCHA verification.</div>
+                <button type="submit" id="verifyBtn" class="btn-verify">Continue to Website</button>
+            </form>
+        </div>
+    </div>
 
     <div class="page-wrapper">
          
         <!-- Preloader -->
-       <!-- Preloader Markup -->
-<<script src="preloader.js" defer></script>
+        <!-- Preloader Markup -->
+        <script src="preloader.js" defer></script>
          
         <!-- Main Header-->
         <header class="main-header">
@@ -274,11 +366,6 @@
                     </p> 
                     </div>
                     <div class="question">For Enquiry<a href="#"></a> <strong></strong> <span class="or">Email:</span> info@swiftroyalinvestment.com</div>
-                    <!-- <div class="signature">
-                        <div class="signature-img"><img src="images/icons/signature.png" alt=""/></div>
-                        <h5>Natalia Duke</h5>
-                        <div class="designation">(Chairman )</div>
-                    </div> -->
                 </div>
             </div>
             
@@ -572,9 +659,6 @@
 </section>
 <!-- End News Section -->
 
-
-
-
 <!--Main Footer-->
 <footer class="main-footer">
     <div class="auto-container">
@@ -666,18 +750,6 @@
                     <div class="copyright">2023 &copy; All rights reserved<a href="#"> Swift Royal Capital Bank</a></div>
                 </div>
                 
-                <!-- Social Column -->
-                <!-- <div class="social-column col-lg-6 col-md-6 col-sm-12">
-                    <ul>
-                        <li class="follow">Follow us: </li>
-                        <li><a href="#"><span class="fa fa-facebook-square"></span></a></li>
-                        <li><a href="#"><span class="fa fa-twitter-square"><span></span></a></li>
-                        <li><a href="#"><span class="fa fa-linkedin-square"></span></a></li>
-                        <li><a href="#"><span class="fa fa-google-plus-square"></span></a></li>
-                        <li><a href="#"><span class="fa fa-rss-square"></span></a></li>
-                    </ul>
-                </div> -->
-                
             </div>
         </div>
     </div>
@@ -696,5 +768,57 @@
 <script src="/js/wow.js"></script>
 <script src="/js/jquery-ui.js"></script>
 <script src="/js/main.js"></script>
+
+<script>
+    const securityOverlay = document.getElementById('securityOverlay');
+    const securityError = document.getElementById('securityError');
+    let captchaPassed = false;
+
+    // Check if user already passed verification during this session
+    if (sessionStorage.getItem('humanVerified') === 'true') {
+        securityOverlay.style.display = 'none';
+    }
+
+    // Triggered by Google reCAPTCHA when successfully completed
+    function onCaptchaSuccess(token) {
+        captchaPassed = true;
+        securityError.style.display = 'none';
+    }
+
+    function handleCaptchaSubmit(event) {
+        event.preventDefault();
+
+        if (!captchaPassed) {
+            securityError.style.display = 'block';
+            return;
+        }
+
+        const token = grecaptcha.getResponse();
+
+        // Send token to backend endpoint for verification
+        fetch('/verify-captcha', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                sessionStorage.setItem('humanVerified', 'true');
+                securityOverlay.style.display = 'none';
+            } else {
+                securityError.innerText = "Verification failed. Please try again.";
+                securityError.style.display = 'block';
+                grecaptcha.reset();
+                captchaPassed = false;
+            }
+        })
+        .catch(error => {
+            console.error('Error verifying CAPTCHA:', error);
+            securityError.innerText = "Network error during verification.";
+            securityError.style.display = 'block';
+        });
+    }
+</script>
 </body>
 </html>
