@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 const User = require('../models/User');
 const env = require('../config/env');
 
@@ -329,7 +330,26 @@ router.post('/forgot-password', async (req, res, next) => {
     
     await user.save();
 
-    console.log(`[OTP SYSTEM] Password Reset OTP for ${email}: ${otpCode}`);
+    // ==========================================
+    // SEND REAL EMAIL VIA NODEMAILER
+    // ==========================================
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER, // Reads from your cloud environment variables
+        pass: process.env.EMAIL_PASS  // Reads your 16-character App Password
+      }
+    });
+
+    const mailOptions = {
+      from: `"Swift Royal Capital Bank" <${process.env.EMAIL_USER}>`,
+      to: user.email,
+      subject: 'Password Reset Verification Code',
+      text: `Hello ${user.firstName || 'Client'},\n\nYour password reset OTP code is: ${otpCode}\n\nThis code will expire in 2 minutes. If you did not request this, please ignore this email.\n\nRegards,\nSwift Royal Capital Bank`
+    };
+
+    await transporter.sendMail(mailOptions);
+    // ==========================================
 
     return res.status(200).json({
       success: true,
@@ -337,7 +357,8 @@ router.post('/forgot-password', async (req, res, next) => {
     });
 
   } catch (err) {
-    next(err);
+    console.error('Email Dispatch Error:', err);
+    return res.status(500).json({ success: false, message: 'Failed to send OTP email. Please try again later.' });
   }
 });
 // ==========================================

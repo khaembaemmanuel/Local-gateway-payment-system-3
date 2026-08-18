@@ -5,10 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login | Swift Royal Capital Bank</title>
 
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Saira:wght@400;500;600;700&display=swap" rel="stylesheet">
   
-  <!-- FontAwesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
@@ -120,6 +118,19 @@
       color: #94a3b8;
     }
 
+    /* Timer Display Style */
+    .timer-display {
+      font-size: 13px;
+      font-weight: 600;
+      color: #dc2626;
+      margin-top: 6px;
+      text-align: right;
+    }
+
+    .timer-display.expired {
+      color: #64748b;
+    }
+
     /* Action Buttons Row */
     .actions-row {
       display: flex;
@@ -143,6 +154,11 @@
 
     .btn-login:hover {
       background-color: #002244;
+    }
+
+    .btn-login:disabled {
+      background-color: #94a3b8;
+      cursor: not-allowed;
     }
 
     .reset-link {
@@ -198,26 +214,21 @@
 
   <div class="login-container">
     
-    <!-- Bank Name Header -->
     <div class="bank-title">Swift Royal Capital Bank</div>
 
-    <!-- Logo -->
     <div class="logo-container">
       <a href="/index.html">
         <img src="/images/logo-blue.png" alt="Swift Royal Capital Bank Logo" onerror="this.style.display='none'">
       </a>
     </div>
 
-    <!-- Title -->
     <div class="login-header">
       <h2 id="formTitle">Login Form</h2>
       <div class="accent-bar"></div>
     </div>
 
-    <!-- Feedback Message Box -->
     <div id="alertBox" class="alert-message"></div>
 
-    <!-- 1. Login Form -->
     <form id="loginForm">
       <div class="form-group">
         <label for="identifier">Username/Email</label>
@@ -242,7 +253,6 @@
       </div>
     </form>
 
-    <!-- 2. Step 1: Reset Email Form -->
     <form id="resetEmailForm" style="display: none;">
       <div class="form-group">
         <label for="resetEmail">Registered Email</label>
@@ -258,23 +268,23 @@
       </div>
     </form>
 
-    <!-- 3. Step 2: OTP Verification Form -->
     <form id="verifyOtpForm" style="display: none;">
       <div class="form-group">
-        <label for="otpCode">Enter OTP (Expires in 2 mins)</label>
+        <label for="otpCode">Enter 6-digit OTP</label>
         <div class="input-wrapper">
           <i class="fa-solid fa-shield-keyhole"></i>
           <input type="text" id="otpCode" name="otpCode" placeholder="Enter 6-digit OTP" maxlength="6" required>
         </div>
+        <div id="otpTimer" class="timer-display">Code expires in: <span id="timeRemaining">02:00</span></div>
       </div>
 
       <div class="actions-row">
         <button type="submit" class="btn-login" id="verifyOtpBtn">Verify OTP</button>
+        <a href="#" id="resendOtpLink" class="reset-link" style="display: none;">Resend OTP</a>
         <a href="#" id="backToEmailForm" class="reset-link">Back</a>
       </div>
     </form>
 
-    <!-- 4. Step 3: New Password Form -->
     <form id="newPasswordForm" style="display: none;">
       <div class="form-group">
         <label for="newPassword">New Password (Min 8 Characters)</label>
@@ -291,7 +301,6 @@
 
   </div>
 
-  <!-- Multi-Step Application Logic Script -->
   <script>
     const loginForm = document.getElementById('loginForm');
     const resetEmailForm = document.getElementById('resetEmailForm');
@@ -304,9 +313,15 @@
     const showResetEmailForm = document.getElementById('showResetEmailForm');
     const backToLoginFromEmail = document.getElementById('backToLoginFromEmail');
     const backToEmailForm = document.getElementById('backToEmailForm');
+    const resendOtpLink = document.getElementById('resendOtpLink');
+
+    const timeRemainingSpan = document.getElementById('timeRemaining');
+    const otpTimerBox = document.getElementById('otpTimer');
+    const verifyOtpBtn = document.getElementById('verifyOtpBtn');
 
     let savedEmail = '';
     let verifiedOtp = '';
+    let countdownInterval = null;
 
     function showAlert(message, type = 'danger') {
       alertBox.textContent = message;
@@ -320,6 +335,38 @@
       verifyOtpForm.style.display = 'none';
       newPasswordForm.style.display = 'none';
       alertBox.style.display = 'none';
+      if (countdownInterval) clearInterval(countdownInterval);
+    }
+
+    // Start 2-minute countdown timer function
+    function startOtpTimer() {
+      if (countdownInterval) clearInterval(countdownInterval);
+      
+      let totalSeconds = 120; // 2 minutes
+      verifyOtpBtn.disabled = false;
+      resendOtpLink.style.display = 'none';
+      otpTimerBox.classList.remove('expired');
+
+      countdownInterval = setInterval(() => {
+        let minutes = Math.floor(totalSeconds / 60);
+        let seconds = totalSeconds % 60;
+
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        seconds = seconds < 10 ? '0' + seconds : seconds;
+
+        timeRemainingSpan.textContent = `${minutes}:${seconds}`;
+
+        if (totalSeconds <= 0) {
+          clearInterval(countdownInterval);
+          timeRemainingSpan.textContent = 'Expired';
+          otpTimerBox.classList.add('expired');
+          verifyOtpBtn.disabled = true;
+          showAlert('OTP has expired. Please click Resend OTP.', 'danger');
+          resendOtpLink.style.display = 'inline';
+        }
+
+        totalSeconds--;
+      }, 1000);
     }
 
     // View Navigation
@@ -342,6 +389,34 @@
       hideAllForms();
       resetEmailForm.style.display = 'block';
       formTitle.textContent = 'Reset Account';
+    });
+
+    // Handle Resend OTP Click
+    resendOtpLink.addEventListener('click', async (e) => {
+      e.preventDefault();
+      alertBox.style.display = 'none';
+      resendOtpLink.textContent = 'Resending...';
+
+      try {
+        const response = await fetch('/api/auth/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: savedEmail })
+        });
+        const data = await response.json();
+
+        if (response.ok) {
+          showAlert('A new OTP has been sent to your email.', 'success');
+          resendOtpLink.textContent = 'Resend OTP';
+          startOtpTimer(); // Restart the 2-minute timer
+        } else {
+          showAlert(data.message || 'Failed to resend OTP.');
+          resendOtpLink.textContent = 'Resend OTP';
+        }
+      } catch (err) {
+        showAlert('Network error. Please try again.');
+        resendOtpLink.textContent = 'Resend OTP';
+      }
     });
 
     // Login Form Submission
@@ -421,6 +496,7 @@
             hideAllForms();
             verifyOtpForm.style.display = 'block';
             formTitle.textContent = 'Verify OTP';
+            startOtpTimer(); // Start timer once OTP form displays
           }, 1000);
         } else {
           showAlert(data.message || 'Email record not found.');
@@ -439,7 +515,6 @@
       e.preventDefault();
       alertBox.style.display = 'none';
       const otpInput = document.getElementById('otpCode').value.trim();
-      const verifyOtpBtn = document.getElementById('verifyOtpBtn');
 
       verifyOtpBtn.disabled = true;
       verifyOtpBtn.textContent = 'Verifying OTP...';
@@ -453,6 +528,7 @@
         const data = await response.json();
 
         if (response.ok) {
+          if (countdownInterval) clearInterval(countdownInterval);
           verifiedOtp = otpInput;
           showAlert('OTP verified successfully!', 'success');
           setTimeout(() => {
