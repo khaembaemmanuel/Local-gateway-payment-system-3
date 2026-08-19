@@ -1,11 +1,9 @@
-
 const axios = require('axios');
 const env = require('./env');
 
 const BASE_URL = env.mpesa.baseUrl;
 
 /**
- 
  * @returns {Promise<string>} Bearer Access Token
  */
 const getOAuthToken = async () => {
@@ -27,13 +25,12 @@ const getOAuthToken = async () => {
 
     return response.data.access_token;
   } catch (err) {
-    console.error('[Daraja OAuth Error]', err.response?.data || err.message);
+    console.error('[Daraja OAuth Error Details]:', JSON.stringify(err.response?.data || err.message, null, 2));
     throw new Error('Failed to authenticate with Safaricom Daraja API');
   }
 };
 
 /**
- 
  * @returns {{ password: string, timestamp: string, shortCode: string }}
  */
 const generateStkPassword = () => {
