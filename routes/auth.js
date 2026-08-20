@@ -89,7 +89,7 @@ router.post('/register', async (req, res, next) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // Generate unique account number
-    const accountNumber = 'SRCB' + Math.floor(1000000000 + Math.random() * 9000000000);
+    const accountNumber = 'SRIB' + Math.floor(1000000000 + Math.random() * 9000000000);
 
     // Create and save new user
     const newUser = new User({

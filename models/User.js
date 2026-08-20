@@ -60,10 +60,10 @@ const userSchema = new mongoose.Schema({
           age--;
         }
         
-        // Enforce minimum age requirement of 23 years old
-        return age >= 23;
+        // Enforce minimum age requirement of 18 years old
+        return age >= 18;
       },
-      message: 'You must be at least 23 years old to register an account.'
+      message: 'You must be at least 18 years old to register an account.'
     }
   },
   address: { 
@@ -92,8 +92,10 @@ const userSchema = new mongoose.Schema({
   },
   role: { 
     type: String, 
-    enum: ['USER', 'ADMIN'], 
-    default: 'USER' 
+    enum: ['USER', 'ADMIN', 'SUPERADMIN'], 
+    default: 'USER',
+    uppercase: true,
+    trim: true
   },
   otp: {
     code: { type: String, default: null },

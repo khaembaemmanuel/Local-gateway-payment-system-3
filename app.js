@@ -6,9 +6,10 @@ const path = require('path');
 const axios = require('axios');
 const connectDB = require('./config/db');
 const PORT = process.env.PORT || 4000;
-
+const mongoSanitize = require('express-mongo-sanitize');
 // Initialize express app FIRST before using app.use()
 const app = express();
+app.use(mongoSanitize()); 
 
 // 1. Core Middlewares
 app.use(cors());

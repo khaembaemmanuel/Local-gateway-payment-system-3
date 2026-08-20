@@ -4,9 +4,6 @@ const path = require('path');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User'); 
 
-// Hardcoded Single Admin Email
-const ADMIN_EMAIL = "emmanuelbarasa168@gmail.com"; //admin
-
 // 1. JWT Authentication Middleware
 const verifyToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
@@ -25,19 +22,38 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-// 2. Strict Single Admin Guard Middleware
-const requireSingleAdmin = async (req, res, next) => {
+// 2. Standard Admin Guard Middleware (Allows ADMIN and SUPERADMIN)
+const requireAdmin = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id || req.user._id);
 
-    if (user && user.email === ADMIN_EMAIL) {
+    if (user && (user.role === 'ADMIN' || user.role === 'SUPERADMIN')) {
       req.adminUser = user;
       return next();
     }
 
     return res.status(403).json({ 
       success: false, 
-      message: 'Access Denied: You are not authorized here.' 
+      message: 'Access Denied: Administrator privileges required.' 
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: 'Security check failed.' });
+  }
+};
+
+// 3. Strict Super Admin Guard Middleware (Allows ONLY SUPERADMIN)
+const requireSuperAdmin = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id || req.user._id);
+
+    if (user && user.role === 'SUPERADMIN') {
+      req.adminUser = user;
+      return next();
+    }
+
+    return res.status(403).json({ 
+      success: false, 
+      message: 'Access Denied: Super Admin privileges required.' 
     });
   } catch (err) {
     return res.status(500).json({ success: false, message: 'Security check failed.' });
@@ -53,8 +69,53 @@ router.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, '../private/admin.html'));
 });
 
+// ==========================================
+// SUPER ADMIN MONITORING & MANAGEMENT ROUTES
+// ==========================================
+
+// GET ALL ADMIN ACCOUNTS (GET /admin/list-admins)
+router.get('/list-admins', verifyToken, requireSuperAdmin, async (req, res) => {
+  try {
+    const admins = await User.find({ role: { $in: ['ADMIN', 'SUPERADMIN'] } }).select('-password');
+    return res.json({ success: true, count: admins.length, admins });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: 'Failed to fetch admin accounts.' });
+  }
+});
+
+// PROMOTE OR DEMOTE USER ROLE (POST /admin/set-role)
+router.post('/set-role', verifyToken, requireSuperAdmin, async (req, res) => {
+  const { userId, role } = req.body; // role: 'USER', 'ADMIN', or 'SUPERADMIN'
+
+  const normalizedRole = role ? role.toUpperCase() : '';
+  if (!['USER', 'ADMIN', 'SUPERADMIN'].includes(normalizedRole)) {
+    return res.status(400).json({ success: false, message: 'Invalid role specified.' });
+  }
+
+  try {
+    const targetUser = await User.findById(userId);
+    if (!targetUser) {
+      return res.status(404).json({ success: false, message: 'Target user not found.' });
+    }
+
+    targetUser.role = normalizedRole;
+    await targetUser.save();
+
+    return res.json({ 
+      success: true, 
+      message: `User account ${targetUser.email} has been updated to role: ${normalizedRole}` 
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: 'Failed to update user role.' });
+  }
+});
+
+// ==========================================
+// STANDARD ADMIN & SUPER ADMIN MANAGEMENT ROUTES
+// ==========================================
+
 // GET TOTAL REGISTERED USERS COUNT (GET /admin/users/count)
-router.get('/users/count', verifyToken, requireSingleAdmin, async (req, res) => {
+router.get('/users/count', verifyToken, requireAdmin, async (req, res) => {
   try {
     const count = await User.countDocuments();
     return res.json({ success: true, count });
@@ -64,7 +125,7 @@ router.get('/users/count', verifyToken, requireSingleAdmin, async (req, res) => 
 });
 
 // SEARCH USER BY ACCOUNT NUMBER OR EMAIL (GET /admin/user/search?query=...)
-router.get('/user/search', verifyToken, requireSingleAdmin, async (req, res) => {
+router.get('/user/search', verifyToken, requireAdmin, async (req, res) => {
   const { query } = req.query;
 
   if (!query) {
@@ -90,7 +151,7 @@ router.get('/user/search', verifyToken, requireSingleAdmin, async (req, res) => 
 });
 
 // ADJUST BALANCE (ADD OR DEDUCT) (POST /admin/adjust-balance)
-router.post('/adjust-balance', verifyToken, requireSingleAdmin, async (req, res) => {
+router.post('/adjust-balance', verifyToken, requireAdmin, async (req, res) => {
   const { userId, amount, action } = req.body; // action: 'add' or 'deduct'
 
   const parsedAmount = parseFloat(amount);
@@ -129,7 +190,7 @@ router.post('/adjust-balance', verifyToken, requireSingleAdmin, async (req, res)
 });
 
 // TOGGLE ACCOUNT DEACTIVATION STATUS (POST /admin/toggle-status)
-router.post('/toggle-status', verifyToken, requireSingleAdmin, async (req, res) => {
+router.post('/toggle-status', verifyToken, requireAdmin, async (req, res) => {
   const { userId, status } = req.body; // status: 'active' or 'deactivated'
 
   if (!userId || !['active', 'deactivated'].includes(status)) {
@@ -157,7 +218,7 @@ router.post('/toggle-status', verifyToken, requireSingleAdmin, async (req, res) 
 });
 
 // DELETE USER ACCOUNT PERMANENTLY (DELETE /admin/delete-user/:userId)
-router.delete('/delete-user/:userId', verifyToken, requireSingleAdmin, async (req, res) => {
+router.delete('/delete-user/:userId', verifyToken, requireSuperAdmin, async (req, res) => {
   const { userId } = req.params;
 
   try {

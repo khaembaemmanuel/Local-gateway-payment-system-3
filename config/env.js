@@ -25,7 +25,7 @@ requiredKeys.forEach((key) => {
 const mpesaEnv = process.env.MPESA_ENV.toLowerCase();
 const mpesaBaseUrl = mpesaEnv === 'production'
   ? 'https://api.safaricom.co.ke'
-  : 'https://sandbox.safaricom.co.ke';
+
 
 module.exports = Object.freeze({
   port: process.env.PORT,

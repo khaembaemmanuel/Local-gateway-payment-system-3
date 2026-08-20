@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const env = require('./env');
 
-// Enforce strict query mode for consistent data filtering
+// data filtering
 mongoose.set('strictQuery', true);
 
 const connectDB = async () => {
@@ -15,7 +15,7 @@ const connectDB = async () => {
         const conn = await mongoose.connect(env.mongoUri, options);
         console.log(`✅ [Database] Connected to MongoDB: ${conn.connection.host}`);
 
-        // Listen for runtime connection events (critical for cloud monitoring)
+        // (critical for cloud monitoring)
         mongoose.connection.on('error', (err) => {
             console.error(`❌ [Database Runtime Error]: ${err.message}`);
         });
@@ -30,7 +30,6 @@ const connectDB = async () => {
 
     } catch (err) {
         console.error(`❌ [Database Connection Error]: ${err.message}`);
-        // Throw the error so server.js catches it and safely terminates startup
         throw err;
     }
 };

@@ -14,7 +14,7 @@ const transporter = nodemailer.createTransport({
  */
 const sendOtpEmail = async (toEmail, otpCode) => {
   const mailOptions = {
-    from: '"Swift Royal Capital Bank" <no-reply@swiftroyalbank.com>',
+    from: '"Swift Royal Investment Bank" <no-reply@swiftroyalbank.com>',
     to: toEmail,
     subject: 'Your Account Verification Code',
     html: `

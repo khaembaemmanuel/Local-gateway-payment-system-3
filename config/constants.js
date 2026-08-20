@@ -2,7 +2,6 @@ const ROLES = Object.freeze({
   USER: 'USER',
   ADMIN: 'ADMIN'
 });
-
 const TRANSACTION_TYPES = Object.freeze({
   DEPOSIT: 'Deposit',
   WITHDRAWAL: 'Withdrawal',
