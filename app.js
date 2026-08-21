@@ -7,25 +7,39 @@ const axios = require('axios');
 const connectDB = require('./config/db');
 const PORT = process.env.PORT || 4000;
 const mongoSanitize = require('express-mongo-sanitize');
+
 // Initialize express app FIRST before using app.use()
 const app = express();
-app.use(mongoSanitize()); 
 
 // 1. Core Middlewares
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Place mongoSanitize AFTER express.json() so req.body is parsed first
+app.use(mongoSanitize()); 
+
 // 2. Serve Static Frontend Files
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'private'))); // Added to support serving private files when explicitly routed
+
 app.get('/register.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'register.html'));
+});
+
+app.get('/login.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+app.get('/dashboard.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 
 // 3. API routers & Verification Endpoint
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/payment', require('./routes/payment'));
 app.use('/api/account', require('./routes/accountRouter'));
+
 // Mount Admin Routes (Handles /admin/dashboard, /admin/user/search, etc.)
 app.use('/admin', require('./routes/adminRouter'));
 
@@ -57,9 +71,6 @@ app.post('/verify-captcha', async (req, res) => {
 // 4. Root Endpoint / Health Check
 app.get('/health', (req, res) => {
   res.json({ success: true, status: 'UP', timestamp: new Date().toISOString() });
-});
-app.get('/login.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
 // 5. Global Error Handling Middleware
