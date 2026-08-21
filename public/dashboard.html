@@ -592,11 +592,28 @@
     box.style.display = 'block';
   }
 
+  // Client-side phone formatting helper function for 12-digit M-Pesa standard
+  function formatPhoneNumber(inputPhone) {
+    let cleaned = inputPhone.replace(/\D/g, '');
+
+    if (cleaned.startsWith('0') && cleaned.length === 10) {
+      cleaned = '254' + cleaned.substring(1);
+    } else if ((cleaned.startsWith('7') || cleaned.startsWith('1')) && cleaned.length === 9) {
+      cleaned = '254' + cleaned;
+    }
+
+    if (!/^254[17]\d{8}$/.test(cleaned)) {
+      throw new Error('Invalid phone number format. Please enter a valid Safaricom number (e.g., 0712345678).');
+    }
+
+    return cleaned;
+  }
+
   // Handle M-Pesa STK Push Deposit Submissions
   document.getElementById('depositForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const amount = parseFloat(document.getElementById('depositAmount').value);
-    const phone = document.getElementById('mpesaPhone').value.trim();
+    const rawPhone = document.getElementById('mpesaPhone').value.trim();
     const token = localStorage.getItem('token') || localStorage.getItem('authToken') || localStorage.getItem('srcb_token');
 
     const submitBtn = document.getElementById('depositSubmitBtn');
@@ -609,8 +626,11 @@
       return showAlert(alertId, 'Please enter a valid deposit amount.', 'danger');
     }
 
-    if (!phone) {
-      return showAlert(alertId, 'A valid M-Pesa phone number is required.', 'danger');
+    let formattedPhone;
+    try {
+      formattedPhone = formatPhoneNumber(rawPhone);
+    } catch (err) {
+      return showAlert(alertId, err.message, 'danger');
     }
 
     submitBtn.disabled = true;
@@ -623,7 +643,7 @@
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ amount, phone })
+        body: JSON.stringify({ amount, phone: formattedPhone })
       });
 
       const data = await response.json();
