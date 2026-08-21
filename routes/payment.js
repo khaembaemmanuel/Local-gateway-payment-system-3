@@ -84,7 +84,7 @@ router.post('/stk-push', auth, async (req, res) => {
 // ==========================================
 // 2. DYNAMIC M-PESA CALLBACK WEBHOOK
 // ==========================================
-router.post('/mpesa-callback', async (req, res) => {
+router.post('/callback', async (req, res) => {
   try {
     const { Body } = req.body;
     const stkCallback = Body.stkCallback;
