@@ -31,6 +31,15 @@ app.use(helmet({
   crossOriginEmbedderPolicy: false
 }));
 
+// Explicitly set Permissions-Policy header for A+ security rating
+app.use((req, res, next) => {
+  res.setHeader(
+    'Permissions-Policy',
+    'camera=(), microphone=(), geolocation=(), interest-cohort=()'
+  );
+  next();
+});
+
 // 2. Strict CORS Policy
 const allowedOrigins = [
   'https://infoswiftroyalinvestment.online',
@@ -156,7 +165,7 @@ connectDB()
     });
   })
   .catch((err) => {
-    console.err('❌ Failed to connect to MongoDB:', err.message);
+    console.error('❌ Failed to connect to MongoDB:', err.message);
     process.exit(1);
   });
 
