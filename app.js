@@ -6,7 +6,6 @@ const path = require('path');
 const axios = require('axios');
 const connectDB = require('./config/db');
 const PORT = process.env.PORT || 4000;
-const mongoSanitize = require('express-mongo-sanitize');
 
 // Initialize express app FIRST before using app.use()
 const app = express();
@@ -15,9 +14,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Place mongoSanitize AFTER express.json() so req.body is parsed first
-app.use(mongoSanitize()); 
 
 // 2. Serve Static Frontend Files
 app.use(express.static(path.join(__dirname, 'public')));
