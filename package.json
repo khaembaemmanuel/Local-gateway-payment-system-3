@@ -20,6 +20,7 @@
     "cloudinary": "^2.10.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
+    "country-list-with-dial-code-and-flag": "^5.1.1",
     "crypto-js": "^4.2.0",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
@@ -32,7 +33,6 @@
     "mongoose": "^9.7.4",
     "multer": "^2.2.0",
     "multer-storage-cloudinary": "^2.2.1",
-    "nodemailer": "^9.0.5",
-    "xss-clean": "^0.1.4"
+    "nodemailer": "^9.0.5"
   }
 }

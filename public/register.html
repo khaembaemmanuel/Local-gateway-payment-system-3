@@ -96,6 +96,42 @@
       transition: border-color 0.2s;
     }
 
+    /* Searchable Country Dropdown Styles */
+    .searchable-select-container {
+      position: relative;
+      width: 100%;
+    }
+
+    .country-dropdown-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      max-height: 200px;
+      overflow-y: auto;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-top: none;
+      border-radius: 0 0 4px 4px;
+      z-index: 1000;
+      display: none;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .country-option {
+      padding: 10px 14px;
+      font-size: 14px;
+      cursor: pointer;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .country-option:hover {
+      background-color: #f1f5f9;
+    }
+
     /* Phone Input Container */
     .phone-input-group {
       display: flex;
@@ -217,208 +253,14 @@
         <input type="email" id="email" name="email" placeholder="Your Email Address" required>
       </div>
 
-      <!-- Country of Origin -->
+      <!-- Country of Origin (Searchable with Flags) -->
       <div class="form-row">
-        <label for="country">Country of Origin</label>
-        <select id="country" name="country" required>
-          <option value="" disabled selected>Select Country</option>
-          <option value="AF" data-code="+93" data-currency="AFN" data-digits="9" data-placeholder="701234567">Afghanistan (+93)</option>
-          <option value="AL" data-code="+355" data-currency="EUR" data-digits="9" data-placeholder="681234567">Albania (+355)</option>
-          <option value="DZ" data-code="+213" data-currency="DZD" data-digits="9" data-placeholder="551234567">Algeria (+213)</option>
-          <option value="AD" data-code="+376" data-currency="EUR" data-digits="6" data-placeholder="312345">Andorra (+376)</option>
-          <option value="AO" data-code="+244" data-currency="AOA" data-digits="9" data-placeholder="923456789">Angola (+244)</option>
-          <option value="AG" data-code="+1-268" data-currency="XCD" data-digits="7" data-placeholder="7201234">Antigua and Barbuda (+1-268)</option>
-          <option value="AR" data-code="+54" data-currency="ARS" data-digits="10" data-placeholder="1112345678">Argentina (+54)</option>
-          <option value="AM" data-code="+374" data-currency="AMD" data-digits="8" data-placeholder="91234567">Armenia (+374)</option>
-          <option value="AU" data-code="+61" data-currency="AUD" data-digits="9" data-placeholder="412345678">Australia (+61)</option>
-          <option value="AT" data-code="+43" data-currency="EUR" data-digits="10" data-placeholder="6501234567">Austria (+43)</option>
-          <option value="AZ" data-code="+994" data-currency="AZN" data-digits="9" data-placeholder="401234567">Azerbaijan (+994)</option>
-          <option value="BS" data-code="+1-242" data-currency="BSD" data-digits="7" data-placeholder="3561234">Bahamas (+1-242)</option>
-          <option value="BH" data-code="+973" data-currency="BHD" data-digits="8" data-placeholder="39123456">Bahrain (+973)</option>
-          <option value="BD" data-code="+880" data-currency="BDT" data-digits="10" data-placeholder="1712345678">Bangladesh (+880)</option>
-          <option value="BB" data-code="+1-246" data-currency="BBD" data-digits="7" data-placeholder="2301234">Barbados (+1-246)</option>
-          <option value="BY" data-code="+375" data-currency="BYN" data-digits="9" data-placeholder="291234567">Belarus (+375)</option>
-          <option value="BE" data-code="+32" data-currency="EUR" data-digits="9" data-placeholder="470123456">Belgium (+32)</option>
-          <option value="BZ" data-code="+501" data-currency="BZD" data-digits="7" data-placeholder="6101234">Belize (+501)</option>
-          <option value="BJ" data-code="+229" data-currency="XOF" data-digits="8" data-placeholder="97012345">Benin (+229)</option>
-          <option value="BT" data-code="+975" data-currency="BTN" data-digits="8" data-placeholder="17123456">Bhutan (+975)</option>
-          <option value="BO" data-code="+591" data-currency="BOB" data-digits="8" data-placeholder="71234567">Bolivia (+591)</option>
-          <option value="BA" data-code="+387" data-currency="BAM" data-digits="8" data-placeholder="61123456">Bosnia and Herzegovina (+387)</option>
-          <option value="BW" data-code="+267" data-currency="BWP" data-digits="8" data-placeholder="71234567">Botswana (+267)</option>
-          <option value="BR" data-code="+55" data-currency="BRL" data-digits="11" data-placeholder="11912345678">Brazil (+55)</option>
-          <option value="BN" data-code="+673" data-currency="BND" data-digits="7" data-placeholder="8123456">Brunei (+673)</option>
-          <option value="BG" data-code="+359" data-currency="BGN" data-digits="9" data-placeholder="871234567">Bulgaria (+359)</option>
-          <option value="BF" data-code="+226" data-currency="XOF" data-digits="8" data-placeholder="70123456">Burkina Faso (+226)</option>
-          <option value="BI" data-code="+257" data-currency="BIF" data-digits="8" data-placeholder="79123456">Burundi (+257)</option>
-          <option value="CV" data-code="+238" data-currency="CVE" data-digits="7" data-placeholder="9912345">Cabo Verde (+238)</option>
-          <option value="KH" data-code="+855" data-currency="KHR" data-digits="9" data-placeholder="123456789">Cambodia (+855)</option>
-          <option value="CM" data-code="+237" data-currency="XAF" data-digits="9" data-placeholder="671234567">Cameroon (+237)</option>
-          <option value="CA" data-code="+1" data-currency="CAD" data-digits="10" data-placeholder="4161234567">Canada (+1)</option>
-          <option value="CF" data-code="+236" data-currency="XAF" data-digits="8" data-placeholder="70123456">Central African Republic (+236)</option>
-          <option value="TD" data-code="+235" data-currency="XAF" data-digits="8" data-placeholder="63123456">Chad (+235)</option>
-          <option value="CL" data-code="+56" data-currency="CLP" data-digits="9" data-placeholder="912345678">Chile (+56)</option>
-          <option value="CN" data-code="+86" data-currency="CNY" data-digits="11" data-placeholder="13812345678">China (+86)</option>
-          <option value="CO" data-code="+57" data-currency="COP" data-digits="10" data-placeholder="3001234567">Colombia (+57)</option>
-          <option value="KM" data-code="+269" data-currency="KMF" data-digits="7" data-placeholder="3212345">Comoros (+269)</option>
-          <option value="CG" data-code="+242" data-currency="XAF" data-digits="9" data-placeholder="061234567">Congo (+242)</option>
-          <option value="CD" data-code="+243" data-currency="CDF" data-digits="9" data-placeholder="812345678">Congo (Democratic Republic) (+243)</option>
-          <option value="CR" data-code="+506" data-currency="CRC" data-digits="8" data-placeholder="81234567">Costa Rica (+506)</option>
-          <option value="CI" data-code="+225" data-currency="XOF" data-digits="10" data-placeholder="0712345678">Cote d'Ivoire (+225)</option>
-          <option value="HR" data-code="+385" data-currency="EUR" data-digits="9" data-placeholder="911234567">Croatia (+385)</option>
-          <option value="CU" data-code="+53" data-currency="CUP" data-digits="8" data-placeholder="52123456">Cuba (+53)</option>
-          <option value="CY" data-code="+357" data-currency="EUR" data-digits="8" data-placeholder="99123456">Cyprus (+357)</option>
-          <option value="CZ" data-code="+420" data-currency="CZK" data-digits="9" data-placeholder="601123456">Czech Republic (+420)</option>
-          <option value="DK" data-code="+45" data-currency="DKK" data-digits="8" data-placeholder="12345678">Denmark (+45)</option>
-          <option value="DJ" data-code="+253" data-currency="DJF" data-digits="8" data-placeholder="77123456">Djibouti (+253)</option>
-          <option value="DM" data-code="+1-767" data-currency="XCD" data-digits="7" data-placeholder="2451234">Dominica (+1-767)</option>
-          <option value="DO" data-code="+1-809" data-currency="DOP" data-digits="10" data-placeholder="8091234567">Dominican Republic (+1-809)</option>
-          <option value="EC" data-code="+593" data-currency="USD" data-digits="9" data-placeholder="991234567">Ecuador (+593)</option>
-          <option value="EG" data-code="+20" data-currency="EGP" data-digits="10" data-placeholder="1012345678">Egypt (+20)</option>
-          <option value="SV" data-code="+503" data-currency="USD" data-digits="8" data-placeholder="71234567">El Salvador (+503)</option>
-          <option value="GQ" data-code="+240" data-currency="XAF" data-digits="9" data-placeholder="222123456">Equatorial Guinea (+240)</option>
-          <option value="ER" data-code="+291" data-currency="ERN" data-digits="7" data-placeholder="7123456">Eritrea (+291)</option>
-          <option value="EE" data-code="+372" data-currency="EUR" data-digits="8" data-placeholder="51234567">Estonia (+372)</option>
-          <option value="SZ" data-code="+268" data-currency="SZL" data-digits="8" data-placeholder="76123456">Eswatini (+268)</option>
-          <option value="ET" data-code="+251" data-currency="ETB" data-digits="9" data-placeholder="911234567">Ethiopia (+251)</option>
-          <option value="FJ" data-code="+679" data-currency="FJD" data-digits="7" data-placeholder="9212345">Fiji (+679)</option>
-          <option value="FI" data-code="+358" data-currency="EUR" data-digits="10" data-placeholder="401234567">Finland (+358)</option>
-          <option value="FR" data-code="+33" data-currency="EUR" data-digits="9" data-placeholder="612345678">France (+33)</option>
-          <option value="GA" data-code="+241" data-currency="XAF" data-digits="7" data-placeholder="0612345">Gabon (+241)</option>
-          <option value="GM" data-code="+220" data-currency="GMD" data-digits="7" data-placeholder="7012345">Gambia (+220)</option>
-          <option value="GE" data-code="+995" data-currency="GEL" data-digits="9" data-placeholder="551123456">Georgia (+995)</option>
-          <option value="DE" data-code="+49" data-currency="EUR" data-digits="11" data-placeholder="15123456789">Germany (+49)</option>
-          <option value="GH" data-code="+233" data-currency="GHS" data-digits="9" data-placeholder="241234567">Ghana (+233)</option>
-          <option value="GR" data-code="+30" data-currency="EUR" data-digits="10" data-placeholder="6912345678">Greece (+30)</option>
-          <option value="GD" data-code="+1-473" data-currency="XCD" data-digits="7" data-placeholder="4031234">Grenada (+1-473)</option>
-          <option value="GT" data-code="+502" data-currency="GTQ" data-digits="8" data-placeholder="51234567">Guatemala (+502)</option>
-          <option value="GN" data-code="+224" data-currency="GNF" data-digits="9" data-placeholder="621234567">Guinea (+224)</option>
-          <option value="GW" data-code="+245" data-currency="XOF" data-digits="7" data-placeholder="9512345">Guinea-Bissau (+245)</option>
-          <option value="GY" data-code="+592" data-currency="GYD" data-digits="7" data-placeholder="6012345">Guyana (+592)</option>
-          <option value="HT" data-code="+509" data-currency="HTG" data-digits="8" data-placeholder="37123456">Haiti (+509)</option>
-          <option value="HN" data-code="+504" data-currency="HNL" data-digits="8" data-placeholder="98123456">Honduras (+504)</option>
-          <option value="HU" data-code="+36" data-currency="HUF" data-digits="9" data-placeholder="301234567">Hungary (+36)</option>
-          <option value="IS" data-code="+354" data-currency="ISK" data-digits="7" data-placeholder="6123456">Iceland (+354)</option>
-          <option value="IN" data-code="+91" data-currency="INR" data-digits="10" data-placeholder="9812345678">India (+91)</option>
-          <option value="ID" data-code="+62" data-currency="IDR" data-digits="10" data-placeholder="8123456789">Indonesia (+62)</option>
-          <option value="IR" data-code="+98" data-currency="IRR" data-digits="10" data-placeholder="9121234567">Iran (+98)</option>
-          <option value="IQ" data-code="+964" data-currency="IQD" data-digits="10" data-placeholder="7901234567">Iraq (+964)</option>
-          <option value="IE" data-code="+353" data-currency="EUR" data-digits="9" data-placeholder="851234567">Ireland (+353)</option>
-          <option value="IL" data-code="+972" data-currency="ILS" data-digits="9" data-placeholder="501234567">Israel (+972)</option>
-          <option value="IT" data-code="+39" data-currency="EUR" data-digits="10" data-placeholder="3201234567">Italy (+39)</option>
-          <option value="JM" data-code="+1-876" data-currency="JMD" data-digits="7" data-placeholder="4011234">Jamaica (+1-876)</option>
-          <option value="JP" data-code="+81" data-currency="JPY" data-digits="10" data-placeholder="9012345678">Japan (+81)</option>
-          <option value="JO" data-code="+962" data-currency="JOD" data-digits="9" data-placeholder="791234567">Jordan (+962)</option>
-          <option value="KZ" data-code="+7" data-currency="KZT" data-digits="10" data-placeholder="7011234567">Kazakhstan (+7)</option>
-          <option value="KE" data-code="+254" data-currency="KES" data-digits="9" data-placeholder="712345678">Kenya (+254)</option>
-          <option value="KI" data-code="+686" data-currency="AUD" data-digits="5" data-placeholder="72123">Kiribati (+686)</option>
-          <option value="KP" data-code="+850" data-currency="KPW" data-digits="10" data-placeholder="1921234567">Korea (North) (+850)</option>
-          <option value="KR" data-code="+82" data-currency="KRW" data-digits="10" data-placeholder="1012345678">Korea (South) (+82)</option>
-          <option value="KW" data-code="+965" data-currency="KWD" data-digits="8" data-placeholder="50123456">Kuwait (+965)</option>
-          <option value="KG" data-code="+996" data-currency="KGS" data-digits="9" data-placeholder="500123456">Kyrgyzstan (+996)</option>
-          <option value="LA" data-code="+856" data-currency="LAK" data-digits="10" data-placeholder="2012345678">Laos (+856)</option>
-          <option value="LV" data-code="+371" data-currency="EUR" data-digits="8" data-placeholder="26123456">Latvia (+371)</option>
-          <option value="LB" data-code="+961" data-currency="LBP" data-digits="8" data-placeholder="71123456">Lebanon (+961)</option>
-          <option value="LS" data-code="+266" data-currency="LSL" data-digits="8" data-placeholder="58123456">Lesotho (+266)</option>
-          <option value="LR" data-code="+231" data-currency="LRD" data-digits="8" data-placeholder="77123456">Liberia (+231)</option>
-          <option value="LY" data-code="+218" data-currency="LYD" data-digits="9" data-placeholder="911234567">Libya (+218)</option>
-          <option value="LI" data-code="+423" data-currency="CHF" data-digits="7" data-placeholder="7912345">Liechtenstein (+423)</option>
-          <option value="LT" data-code="+370" data-currency="EUR" data-digits="8" data-placeholder="61234567">Lithuania (+370)</option>
-          <option value="LU" data-code="+352" data-currency="EUR" data-digits="9" data-placeholder="621123456">Luxembourg (+352)</option>
-          <option value="MG" data-code="+261" data-currency="MGA" data-digits="9" data-placeholder="341234567">Madagascar (+261)</option>
-          <option value="MW" data-code="+265" data-currency="MWK" data-digits="9" data-placeholder="991234567">Malawi (+265)</option>
-          <option value="MY" data-code="+60" data-currency="MYR" data-digits="9" data-placeholder="121234567">Malaysia (+60)</option>
-          <option value="MV" data-code="+960" data-currency="MVR" data-digits="7" data-placeholder="7712345">Maldives (+960)</option>
-          <option value="ML" data-code="+223" data-currency="XOF" data-digits="8" data-placeholder="76123456">Mali (+223)</option>
-          <option value="MT" data-code="+356" data-currency="EUR" data-digits="8" data-placeholder="79123456">Malta (+356)</option>
-          <option value="MH" data-code="+692" data-currency="USD" data-digits="7" data-placeholder="4551234">Marshall Islands (+692)</option>
-          <option value="MR" data-code="+222" data-currency="MRU" data-digits="8" data-placeholder="36123456">Mauritania (+222)</option>
-          <option value="MU" data-code="+230" data-currency="MUR" data-digits="8" data-placeholder="57123456">Mauritius (+230)</option>
-          <option value="MX" data-code="+52" data-currency="MXN" data-digits="10" data-placeholder="5512345678">Mexico (+52)</option>
-          <option value="FM" data-code="+691" data-currency="USD" data-digits="7" data-placeholder="3501234">Micronesia (+691)</option>
-          <option value="MD" data-code="+373" data-currency="MDL" data-digits="8" data-placeholder="68123456">Moldova (+373)</option>
-          <option value="MC" data-code="+377" data-currency="EUR" data-digits="8" data-placeholder="41234567">Monaco (+377)</option>
-          <option value="MN" data-code="+976" data-currency="MNT" data-digits="8" data-placeholder="88123456">Mongolia (+976)</option>
-          <option value="ME" data-code="+382" data-currency="EUR" data-digits="8" data-placeholder="67123456">Montenegro (+382)</option>
-          <option value="MA" data-code="+212" data-currency="MAD" data-digits="9" data-placeholder="612345678">Morocco (+212)</option>
-          <option value="MZ" data-code="+258" data-currency="MZN" data-digits="9" data-placeholder="821234567">Mozambique (+258)</option>
-          <option value="MM" data-code="+95" data-currency="MMK" data-digits="9" data-placeholder="912345678">Myanmar (+95)</option>
-          <option value="NA" data-code="+264" data-currency="NAD" data-digits="9" data-placeholder="811234567">Namibia (+264)</option>
-          <option value="NR" data-code="+674" data-currency="AUD" data-digits="7" data-placeholder="5551234">Nauru (+674)</option>
-          <option value="NP" data-code="+977" data-currency="NPR" data-digits="10" data-placeholder="9812345678">Nepal (+977)</option>
-          <option value="NL" data-code="+31" data-currency="EUR" data-digits="9" data-placeholder="612345678">Netherlands (+31)</option>
-          <option value="NZ" data-code="+64" data-currency="NZD" data-digits="9" data-placeholder="211234567">New Zealand (+64)</option>
-          <option value="NI" data-code="+505" data-currency="NIO" data-digits="8" data-placeholder="81234567">Nicaragua (+505)</option>
-          <option value="NE" data-code="+227" data-currency="XOF" data-digits="8" data-placeholder="93123456">Niger (+227)</option>
-          <option value="NG" data-code="+234" data-currency="NGN" data-digits="10" data-placeholder="8021234567">Nigeria (+234)</option>
-          <option value="MK" data-code="+389" data-currency="MKD" data-digits="8" data-placeholder="70123456">North Macedonia (+389)</option>
-          <option value="NO" data-code="+47" data-currency="NOK" data-digits="8" data-placeholder="41234567">Norway (+47)</option>
-          <option value="OM" data-code="+968" data-currency="OMR" data-digits="8" data-placeholder="91234567">Oman (+968)</option>
-          <option value="PK" data-code="+92" data-currency="PKR" data-digits="10" data-placeholder="3001234567">Pakistan (+92)</option>
-          <option value="PW" data-code="+680" data-currency="USD" data-digits="7" data-placeholder="7751234">Palau (+680)</option>
-          <option value="PS" data-code="+970" data-currency="ILS" data-digits="9" data-placeholder="591234567">Palestine (+970)</option>
-          <option value="PA" data-code="+507" data-currency="PAB" data-digits="8" data-placeholder="61234567">Panama (+507)</option>
-          <option value="PG" data-code="+675" data-currency="PGK" data-digits="8" data-placeholder="70123456">Papua New Guinea (+675)</option>
-          <option value="PY" data-code="+595" data-currency="PYG" data-digits="9" data-placeholder="981123456">Paraguay (+595)</option>
-          <option value="PE" data-code="+51" data-currency="PEN" data-digits="9" data-placeholder="912345678">Peru (+51)</option>
-          <option value="PH" data-code="+63" data-currency="PHP" data-digits="10" data-placeholder="9123456789">Philippines (+63)</option>
-          <option value="PL" data-code="+48" data-currency="PLN" data-digits="9" data-placeholder="512345678">Poland (+48)</option>
-          <option value="PT" data-code="+351" data-currency="EUR" data-digits="9" data-placeholder="912345678">Portugal (+351)</option>
-          <option value="QA" data-code="+974" data-currency="QAR" data-digits="8" data-placeholder="55123456">Qatar (+974)</option>
-          <option value="RO" data-code="+40" data-currency="RON" data-digits="9" data-placeholder="721234567">Romania (+40)</option>
-          <option value="RU" data-code="+7" data-currency="RUB" data-digits="10" data-placeholder="9123456789">Russia (+7)</option>
-          <option value="RW" data-code="+250" data-currency="RWF" data-digits="9" data-placeholder="781234567">Rwanda (+250)</option>
-          <option value="KN" data-code="+1-869" data-currency="XCD" data-digits="7" data-placeholder="6601234">Saint Kitts and Nevis (+1-869)</option>
-          <option value="LC" data-code="+1-758" data-currency="XCD" data-digits="7" data-placeholder="4841234">Saint Lucia (+1-758)</option>
-          <option value="VC" data-code="+1-784" data-currency="XCD" data-digits="7" data-placeholder="4501234">Saint Vincent and the Grenadines (+1-784)</option>
-          <option value="WS" data-code="+685" data-currency="WST" data-digits="7" data-placeholder="7212345">Samoa (+685)</option>
-          <option value="SM" data-code="+378" data-currency="EUR" data-digits="10" data-placeholder="66123456">San Marino (+378)</option>
-          <option value="ST" data-code="+239" data-currency="STN" data-digits="7" data-placeholder="9912345">Sao Tome and Principe (+239)</option>
-          <option value="SA" data-code="+966" data-currency="SAR" data-digits="9" data-placeholder="501234567">Saudi Arabia (+966)</option>
-          <option value="SN" data-code="+221" data-currency="XOF" data-digits="9" data-placeholder="771234567">Senegal (+221)</option>
-          <option value="RS" data-code="+381" data-currency="RSD" data-digits="9" data-placeholder="601234567">Serbia (+381)</option>
-          <option value="SC" data-code="+248" data-currency="SCR" data-digits="7" data-placeholder="2512345">Seychelles (+248)</option>
-          <option value="SL" data-code="+232" data-currency="SLL" data-digits="8" data-placeholder="76123456">Sierra Leone (+232)</option>
-          <option value="SG" data-code="+65" data-currency="SGD" data-digits="8" data-placeholder="81234567">Singapore (+65)</option>
-          <option value="SK" data-code="+421" data-currency="EUR" data-digits="9" data-placeholder="901234567">Slovakia (+421)</option>
-          <option value="SI" data-code="+386" data-currency="EUR" data-digits="8" data-placeholder="41123456">Slovenia (+386)</option>
-          <option value="SB" data-code="+677" data-currency="SBD" data-digits="7" data-placeholder="7412345">Solomon Islands (+677)</option>
-          <option value="SO" data-code="+252" data-currency="SOS" data-digits="9" data-placeholder="611234567">Somalia (+252)</option>
-          <option value="ZA" data-code="+27" data-currency="ZAR" data-digits="9" data-placeholder="821234567">South Africa (+27)</option>
-          <option value="SS" data-code="+211" data-currency="SSP" data-digits="9" data-placeholder="912345678">South Sudan (+211)</option>
-          <option value="ES" data-code="+34" data-currency="EUR" data-digits="9" data-placeholder="612345678">Spain (+34)</option>
-          <option value="LK" data-code="+94" data-currency="LKR" data-digits="9" data-placeholder="712345678">Sri Lanka (+94)</option>
-          <option value="SD" data-code="+249" data-currency="SDG" data-digits="9" data-placeholder="912345678">Sudan (+249)</option>
-          <option value="SR" data-code="+597" data-currency="SRD" data-digits="7" data-placeholder="8512345">Suriname (+597)</option>
-          <option value="SE" data-code="+46" data-currency="SEK" data-digits="9" data-placeholder="701234567">Sweden (+46)</option>
-          <option value="CH" data-code="+41" data-currency="CHF" data-digits="9" data-placeholder="791234567">Switzerland (+41)</option>
-          <option value="SY" data-code="+963" data-currency="SYP" data-digits="9" data-placeholder="941234567">Syria (+963)</option>
-          <option value="TW" data-code="+886" data-currency="TWD" data-digits="9" data-placeholder="912345678">Taiwan (+886)</option>
-          <option value="TJ" data-code="+992" data-currency="TJS" data-digits="9" data-placeholder="911234567">Tajikistan (+992)</option>
-          <option value="TZ" data-code="+255" data-currency="TZS" data-digits="9" data-placeholder="712345678">Tanzania (+255)</option>
-          <option value="TH" data-code="+66" data-currency="THB" data-digits="9" data-placeholder="812345678">Thailand (+66)</option>
-          <option value="TL" data-code="+670" data-currency="USD" data-digits="7" data-placeholder="7712345">Timor-Leste (+670)</option>
-          <option value="TG" data-code="+228" data-currency="XOF" data-digits="8" data-placeholder="90123456">Togo (+228)</option>
-          <option value="TO" data-code="+676" data-currency="TOP" data-digits="5" data-placeholder="77123">Tonga (+676)</option>
-          <option value="TT" data-code="+1-868" data-currency="TTD" data-digits="7" data-placeholder="6801234">Trinidad and Tobago (+1-868)</option>
-          <option value="TN" data-code="+216" data-currency="TND" data-digits="8" data-placeholder="20123456">Tunisia (+216)</option>
-          <option value="TR" data-code="+90" data-currency="TRY" data-digits="10" data-placeholder="5011234567">Turkey (+90)</option>
-          <option value="TM" data-code="+993" data-currency="TMT" data-digits="8" data-placeholder="61123456">Turkmenistan (+993)</option>
-          <option value="TV" data-code="+688" data-currency="AUD" data-digits="5" data-placeholder="20123">Tuvalu (+688)</option>
-          <option value="UG" data-code="+256" data-currency="UGX" data-digits="9" data-placeholder="772123456">Uganda (+256)</option>
-          <option value="UA" data-code="+380" data-currency="UAH" data-digits="9" data-placeholder="671234567">Ukraine (+380)</option>
-          <option value="AE" data-code="+971" data-currency="AED" data-digits="9" data-placeholder="501234567">United Arab Emirates (+971)</option>
-          <option value="GB" data-code="+44" data-currency="GBP" data-digits="10" data-placeholder="7912345678">United Kingdom (+44)</option>
-          <option value="US" data-code="+1" data-currency="USD" data-digits="10" data-placeholder="4151234567">United States (+1)</option>
-          <option value="UY" data-code="+598" data-currency="UYU" data-digits="8" data-placeholder="99123456">Uruguay (+598)</option>
-          <option value="UZ" data-code="+998" data-currency="UZS" data-digits="9" data-placeholder="901234567">Uzbekistan (+998)</option>
-          <option value="VU" data-code="+678" data-currency="VUV" data-digits="7" data-placeholder="5512345">Vanuatu (+678)</option>
-          <option value="VA" data-code="+379" data-currency="EUR" data-digits="10" data-placeholder="66123456">Vatican City (+379)</option>
-          <option value="VE" data-code="+58" data-currency="VES" data-digits="10" data-placeholder="4121234567">Venezuela (+58)</option>
-          <option value="VN" data-code="+84" data-currency="VND" data-digits="9" data-placeholder="912345678">Vietnam (+84)</option>
-          <option value="YE" data-code="+967" data-currency="YER" data-digits="9" data-placeholder="711234567">Yemen (+967)</option>
-          <option value="ZM" data-code="+260" data-currency="ZMK" data-digits="9" data-placeholder="971234567">Zambia (+260)</option>
-          <option value="ZW" data-code="+263" data-currency="ZWL" data-digits="9" data-placeholder="771234567">Zimbabwe (+263)</option>
-        </select>
+        <label for="countrySearch">Country of Origin</label>
+        <div class="searchable-select-container">
+          <input type="text" id="countrySearch" placeholder="Type to search country..." autocomplete="off" required>
+          <input type="hidden" id="country" name="country" required>
+          <div id="countryDropdownList" class="country-dropdown-list"></div>
+        </div>
       </div>
 
       <!-- Phone Number -->
@@ -501,70 +343,300 @@
   </div>
 
   <script>
+    // Master country dataset containing name, code, flag, dialing prefix, currency, digits, and placeholder
+    const countriesData = [
+      { name: "Afghanistan", code: "AF", flag: "🇦🇫", dialCode: "+93", currency: "AFN", digits: 9, placeholder: "701234567" },
+      { name: "Albania", code: "AL", flag: "🇦🇱", dialCode: "+355", currency: "EUR", digits: 9, placeholder: "681234567" },
+      { name: "Algeria", code: "DZ", flag: "🇩🇿", dialCode: "+213", currency: "DZD", digits: 9, placeholder: "551234567" },
+      { name: "Andorra", code: "AD", flag: "🇦🇩", dialCode: "+376", currency: "EUR", digits: 6, placeholder: "312345" },
+      { name: "Angola", code: "AO", flag: "🇦🇴", dialCode: "+244", currency: "AOA", digits: 9, placeholder: "923456789" },
+      { name: "Antigua and Barbuda", code: "AG", flag: "🇦🇬", dialCode: "+1-268", currency: "XCD", digits: 7, placeholder: "7201234" },
+      { name: "Argentina", code: "AR", flag: "🇦🇷", dialCode: "+54", currency: "ARS", digits: 10, placeholder: "1112345678" },
+      { name: "Armenia", code: "AM", flag: "🇦🇲", dialCode: "+374", currency: "AMD", digits: 8, placeholder: "91234567" },
+      { name: "Australia", code: "AU", flag: "🇦🇺", dialCode: "+61", currency: "AUD", digits: 9, placeholder: "412345678" },
+      { name: "Austria", code: "AT", flag: "🇦🇹", dialCode: "+43", currency: "EUR", digits: 10, placeholder: "6501234567" },
+      { name: "Azerbaijan", code: "AZ", flag: "🇦🇿", dialCode: "+994", currency: "AZN", digits: 9, placeholder: "401234567" },
+      { name: "Bahamas", code: "BS", flag: "🇧🇸", dialCode: "+1-242", currency: "BSD", digits: 7, placeholder: "3561234" },
+      { name: "Bahrain", code: "BH", flag: "🇧🇭", dialCode: "+973", currency: "BHD", digits: 8, placeholder: "39123456" },
+      { name: "Bangladesh", code: "BD", flag: "🇧🇩", dialCode: "+880", currency: "BDT", digits: 10, placeholder: "1712345678" },
+      { name: "Barbados", code: "BB", flag: "🇧🇧", dialCode: "+1-246", currency: "BBD", digits: 7, placeholder: "2301234" },
+      { name: "Belarus", code: "BY", flag: "🇧🇾", dialCode: "+375", currency: "BYN", digits: 9, placeholder: "291234567" },
+      { name: "Belgium", code: "BE", flag: "🇧🇪", dialCode: "+32", currency: "EUR", digits: 9, placeholder: "470123456" },
+      { name: "Belize", code: "BZ", flag: "🇧🇿", dialCode: "+501", currency: "BZD", digits: 7, placeholder: "6101234" },
+      { name: "Benin", code: "BJ", flag: "🇧🇯", dialCode: "+229", currency: "XOF", digits: 8, placeholder: "97012345" },
+      { name: "Bhutan", code: "BT", flag: "🇧🇹", dialCode: "+975", currency: "BTN", digits: 8, placeholder: "17123456" },
+      { name: "Bolivia", code: "BO", flag: "🇧🇴", dialCode: "+591", currency: "BOB", digits: 8, placeholder: "71234567" },
+      { name: "Bosnia and Herzegovina", code: "BA", flag: "🇧🇦", dialCode: "+387", currency: "BAM", digits: 8, placeholder: "61123456" },
+      { name: "Botswana", code: "BW", flag: "🇧🇼", dialCode: "+267", currency: "BWP", digits: 8, placeholder: "71234567" },
+      { name: "Brazil", code: "BR", flag: "🇧🇷", dialCode: "+55", currency: "BRL", digits: 11, placeholder: "11912345678" },
+      { name: "Brunei", code: "BN", flag: "🇧🇳", dialCode: "+673", currency: "BND", digits: 7, placeholder: "8123456" },
+      { name: "Bulgaria", code: "BG", flag: "🇧🇬", dialCode: "+359", currency: "BGN", digits: 9, placeholder: "871234567" },
+      { name: "Burkina Faso", code: "BF", flag: "🇧🇫", dialCode: "+226", currency: "XOF", digits: 8, placeholder: "70123456" },
+      { name: "Burundi", code: "BI", flag: "🇧🇮", dialCode: "+257", currency: "BIF", digits: 8, placeholder: "79123456" },
+      { name: "Cabo Verde", code: "CV", flag: "🇨🇻", dialCode: "+238", currency: "CVE", digits: 7, placeholder: "9912345" },
+      { name: "Cambodia", code: "KH", flag: "🇰🇭", dialCode: "+855", currency: "KHR", digits: 9, placeholder: "123456789" },
+      { name: "Cameroon", code: "CM", flag: "🇨🇲", dialCode: "+237", currency: "XAF", digits: 9, placeholder: "671234567" },
+      { name: "Canada", code: "CA", flag: "🇨🇦", dialCode: "+1", currency: "CAD", digits: 10, placeholder: "4161234567" },
+      { name: "Central African Republic", code: "CF", flag: "🇨🇫", dialCode: "+236", currency: "XAF", digits: 8, placeholder: "70123456" },
+      { name: "Chad", code: "TD", flag: "🇹🇩", dialCode: "+235", currency: "XAF", digits: 8, placeholder: "63123456" },
+      { name: "Chile", code: "CL", flag: "🇨🇱", dialCode: "+56", currency: "CLP", digits: 9, placeholder: "912345678" },
+      { name: "China", code: "CN", flag: "🇨🇳", dialCode: "+86", currency: "CNY", digits: 11, placeholder: "13812345678" },
+      { name: "Colombia", code: "CO", flag: "🇨🇴", dialCode: "+57", currency: "COP", digits: 10, placeholder: "3001234567" },
+      { name: "Comoros", code: "KM", flag: "🇰🇲", dialCode: "+269", currency: "KMF", digits: 7, placeholder: "3212345" },
+      { name: "Congo", code: "CG", flag: "🇨🇬", dialCode: "+242", currency: "XAF", digits: 9, placeholder: "061234567" },
+      { name: "Congo (Democratic Republic)", code: "CD", flag: "🇨🇩", dialCode: "+243", currency: "CDF", digits: 9, placeholder: "812345678" },
+      { name: "Costa Rica", code: "CR", flag: "🇨🇷", dialCode: "+506", currency: "CRC", digits: 8, placeholder: "81234567" },
+      { name: "Cote d'Ivoire", code: "CI", flag: "🇨🇮", dialCode: "+225", currency: "XOF", digits: 10, placeholder: "0712345678" },
+      { name: "Croatia", code: "HR", flag: "🇭🇷", dialCode: "+385", currency: "EUR", digits: 9, placeholder: "911234567" },
+      { name: "Cuba", code: "CU", flag: "🇨🇺", dialCode: "+53", currency: "CUP", digits: 8, placeholder: "52123456" },
+      { name: "Cyprus", code: "CY", flag: "🇨🇾", dialCode: "+357", currency: "EUR", digits: 8, placeholder: "99123456" },
+      { name: "Czech Republic", code: "CZ", flag: "🇨🇿", dialCode: "+420", currency: "CZK", digits: 9, placeholder: "601123456" },
+      { name: "Denmark", code: "DK", flag: "🇩🇰", dialCode: "+45", currency: "DKK", digits: 8, placeholder: "12345678" },
+      { name: "Djibouti", code: "DJ", flag: "🇩🇯", dialCode: "+253", currency: "DJF", digits: 8, placeholder: "77123456" },
+      { name: "Dominica", code: "DM", flag: "🇩🇲", dialCode: "+1-767", currency: "XCD", digits: 7, placeholder: "2451234" },
+      { name: "Dominican Republic", code: "DO", flag: "🇩🇴", dialCode: "+1-809", currency: "DOP", digits: 10, placeholder: "8091234567" },
+      { name: "Ecuador", code: "EC", flag: "🇪🇨", dialCode: "+593", currency: "USD", digits: 9, placeholder: "991234567" },
+      { name: "Egypt", code: "EG", flag: "🇪🇬", dialCode: "+20", currency: "EGP", digits: 10, placeholder: "1012345678" },
+      { name: "El Salvador", code: "SV", flag: "🇸🇻", dialCode: "+503", currency: "USD", digits: 8, placeholder: "71234567" },
+      { name: "Equatorial Guinea", code: "GQ", flag: "🇬🇶", dialCode: "+240", currency: "XAF", digits: 9, placeholder: "222123456" },
+      { name: "Eritrea", code: "ER", flag: "🇪🇷", dialCode: "+291", currency: "ERN", digits: 7, placeholder: "7123456" },
+      { name: "Estonia", code: "EE", flag: "🇪🇪", dialCode: "+372", currency: "EUR", digits: 8, placeholder: "51234567" },
+      { name: "Eswatini", code: "SZ", flag: "🇸🇿", dialCode: "+268", currency: "SZL", digits: 8, placeholder: "76123456" },
+      { name: "Ethiopia", code: "ET", flag: "🇪🇹", dialCode: "+251", currency: "ETB", digits: 9, placeholder: "911234567" },
+      { name: "Fiji", code: "FJ", flag: "🇫🇯", dialCode: "+679", currency: "FJD", digits: 7, placeholder: "9212345" },
+      { name: "Finland", code: "FI", flag: "🇫🇮", dialCode: "+358", currency: "EUR", digits: 10, placeholder: "401234567" },
+      { name: "France", code: "FR", flag: "🇫🇷", dialCode: "+33", currency: "EUR", digits: 9, placeholder: "612345678" },
+      { name: "Gabon", code: "GA", flag: "🇬🇦", dialCode: "+241", currency: "XAF", digits: 7, placeholder: "0612345" },
+      { name: "Gambia", code: "GM", flag: "🇬🇲", dialCode: "+220", currency: "GMD", digits: 7, placeholder: "7012345" },
+      { name: "Georgia", code: "GE", flag: "🇬🇪", dialCode: "+995", currency: "GEL", digits: 9, placeholder: "551123456" },
+      { name: "Germany", code: "DE", flag: "🇩🇪", dialCode: "+49", currency: "EUR", digits: 11, placeholder: "15123456789" },
+      { name: "Ghana", code: "GH", flag: "🇬🇭", dialCode: "+233", currency: "GHS", digits: 9, placeholder: "241234567" },
+      { name: "Greece", code: "GR", flag: "🇬🇷", dialCode: "+30", currency: "EUR", digits: 10, placeholder: "6912345678" },
+      { name: "Grenada", code: "GD", flag: "🇬🇩", dialCode: "+1-473", currency: "XCD", digits: 7, placeholder: "4031234" },
+      { name: "Guatemala", code: "GT", flag: "🇬🇹", dialCode: "+502", currency: "GTQ", digits: 8, placeholder: "51234567" },
+      { name: "Guinea", code: "GN", flag: "🇬🇳", dialCode: "+224", currency: "GNF", digits: 9, placeholder: "621234567" },
+      { name: "Guinea-Bissau", code: "GW", flag: "🇬🇼", dialCode: "+245", currency: "XOF", digits: 7, placeholder: "9512345" },
+      { name: "Guyana", code: "GY", flag: "🇬🇾", dialCode: "+592", currency: "GYD", digits: 7, placeholder: "6012345" },
+      { name: "Haiti", code: "HT", flag: "🇭🇹", dialCode: "+509", currency: "HTG", digits: 8, placeholder: "37123456" },
+      { name: "Honduras", code: "HN", flag: "🇭🇳", dialCode: "+504", currency: "HNL", digits: 8, placeholder: "98123456" },
+      { name: "Hungary", code: "HU", flag: "🇭🇺", dialCode: "+36", currency: "HUF", digits: 9, placeholder: "301234567" },
+      { name: "Iceland", code: "IS", flag: "🇮🇸", dialCode: "+354", currency: "ISK", digits: 7, placeholder: "6123456" },
+      { name: "India", code: "IN", flag: "🇮🇳", dialCode: "+91", currency: "INR", digits: 10, placeholder: "9812345678" },
+      { name: "Indonesia", code: "ID", flag: "🇮🇩", dialCode: "+62", currency: "IDR", digits: 10, placeholder: "8123456789" },
+      { name: "Iran", code: "IR", flag: "🇮🇷", dialCode: "+98", currency: "IRR", digits: 10, placeholder: "9121234567" },
+      { name: "Iraq", code: "IQ", flag: "🇮🇶", dialCode: "+964", currency: "IQD", digits: 10, placeholder: "7901234567" },
+      { name: "Ireland", code: "IE", flag: "🇮🇪", dialCode: "+353", currency: "EUR", digits: 9, placeholder: "851234567" },
+      { name: "Israel", code: "IL", flag: "🇮🇱", dialCode: "+972", currency: "ILS", digits: 9, placeholder: "501234567" },
+      { name: "Italy", code: "IT", flag: "🇮🇹", dialCode: "+39", currency: "EUR", digits: 10, placeholder: "3201234567" },
+      { name: "Jamaica", code: "JM", flag: "🇯🇲", dialCode: "+1-876", currency: "JMD", digits: 7, placeholder: "4011234" },
+      { name: "Japan", code: "JP", flag: "🇯🇵", dialCode: "+81", currency: "JPY", digits: 10, placeholder: "9012345678" },
+      { name: "Jordan", code: "JO", flag: "🇯🇴", dialCode: "+962", currency: "JOD", digits: 9, placeholder: "791234567" },
+      { name: "Kazakhstan", code: "KZ", flag: "🇰🇿", dialCode: "+7", currency: "KZT", digits: 10, placeholder: "7011234567" },
+      { name: "Kenya", code: "KE", flag: "🇰🇪", dialCode: "+254", currency: "KES", digits: 9, placeholder: "712345678" },
+      { name: "Kiribati", code: "KI", flag: "🇰🇮", dialCode: "+686", currency: "AUD", digits: 5, placeholder: "72123" },
+      { name: "Korea (North)", code: "KP", flag: "🇰🇵", dialCode: "+850", currency: "KPW", digits: 10, placeholder: "1921234567" },
+      { name: "Korea (South)", code: "KR", flag: "🇰🇷", dialCode: "+82", currency: "KRW", digits: 10, placeholder: "1012345678" },
+      { name: "Kuwait", code: "KW", flag: "🇰🇼", dialCode: "+965", currency: "KWD", digits: 8, placeholder: "50123456" },
+      { name: "Kyrgyzstan", code: "KG", flag: "🇰🇬", dialCode: "+996", currency: "KGS", digits: 9, placeholder: "500123456" },
+      { name: "Laos", code: "LA", flag: "🇱🇦", dialCode: "+856", currency: "LAK", digits: 10, placeholder: "2012345678" },
+      { name: "Latvia", code: "LV", flag: "🇱🇻", dialCode: "+371", currency: "EUR", digits: 8, placeholder: "26123456" },
+      { name: "Lebanon", code: "LB", flag: "🇱🇧", dialCode: "+961", currency: "LBP", digits: 8, placeholder: "71123456" },
+      { name: "Lesotho", code: "LS", flag: "🇱🇸", dialCode: "+266", currency: "LSL", digits: 8, placeholder: "58123456" },
+      { name: "Liberia", code: "LR", flag: "🇱🇷", dialCode: "+231", currency: "LRD", digits: 8, placeholder: "77123456" },
+      { name: "Libya", code: "LY", flag: "🇱🇾", dialCode: "+218", currency: "LYD", digits: 9, placeholder: "911234567" },
+      { name: "Liechtenstein", code: "LI", flag: "🇱🇮", dialCode: "+423", currency: "CHF", digits: 7, placeholder: "7912345" },
+      { name: "Lithuania", code: "LT", flag: "🇱🇹", dialCode: "+370", currency: "EUR", digits: 8, placeholder: "61234567" },
+      { name: "Luxembourg", code: "LU", flag: "🇱🇺", dialCode: "+352", currency: "EUR", digits: 9, placeholder: "621123456" },
+      { name: "Madagascar", code: "MG", flag: "🇲🇬", dialCode: "+261", currency: "MGA", digits: 9, placeholder: "341234567" },
+      { name: "Malawi", code: "MW", flag: "🇲🇼", dialCode: "+265", currency: "MWK", digits: 9, placeholder: "991234567" },
+      { name: "Malaysia", code: "MY", flag: "🇲🇾", dialCode: "+60", currency: "MYR", digits: 9, placeholder: "121234567" },
+      { name: "Maldives", code: "MV", flag: "🇲🇻", dialCode: "+960", currency: "MVR", digits: 7, placeholder: "7712345" },
+      { name: "Mali", code: "ML", flag: "🇲🇱", dialCode: "+223", currency: "XOF", digits: 8, placeholder: "76123456" },
+      { name: "Malta", code: "MT", flag: "🇲🇹", dialCode: "+356", currency: "EUR", digits: 8, placeholder: "79123456" },
+      { name: "Marshall Islands", code: "MH", flag: "🇲🇭", dialCode: "+692", currency: "USD", digits: 7, placeholder: "4551234" },
+      { name: "Mauritania", code: "MR", flag: "🇲🇷", dialCode: "+222", currency: "MRU", digits: 8, placeholder: "36123456" },
+      { name: "Mauritius", code: "MU", flag: "🇲🇺", dialCode: "+230", currency: "MUR", digits: 8, placeholder: "57123456" },
+      { name: "Mexico", code: "MX", flag: "🇲🇽", dialCode: "+52", currency: "MXN", digits: 10, placeholder: "5512345678" },
+      { name: "Micronesia", code: "FM", flag: "🇫🇲", dialCode: "+691", currency: "USD", digits: 7, placeholder: "3501234" },
+      { name: "Moldova", code: "MD", flag: "🇲🇩", dialCode: "+373", currency: "MDL", digits: 8, placeholder: "68123456" },
+      { name: "Monaco", code: "MC", flag: "🇲🇨", dialCode: "+377", currency: "EUR", digits: 8, placeholder: "41234567" },
+      { name: "Mongolia", code: "MN", flag: "🇲🇳", dialCode: "+976", currency: "MNT", digits: 8, placeholder: "88123456" },
+      { name: "Montenegro", code: "ME", flag: "🇲🇪", dialCode: "+382", currency: "EUR", digits: 8, placeholder: "67123456" },
+      { name: "Morocco", code: "MA", flag: "🇲🇦", dialCode: "+212", currency: "MAD", digits: 9, placeholder: "612345678" },
+      { name: "Mozambique", code: "MZ", flag: "🇲🇿", dialCode: "+258", currency: "MZN", digits: 9, placeholder: "821234567" },
+      { name: "Myanmar", code: "MM", flag: "🇲🇲", dialCode: "+95", currency: "MMK", digits: 9, placeholder: "912345678" },
+      { name: "Namibia", code: "NA", flag: "🇳🇦", dialCode: "+264", currency: "NAD", digits: 9, placeholder: "811234567" },
+      { name: "Nauru", code: "NR", flag: "🇳🇷", dialCode: "+674", currency: "AUD", digits: 7, placeholder: "5551234" },
+      { name: "Nepal", code: "NP", flag: "🇳🇵", dialCode: "+977", currency: "NPR", digits: 10, placeholder: "9812345678" },
+      { name: "Netherlands", code: "NL", flag: "🇳🇱", dialCode: "+31", currency: "EUR", digits: 9, placeholder: "612345678" },
+      { name: "New Zealand", code: "NZ", flag: "🇳🇿", dialCode: "+64", currency: "NZD", digits: 9, placeholder: "211234567" },
+      { name: "Nicaragua", code: "NI", flag: "🇳🇮", dialCode: "+505", currency: "NIO", digits: 8, placeholder: "81234567" },
+      { name: "Niger", code: "NE", flag: "🇳🇪", dialCode: "+227", currency: "XOF", digits: 8, placeholder: "93123456" },
+      { name: "Nigeria", code: "NG", flag: "🇳🇬", dialCode: "+234", currency: "NGN", digits: 10, placeholder: "8021234567" },
+      { name: "North Macedonia", code: "MK", flag: "🇲🇰", dialCode: "+389", currency: "MKD", digits: 8, placeholder: "70123456" },
+      { name: "Norway", code: "NO", flag: "🇳🇴", dialCode: "+47", currency: "NOK", digits: 8, placeholder: "41234567" },
+      { name: "Oman", code: "OM", flag: "🇴🇲", dialCode: "+968", currency: "OMR", digits: 8, placeholder: "91234567" },
+      { name: "Pakistan", code: "PK", flag: "🇵🇰", dialCode: "+92", currency: "PKR", digits: 10, placeholder: "3001234567" },
+      { name: "Palau", code: "PW", flag: "🇵🇼", dialCode: "+680", currency: "USD", digits: 7, placeholder: "7751234" },
+      { name: "Palestine", code: "PS", flag: "🇵🇸", dialCode: "+970", currency: "ILS", digits: 9, placeholder: "591234567" },
+      { name: "Panama", code: "PA", flag: "🇵🇦", dialCode: "+507", currency: "PAB", digits: 8, placeholder: "61234567" },
+      { name: "Papua New Guinea", code: "PG", flag: "🇵🇬", dialCode: "+675", currency: "PGK", digits: 8, placeholder: "70123456" },
+      { name: "Paraguay", code: "PY", flag: "🇵🇾", dialCode: "+595", currency: "PYG", digits: 9, placeholder: "981123456" },
+      { name: "Peru", code: "PE", flag: "🇵🇪", dialCode: "+51", currency: "PEN", digits: 9, placeholder: "912345678" },
+      { name: "Philippines", code: "PH", flag: "🇵🇭", dialCode: "+63", currency: "PHP", digits: 10, placeholder: "9123456789" },
+      { name: "Poland", code: "PL", flag: "🇵🇱", dialCode: "+48", currency: "PLN", digits: 9, placeholder: "512345678" },
+      { name: "Portugal", code: "PT", flag: "🇵🇹", dialCode: "+351", currency: "EUR", digits: 9, placeholder: "912345678" },
+      { name: "Qatar", code: "QA", flag: "🇶🇦", dialCode: "+974", currency: "QAR", digits: 8, placeholder: "55123456" },
+      { name: "Romania", code: "RO", flag: "🇷🇴", dialCode: "+40", currency: "RON", digits: 9, placeholder: "721234567" },
+      { name: "Russia", code: "RU", flag: "🇷🇺", dialCode: "+7", currency: "RUB", digits: 10, placeholder: "9123456789" },
+      { name: "Rwanda", code: "RW", flag: "🇷🇼", dialCode: "+250", currency: "RWF", digits: 9, placeholder: "781234567" },
+      { name: "Saint Kitts and Nevis", code: "KN", flag: "🇰🇳", dialCode: "+1-869", currency: "XCD", digits: 7, placeholder: "6601234" },
+      { name: "Saint Lucia", code: "LC", flag: "🇱🇨", dialCode: "+1-758", currency: "XCD", digits: 7, placeholder: "4841234" },
+      { name: "Saint Vincent and the Grenadines", code: "VC", flag: "🇻🇨", dialCode: "+1-784", currency: "XCD", digits: 7, placeholder: "4501234" },
+      { name: "Samoa", code: "WS", flag: "🇼🇸", dialCode: "+685", currency: "WST", digits: 7, placeholder: "7212345" },
+      { name: "San Marino", code: "SM", flag: "🇸🇲", dialCode: "+378", currency: "EUR", digits: 10, placeholder: "66123456" },
+      { name: "Sao Tome and Principe", code: "ST", flag: "🇸🇹", dialCode: "+239", currency: "STN", digits: 7, placeholder: "9912345" },
+      { name: "Saudi Arabia", code: "SA", flag: "🇸🇦", dialCode: "+966", currency: "SAR", digits: 9, placeholder: "501234567" },
+      { name: "Senegal", code: "SN", flag: "🇸🇳", dialCode: "+221", currency: "XOF", digits: 9, placeholder: "771234567" },
+      { name: "Serbia", code: "RS", flag: "🇷🇸", dialCode: "+381", currency: "RSD", digits: 9, placeholder: "601234567" },
+      { name: "Seychelles", code: "SC", flag: "🇸🇨", dialCode: "+248", currency: "SCR", digits: 7, placeholder: "2512345" },
+      { name: "Sierra Leone", code: "SL", flag: "🇸🇱", dialCode: "+232", currency: "SLL", digits: 8, placeholder: "76123456" },
+      { name: "Singapore", code: "SG", flag: "🇸🇬", dialCode: "+65", currency: "SGD", digits: 8, placeholder: "81234567" },
+      { name: "Slovakia", code: "SK", flag: "🇸🇰", dialCode: "+421", currency: "EUR", digits: 9, placeholder: "901234567" },
+      { name: "Slovenia", code: "SI", flag: "🇸🇮", dialCode: "+386", currency: "EUR", digits: 8, placeholder: "41123456" },
+      { name: "Solomon Islands", code: "SB", flag: "🇸🇧", dialCode: "+677", currency: "SBD", digits: 7, placeholder: "7412345" },
+      { name: "Somalia", code: "SO", flag: "🇸🇴", dialCode: "+252", currency: "SOS", digits: 9, placeholder: "611234567" },
+      { name: "South Africa", code: "ZA", flag: "🇿🇦", dialCode: "+27", currency: "ZAR", digits: 9, placeholder: "821234567" },
+      { name: "South Sudan", code: "SS", flag: "🇸🇸", dialCode: "+211", currency: "SSP", digits: 9, placeholder: "912345678" },
+      { name: "Spain", code: "ES", flag: "🇪🇸", dialCode: "+34", currency: "EUR", digits: 9, placeholder: "612345678" },
+      { name: "Sri Lanka", code: "LK", flag: "🇱🇰", dialCode: "+94", currency: "LKR", digits: 9, placeholder: "712345678" },
+      { name: "Sudan", code: "SD", flag: "🇸🇩", dialCode: "+249", currency: "SDG", digits: 9, placeholder: "912345678" },
+      { name: "Suriname", code: "SR", flag: "🇸🇷", dialCode: "+597", currency: "SRD", digits: 7, placeholder: "8512345" },
+      { name: "Sweden", code: "SE", flag: "🇸🇪", dialCode: "+46", currency: "SEK", digits: 9, placeholder: "701234567" },
+      { name: "Switzerland", code: "CH", flag: "🇨🇭", dialCode: "+41", currency: "CHF", digits: 9, placeholder: "791234567" },
+      { name: "Syria", code: "SY", flag: "🇸🇾", dialCode: "+963", currency: "SYP", digits: 9, placeholder: "941234567" },
+      { name: "Taiwan", code: "TW", flag: "🇹🇼", dialCode: "+886", currency: "TWD", digits: 9, placeholder: "912345678" },
+      { name: "Tajikistan", code: "TJ", flag: "🇹🇯", dialCode: "+992", currency: "TJS", digits: 9, placeholder: "911234567" },
+      { name: "Tanzania", code: "TZ", flag: "🇹🇿", dialCode: "+255", currency: "TZS", digits: 9, placeholder: "712345678" },
+      { name: "Thailand", code: "TH", flag: "🇹🇭", dialCode: "+66", currency: "THB", digits: 9, placeholder: "812345678" },
+      { name: "Timor-Leste", code: "TL", flag: "🇹🇱", dialCode: "+670", currency: "USD", digits: 7, placeholder: "7712345" },
+      { name: "Togo", code: "TG", flag: "🇹🇬", dialCode: "+228", currency: "XOF", digits: 8, placeholder: "90123456" },
+      { name: "Tonga", code: "TO", flag: "🇹🇴", dialCode: "+676", currency: "TOP", digits: 5, placeholder: "77123" },
+      { name: "Trinidad and Tobago", code: "TT", flag: "🇹🇹", dialCode: "+1-868", currency: "TTD", digits: 7, placeholder: "6801234" },
+      { name: "Tunisia", code: "TN", flag: "🇹🇳", dialCode: "+216", currency: "TND", digits: 8, placeholder: "20123456" },
+      { name: "Turkey", code: "TR", flag: "🇹🇷", dialCode: "+90", currency: "TRY", digits: 10, placeholder: "5011234567" },
+      { name: "Turkmenistan", code: "TM", flag: "🇹🇲", dialCode: "+993", currency: "TMT", digits: 8, placeholder: "61123456" },
+      { name: "Tuvalu", code: "TV", flag: "🇹🇻", dialCode: "+688", currency: "AUD", digits: 5, placeholder: "20123" },
+      { name: "Uganda", code: "UG", flag: "🇺🇬", dialCode: "+256", currency: "UGX", digits: 9, placeholder: "772123456" },
+      { name: "Ukraine", code: "UA", flag: "🇺🇦", dialCode: "+380", currency: "UAH", digits: 9, placeholder: "671234567" },
+      { name: "United Arab Emirates", code: "AE", flag: "🇦🇪", dialCode: "+971", currency: "AED", digits: 9, placeholder: "501234567" },
+      { name: "United Kingdom", code: "GB", flag: "🇬🇧", dialCode: "+44", currency: "GBP", digits: 10, placeholder: "7912345678" },
+      { name: "United States", code: "US", flag: "🇺🇸", dialCode: "+1", currency: "USD", digits: 10, placeholder: "4151234567" },
+      { name: "Uruguay", code: "UY", flag: "🇺🇾", dialCode: "+598", currency: "UYU", digits: 8, placeholder: "99123456" },
+      { name: "Uzbekistan", code: "UZ", flag: "🇺🇿", dialCode: "+998", currency: "UZS", digits: 9, placeholder: "901234567" },
+      { name: "Vanuatu", code: "VU", flag: "🇻🇺", dialCode: "+678", currency: "VUV", digits: 7, placeholder: "5512345" },
+      { name: "Vatican City", code: "VA", flag: "🇻🇦", dialCode: "+379", currency: "EUR", digits: 10, placeholder: "66123456" },
+      { name: "Venezuela", code: "VE", flag: "🇻🇪", dialCode: "+58", currency: "VES", digits: 10, placeholder: "4121234567" },
+      { name: "Vietnam", code: "VN", flag: "🇻🇳", dialCode: "+84", currency: "VND", digits: 9, placeholder: "912345678" },
+      { name: "Yemen", code: "YE", flag: "🇾🇪", dialCode: "+967", currency: "YER", digits: 9, placeholder: "711234567" },
+      { name: "Zambia", code: "ZM", flag: "🇿🇲", dialCode: "+260", currency: "ZMK", digits: 9, placeholder: "971234567" },
+      { name: "Zimbabwe", code: "ZW", flag: "🇿🇼", dialCode: "+263", currency: "ZWL", digits: 9, placeholder: "771234567" }
+    ];
+
     const registerForm = document.getElementById('registerForm');
     const alertBox = document.getElementById('alertBox');
     const registerBtn = document.getElementById('registerBtn');
-    const countrySelect = document.getElementById('country');
+    
+    const countrySearch = document.getElementById('countrySearch');
+    const countryHidden = document.getElementById('country');
+    const countryDropdownList = document.getElementById('countryDropdownList');
+
     const phonePrefix = document.getElementById('phonePrefix');
     const phoneInput = document.getElementById('phone');
     const currencySelect = document.getElementById('currency');
     const dobInput = document.getElementById('dob');
 
-    // Automatically set max attribute on Date of Birth so users must be at least 18 years old from today
-    const today = new Date();
-    const targetYear = today.getFullYear() - 18;
-    const targetMonth = String(today.getMonth() + 1).padStart(2, '0');
-    const targetDay = String(today.getDate()).padStart(2, '0');
-    dobInput.setAttribute('max', `${targetYear}-${targetMonth}-${targetDay}`);
+    let selectedCountryData = null;
 
-    // Automatically update country code prefix, digit length, placeholder, and currency when country changes
-    countrySelect.addEventListener('change', (e) => {
-      const selectedOption = countrySelect.options[countrySelect.selectedIndex];
-      const code = selectedOption.getAttribute('data-code');
-      const currency = selectedOption.getAttribute('data-currency');
-      const digits = selectedOption.getAttribute('data-digits');
-      const placeholder = selectedOption.getAttribute('data-placeholder');
+    // Render dropdown options based on filter query
+    function renderCountryOptions(filter = '') {
+      countryDropdownList.innerHTML = '';
+      const filtered = countriesData.filter(c => c.name.toLowerCase().includes(filter.toLowerCase()));
 
-      // Update phone prefix box
-      phonePrefix.textContent = code || '+---';
-
-      // Enable phone input and set validation constraints
-      if (code) {
-        phoneInput.disabled = false;
-        phoneInput.setAttribute('maxlength', digits);
-        phoneInput.setAttribute('placeholder', placeholder || 'Enter phone number');
-        phoneInput.title = `Please enter exactly ${digits} digits for this country`;
-        phoneInput.value = ''; // Clear previous input on country switch
-      } else {
-        phoneInput.disabled = true;
-        phoneInput.placeholder = 'Select a country first';
+      if (filtered.length === 0) {
+        countryDropdownList.style.display = 'none';
+        return;
       }
 
-      // Automatically preselect matching currency if available in the dropdown
-      if (currency) {
+      filtered.forEach(c => {
+        const div = document.createElement('div');
+        div.className = 'country-option';
+        div.innerHTML = `<span>${c.flag}</span> <span>${c.name} (${c.dialCode})</span>`;
+        div.addEventListener('click', () => {
+          selectCountry(c);
+        });
+        countryDropdownList.appendChild(div);
+      });
+
+      countryDropdownList.style.display = 'block';
+    }
+
+    function selectCountry(c) {
+      selectedCountryData = c;
+      countrySearch.value = `${c.flag}  ${c.name}`;
+      countryHidden.value = c.code;
+      countryDropdownList.style.display = 'none';
+
+      // Update phone prefix box & input constraints
+      phonePrefix.textContent = c.dialCode;
+      phoneInput.disabled = false;
+      phoneInput.setAttribute('maxlength', c.digits);
+      phoneInput.setAttribute('placeholder', c.placeholder);
+      phoneInput.title = `Please enter exactly ${c.digits} digits for this country`;
+      phoneInput.value = '';
+
+      // Preselect or dynamically append matching currency
+      if (c.currency) {
         let currencyOptionExists = false;
         for (let i = 0; i < currencySelect.options.length; i++) {
-          if (currencySelect.options[i].value === currency) {
-            currencySelect.value = currency;
+          if (currencySelect.options[i].value === c.currency) {
+            currencySelect.value = c.currency;
             currencyOptionExists = true;
             break;
           }
         }
-        // If the currency isn't in the default dropdown list, dynamically add it
         if (!currencyOptionExists) {
           const newOpt = document.createElement('option');
-          newOpt.value = currency;
-          newOpt.textContent = currency;
+          newOpt.value = c.currency;
+          newOpt.textContent = c.currency;
           currencySelect.appendChild(newOpt);
-          currencySelect.value = currency;
+          currencySelect.value = c.currency;
         }
+      }
+    }
+
+    // Event listeners for searchable country input
+    countrySearch.addEventListener('focus', () => {
+      renderCountryOptions(countrySearch.value);
+    });
+
+    countrySearch.addEventListener('input', () => {
+      selectedCountryData = null;
+      countryHidden.value = '';
+      renderCountryOptions(countrySearch.value);
+    });
+
+    // Hide dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.searchable-select-container')) {
+        countryDropdownList.style.display = 'none';
       }
     });
 
     // Enforce dynamic numeric digits input based on selected country's required length
     phoneInput.addEventListener('input', (e) => {
-      const selectedOption = countrySelect.options[countrySelect.selectedIndex];
-      const maxDigits = parseInt(selectedOption.getAttribute('data-digits')) || 15;
+      if (!selectedCountryData) return;
+      const maxDigits = selectedCountryData.digits || 15;
       phoneInput.value = phoneInput.value.replace(/\D/g, '').slice(0, maxDigits);
     });
 
@@ -578,30 +650,19 @@
       e.preventDefault();
       alertBox.style.display = 'none';
 
+      if (!selectedCountryData) {
+        showAlert('Please select a valid country from the list.');
+        countrySearch.focus();
+        return;
+      }
+
       // Validate exact phone digit length before submitting
-      const selectedOption = countrySelect.options[countrySelect.selectedIndex];
-      const expectedDigits = parseInt(selectedOption.getAttribute('data-digits'));
+      const expectedDigits = selectedCountryData.digits;
       const rawPhone = phoneInput.value.trim();
 
       if (expectedDigits && rawPhone.length !== expectedDigits) {
         showAlert(`Phone number for this country must be exactly ${expectedDigits} digits.`);
         phoneInput.focus();
-        return;
-      }
-
-      // Validate that age is at least 18 years old
-      const dobValue = new Date(dobInput.value);
-      const todayDate = new Date();
-      let age = todayDate.getFullYear() - dobValue.getFullYear();
-      const m = todayDate.getMonth() - dobValue.getMonth();
-      
-      if (m < 0 || (m === 0 && todayDate.getDate() < dobValue.getDate())) {
-        age--;
-      }
-
-      if (age < 18) {
-        showAlert('You must be at least 23 years old to register.');
-        dobInput.focus();
         return;
       }
 
@@ -612,7 +673,7 @@
         firstName: document.getElementById('firstName').value.trim(),
         lastName: document.getElementById('lastName').value.trim(),
         email: document.getElementById('email').value.trim(),
-        country: countrySelect.value,
+        country: countryHidden.value,
         phone: fullPhoneNumber,
         gender: document.getElementById('gender').value,
         dob: dobInput.value,

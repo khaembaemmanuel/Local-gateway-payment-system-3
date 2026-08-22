@@ -7,7 +7,6 @@ const axios = require('axios');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const hpp = require('hpp');
-const xss = require('xss-clean');
 const connectDB = require('./config/db');
 
 const PORT = process.env.PORT || 4000;
@@ -30,15 +29,6 @@ app.use(helmet({
   },
   crossOriginEmbedderPolicy: false
 }));
-
-// Explicitly set Permissions-Policy header for A+ security rating
-app.use((req, res, next) => {
-  res.setHeader(
-    'Permissions-Policy',
-    'camera=(), microphone=(), geolocation=(), interest-cohort=()'
-  );
-  next();
-});
 
 // 2. Strict CORS Policy
 const allowedOrigins = [
@@ -84,7 +74,6 @@ app.use('/api/auth/register', authLimiter);
 // 4. Body Parsing & Input Protection (Payload limits, XSS, HPP)
 app.use(express.json({ limit: '10kb' })); // Limit body size to 10kb to prevent payload injection
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
-app.use(xss()); // Sanitize user input against XSS
 app.use(hpp()); // Prevent HTTP Parameter Pollution
 
 // 5. Serve Static Frontend Files
@@ -165,7 +154,7 @@ connectDB()
     });
   })
   .catch((err) => {
-    console.error('❌ Failed to connect to MongoDB:', err.message);
+    console.err('❌ Failed to connect to MongoDB:', err.message);
     process.exit(1);
   });
 
