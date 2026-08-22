@@ -71,7 +71,7 @@ app.use('/api/', globalLimiter);
 app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/register', authLimiter);
 
-// 4. Body Parsing & Input Protection (Payload limits, XSS, HPP)
+// 4. Body Parsing & Input Protection (Payload limits & HPP)
 app.use(express.json({ limit: '10kb' })); // Limit body size to 10kb to prevent payload injection
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(hpp()); // Prevent HTTP Parameter Pollution
@@ -154,7 +154,7 @@ connectDB()
     });
   })
   .catch((err) => {
-    console.err('❌ Failed to connect to MongoDB:', err.message);
+    console.error('❌ Failed to connect to MongoDB:', err.message);
     process.exit(1);
   });
 
