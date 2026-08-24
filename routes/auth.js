@@ -1,3 +1,4 @@
+// routes/auth.js
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
@@ -308,7 +309,6 @@ router.post('/forgot-password', async (req, res, next) => {
 
     const user = await User.findOne({ email: email.toLowerCase().trim() });
     
-    // Explicitly check if user exists and return an error if not found
     if (!user) {
       return res.status(404).json({ 
         success: false, 
@@ -330,14 +330,11 @@ router.post('/forgot-password', async (req, res, next) => {
     
     await user.save();
 
-    // ==========================================
-    // SEND REAL EMAIL VIA NODEMAILER
-    // ==========================================
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: process.env.EMAIL_USER, // Reads from your cloud environment variables
-        pass: process.env.EMAIL_PASS  // Reads your 16-character App Password
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
       }
     });
 
@@ -349,7 +346,6 @@ router.post('/forgot-password', async (req, res, next) => {
     };
 
     await transporter.sendMail(mailOptions);
-    // ==========================================
 
     return res.status(200).json({
       success: true,
@@ -361,6 +357,7 @@ router.post('/forgot-password', async (req, res, next) => {
     return res.status(500).json({ success: false, message: 'Failed to send OTP email. Please try again later.' });
   }
 });
+
 // ==========================================
 // 7. VERIFY OTP ROUTE
 // ==========================================
