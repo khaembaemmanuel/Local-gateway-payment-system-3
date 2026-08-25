@@ -326,7 +326,7 @@
       <div class="form-row">
         <label for="dob">Date of Birth</label>
         <div class="date-input-group">
-          <input type="text" id="dob" name="dob" placeholder="YYYY-MM-DD or select..." autocomplete="off" required>
+          <input type="text" id="dob" name="dob" placeholder="YYYY-MM-DD or select..." maxlength="10" autocomplete="off" required>
           <input type="date" id="dobPicker" aria-label="Select date from calendar">
           <i class="fa-regular fa-calendar date-picker-icon"></i>
         </div>
@@ -694,6 +694,13 @@
     dobPicker.addEventListener('change', () => {
       if (dobPicker.value) {
         dobInput.value = dobPicker.value;
+      }
+    });
+
+    // Enforce maximum of 10 characters for Date of Birth input field
+    dobInput.addEventListener('input', (e) => {
+      if (dobInput.value.length > 10) {
+        dobInput.value = dobInput.value.slice(0, 10);
       }
     });
 
