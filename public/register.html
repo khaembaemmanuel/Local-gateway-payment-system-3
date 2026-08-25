@@ -102,12 +102,18 @@
       width: 100%;
     }
 
+    /* Specific styling for the country input box to accommodate flag */
+    .country-search-input {
+      font-size: 15px !important;
+      font-weight: 500;
+    }
+
     .country-dropdown-list {
       position: absolute;
       top: 100%;
       left: 0;
       right: 0;
-      max-height: 200px;
+      max-height: 220px;
       overflow-y: auto;
       background: #ffffff;
       border: 1px solid #cbd5e1;
@@ -125,11 +131,45 @@
       color: #1e293b;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
+      transition: background-color 0.15s;
     }
 
     .country-option:hover {
       background-color: #f1f5f9;
+    }
+
+    .country-option .flag-icon {
+      font-size: 18px;
+      line-height: 1;
+      min-width: 24px;
+      text-align: center;
+    }
+
+    /* Custom Date Input Group with Picker Icon */
+    .date-input-group {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .date-input-group input[type="text"] {
+      padding-right: 40px;
+    }
+
+    .date-input-group input[type="date"] {
+      position: absolute;
+      right: 10px;
+      width: 24px;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .date-picker-icon {
+      position: absolute;
+      right: 12px;
+      color: #64748b;
+      pointer-events: none;
     }
 
     /* Phone Input Container */
@@ -253,11 +293,11 @@
         <input type="email" id="email" name="email" placeholder="Your Email Address" required>
       </div>
 
-      <!-- Country of Origin (Searchable with Flags) -->
+      <!-- Country of Origin (Searchable with Flags attached) -->
       <div class="form-row">
         <label for="countrySearch">Country of Origin</label>
         <div class="searchable-select-container">
-          <input type="text" id="countrySearch" placeholder="Type to search country..." autocomplete="off" required>
+          <input type="text" id="countrySearch" class="country-search-input" placeholder="Type or select country..." autocomplete="off" required>
           <input type="hidden" id="country" name="country" required>
           <div id="countryDropdownList" class="country-dropdown-list"></div>
         </div>
@@ -282,10 +322,14 @@
         </select>
       </div>
 
-      <!-- Date of Birth -->
+      <!-- Date of Birth (Type or Select) -->
       <div class="form-row">
         <label for="dob">Date of Birth</label>
-        <input type="date" id="dob" name="dob" required>
+        <div class="date-input-group">
+          <input type="text" id="dob" name="dob" placeholder="YYYY-MM-DD or select..." autocomplete="off" required>
+          <input type="date" id="dobPicker" aria-label="Select date from calendar">
+          <i class="fa-regular fa-calendar date-picker-icon"></i>
+        </div>
       </div>
 
       <!-- Full Home Address -->
@@ -554,11 +598,13 @@
     const phonePrefix = document.getElementById('phonePrefix');
     const phoneInput = document.getElementById('phone');
     const currencySelect = document.getElementById('currency');
+    
     const dobInput = document.getElementById('dob');
+    const dobPicker = document.getElementById('dobPicker');
 
     let selectedCountryData = null;
 
-    // Render dropdown options based on filter query
+    // Render dropdown options featuring flags and names side-by-side
     function renderCountryOptions(filter = '') {
       countryDropdownList.innerHTML = '';
       const filtered = countriesData.filter(c => c.name.toLowerCase().includes(filter.toLowerCase()));
@@ -571,7 +617,10 @@
       filtered.forEach(c => {
         const div = document.createElement('div');
         div.className = 'country-option';
-        div.innerHTML = `<span>${c.flag}</span> <span>${c.name} (${c.dialCode})</span>`;
+        div.innerHTML = `
+          <span class="flag-icon">${c.flag}</span>
+          <span>${c.name} <strong style="color: #64748b; font-weight: 500;">(${c.dialCode})</strong></span>
+        `;
         div.addEventListener('click', () => {
           selectCountry(c);
         });
@@ -583,6 +632,7 @@
 
     function selectCountry(c) {
       selectedCountryData = c;
+      // Permanently bind the flag inside the input field alongside the country name
       countrySearch.value = `${c.flag}  ${c.name}`;
       countryHidden.value = c.code;
       countryDropdownList.style.display = 'none';
@@ -617,19 +667,33 @@
 
     // Event listeners for searchable country input
     countrySearch.addEventListener('focus', () => {
-      renderCountryOptions(countrySearch.value);
+      // If user focuses back on an already selected country, clear the flag prefix to let them search fresh if they want
+      renderCountryOptions(countrySearch.value.replace(/^[^\w\s]+\s*/, ''));
     });
 
     countrySearch.addEventListener('input', () => {
       selectedCountryData = null;
       countryHidden.value = '';
-      renderCountryOptions(countrySearch.value);
+      // Strip any emoji flags if user is actively typing a new search query
+      const rawQuery = countrySearch.value.replace(/^[^\w\s]+\s*/, '');
+      renderCountryOptions(rawQuery);
     });
 
     // Hide dropdown when clicking outside
     document.addEventListener('click', (e) => {
       if (!e.target.closest('.searchable-select-container')) {
         countryDropdownList.style.display = 'none';
+        // If they clicked away without making a valid selection, reset the input if it was messy
+        if (!selectedCountryData && countrySearch.value.trim() !== '') {
+          countrySearch.value = '';
+        }
+      }
+    });
+
+    // Sync hidden date picker selection with the text input box
+    dobPicker.addEventListener('change', () => {
+      if (dobPicker.value) {
+        dobInput.value = dobPicker.value;
       }
     });
 
@@ -676,7 +740,7 @@
         country: countryHidden.value,
         phone: fullPhoneNumber,
         gender: document.getElementById('gender').value,
-        dob: dobInput.value,
+        dob: dobInput.value.trim(),
         address: document.getElementById('address').value.trim(),
         accountType: document.getElementById('accountType').value,
         currency: currencySelect.value,
