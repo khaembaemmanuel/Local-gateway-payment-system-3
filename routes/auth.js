@@ -28,7 +28,7 @@ const authenticateToken = (req, res, next) => {
 };
 
 // ==========================================
-// 1. REGISTER USER (With 18+ Age Validation)
+// 1. REGISTER USER (Forced to USER Role Only)
 // ==========================================
 router.post('/register', async (req, res, next) => {
   try {
@@ -92,7 +92,7 @@ router.post('/register', async (req, res, next) => {
     // Generate unique account number
     const accountNumber = 'SRIB' + Math.floor(1000000000 + Math.random() * 9000000000);
 
-    // Create and save new user
+    // Create and save new user - STRICTLY FORCED to 'USER' role to prevent new admin creation
     const newUser = new User({
       firstName,
       lastName,
@@ -127,13 +127,16 @@ router.post('/register', async (req, res, next) => {
       accountNumber: newUser.accountNumber,
       accountType: newUser.accountType,
       currency: newUser.currency,
-      balance: newUser.balance
+      balance: newUser.balance,
+      role: newUser.role
     };
 
     res.status(201).json({ 
       success: true, 
       message: 'Registration successful!', 
       token,
+      role: newUser.role,
+      redirectTo: '/dashboard.html', // Regular users always go to public dashboard
       accountNumber,
       user: userPayload,
       account: userPayload
@@ -145,7 +148,7 @@ router.post('/register', async (req, res, next) => {
 });
 
 // ==========================================
-// 2. DIRECT LOGIN ROUTE (With Deactivation Check)
+// 2. DIRECT LOGIN ROUTE (With .env Admin Check)
 // ==========================================
 router.post('/login', async (req, res, next) => {
   try {
@@ -176,11 +179,27 @@ router.post('/login', async (req, res, next) => {
       });
     }
 
+    // Check against .env configuration for admin email dynamically
+    const configuredAdminEmail = process.env.ADMIN_EMAIL ? process.env.ADMIN_EMAIL.toLowerCase() : '';
+    const isEnvAdmin = user.email && user.email.toLowerCase() === configuredAdminEmail;
+    const isDbAdmin = user.role === 'ADMIN' || user.role === 'SUPERADMIN';
+
+    // If matched via .env, ensure their database role is synchronized to ADMIN
+    if (isEnvAdmin && !isDbAdmin) {
+      user.role = 'ADMIN';
+      await user.save();
+    }
+
+    const isAdmin = isEnvAdmin || isDbAdmin;
+
     const token = jwt.sign(
       { userId: user._id, accountNumber: user.accountNumber, role: user.role },
       env.jwtSecret || process.env.JWT_SECRET,
       { expiresIn: env.jwtExpiresIn || '1d' }
     );
+    
+    // Assign redirection path: private folder admin.html for admins, public dashboard for regular users
+    const redirectTo = isAdmin ? '/admin/admin.html' : '/dashboard.html';
 
     const userPayload = {
       firstName: user.firstName,
@@ -189,13 +208,16 @@ router.post('/login', async (req, res, next) => {
       accountNumber: user.accountNumber,
       accountType: user.accountType,
       currency: user.currency,
-      balance: user.balance
+      balance: user.balance,
+      role: user.role
     };
 
     res.status(200).json({
       success: true,
       message: 'Login successful',
       token,
+      role: user.role,
+      redirectTo: redirectTo, // Tells frontend precisely where to navigate user
       user: userPayload,
       account: userPayload
     });
@@ -224,7 +246,8 @@ router.get('/me', authenticateToken, async (req, res, next) => {
         accountNumber: user.accountNumber,
         accountType: user.accountType,
         currency: user.currency,
-        balance: user.balance
+        balance: user.balance,
+        role: user.role
       }
     });
   } catch (err) {
