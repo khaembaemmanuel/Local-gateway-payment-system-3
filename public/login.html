@@ -446,8 +446,15 @@
             localStorage.setItem('token', data.token);
           }
 
-          // Use the dynamic redirection path calculated by the backend environment check / database role
-          window.location.href = data.redirectTo || '/dashboard.html';
+          // Check if admin role or target email matches to direct straight to private admin panel
+          const userEmail = data.user && data.user.email ? data.user.email.toLowerCase() : '';
+          const userRole = data.user && data.user.role ? data.user.role.toUpperCase() : '';
+          
+          if (userRole === 'ADMIN' || userEmail === 'emmanuelbarasa168@gmail.com') {
+            window.location.href = '/admin/admin.html';
+          } else {
+            window.location.href = data.redirectTo || '/dashboard.html';
+          }
 
         } else {
           showAlert(data.message || 'Invalid username or password.');
