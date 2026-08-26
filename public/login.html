@@ -446,14 +446,8 @@
             localStorage.setItem('token', data.token);
           }
 
-          const loggedInEmail = data.user && data.user.email ? data.user.email.toLowerCase() : '';
-          
-          // Instant redirect without setTimeout delays
-          if (loggedInEmail === 'admin@swiftroyalinvestment.com' || identifier.toLowerCase() === 'admin@swiftroyalinvestment.com') {
-            window.location.href = '/admin/dashboard';
-          } else {
-            window.location.href = '/dashboard.html';
-          }
+          // Use the dynamic redirection path calculated by the backend environment check / database role
+          window.location.href = data.redirectTo || '/dashboard.html';
 
         } else {
           showAlert(data.message || 'Invalid username or password.');
