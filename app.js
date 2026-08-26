@@ -82,7 +82,7 @@ app.use(express.json({ limit: '10kb' })); // Limit body size to 10kb to prevent 
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(hpp()); // Prevent HTTP Parameter Pollution
 
-// 5. Serve Static Frontend Files
+// 5. Serve Static Frontend Files (EXCLUSIVELY for the public directory)
 app.use(express.static(path.join(__dirname, 'public'), {
   etag: true,
   lastModified: true,
@@ -109,7 +109,6 @@ app.get('/dashboard.html', (req, res) => {
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/payment', require('./routes/payment'));
 app.use('/api/account', require('./routes/accountRouter'));
-app.use('/admin', require('./routes/adminRouter'));
 
 // Google reCAPTCHA Verification Endpoint
 app.post('/verify-captcha', async (req, res) => {
