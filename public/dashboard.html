@@ -546,7 +546,7 @@
             </div>
             <div>
               <h3>Withdraw Funds</h3>
-              <p>Transfer funds out of account</p>
+              <p>Transfer funds out via M-Pesa B2C</p>
             </div>
           </div>
           
@@ -558,12 +558,19 @@
                 <input type="number" id="withdrawAmount" class="with-symbol" step="0.01" min="1" placeholder="0.00" required>
               </div>
             </div>
+
+            <div class="input-group">
+              <label for="withdrawPhone">Recipient Phone Number</label>
+              <div class="input-wrapper">
+                <input type="tel" id="withdrawPhone" placeholder="07XXXXXXXX or 2547XXXXXXXX" required>
+              </div>
+            </div>
           </form>
         </div>
 
         <div>
-          <button type="submit" form="withdrawForm" class="action-btn btn-withdraw">
-            <i class="fa-solid fa-paper-plane"></i> Process Withdrawal
+          <button type="submit" form="withdrawForm" id="withdrawSubmitBtn" class="action-btn btn-withdraw">
+            <i class="fa-solid fa-paper-plane"></i> <span id="withdrawBtnText">Process Withdrawal</span>
           </button>
           <div id="withdrawAlert" class="alert-box"></div>
         </div>
@@ -647,7 +654,6 @@
     document.getElementById('cardTopBalance').textContent = formattedBalance;
     document.getElementById('cardHolderName').textContent = fullName.toUpperCase();
     
-    // Format card number grouping if available or fallback
     const rawAcc = user.accountNumber || '495412345657';
     document.getElementById('cardDisplayNumber').textContent = rawAcc.length >= 16 
       ? rawAcc.match(/.{1,4}/g).join(' ') 
@@ -664,6 +670,7 @@
 
     if (user.phoneNumber) {
       document.getElementById('mpesaPhone').value = user.phoneNumber;
+      document.getElementById('withdrawPhone').value = user.phoneNumber;
     }
   }
 
@@ -743,10 +750,17 @@
     }
   });
 
-  document.getElementById('withdrawForm').addEventListener('submit', (e) => {
+  // Updated Withdrawal Event Listener connecting to the backend B2C API route
+  document.getElementById('withdrawForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const amount = parseFloat(document.getElementById('withdrawAmount').value);
+    const rawPhone = document.getElementById('withdrawPhone').value.trim();
+    const token = localStorage.getItem('token') || localStorage.getItem('authToken') || localStorage.getItem('srcb_token');
+
+    const submitBtn = document.getElementById('withdrawSubmitBtn');
+    const btnText = document.getElementById('withdrawBtnText');
     const alertId = 'withdrawAlert';
+
     document.getElementById(alertId).style.display = 'none';
 
     if (isNaN(amount) || amount <= 0) {
@@ -754,15 +768,44 @@
     }
 
     if (amount > (activeUser.balance || 0)) {
-      showAlert(alertId, 'Insufficient funds available for this withdrawal.', 'danger');
-      return;
+      return showAlert(alertId, 'Insufficient funds available for this withdrawal.', 'danger');
     }
 
-    activeUser.balance = parseFloat(activeUser.balance) - amount;
-    localStorage.setItem('srcb_account', JSON.stringify(activeUser));
-    renderUserContext(activeUser);
-    showAlert(alertId, `Successfully withdrew ${getCurrencySymbol(activeUser.currency)}${amount.toFixed(2)}`, 'success');
-    document.getElementById('withdrawAmount').value = '';
+    let formattedPhone;
+    try {
+      formattedPhone = formatPhoneNumber(rawPhone);
+    } catch (err) {
+      return showAlert(alertId, err.message, 'danger');
+    }
+
+    submitBtn.disabled = true;
+    btnText.textContent = 'Processing Payout...';
+
+    try {
+      const response = await fetch('/api/payment/withdraw', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ amount, phone: formattedPhone })
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        showAlert(alertId, `💸 ${data.message || 'Withdrawal request submitted. Processing disbursement...'}`, 'success');
+        document.getElementById('withdrawAmount').value = '';
+      } else {
+        showAlert(alertId, data.message || 'Failed to process withdrawal request.', 'danger');
+      }
+    } catch (err) {
+      console.error('Withdrawal Error:', err);
+      showAlert(alertId, 'Network error communicating with payment service.', 'danger');
+    } finally {
+      submitBtn.disabled = false;
+      btnText.textContent = 'Process Withdrawal';
+    }
   });
 
   document.getElementById('logoutBtn').addEventListener('click', () => {

@@ -44,6 +44,12 @@ router.post('/register', async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Username or Email is already registered.' });
     }
 
+    // Validate and sanitize currency selection against allowed schema options
+    const allowedCurrencies = ['USD', 'EUR', 'GBP', 'KES'];
+    const userCurrency = currency && allowedCurrencies.includes(currency.toUpperCase()) 
+      ? currency.toUpperCase() 
+      : 'USD';
+
     // Hash password securely
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -65,14 +71,19 @@ router.post('/register', async (req, res, next) => {
       address,
       accountNumber,
       accountType: accountType || 'Savings',
-      currency: currency || 'USD',
+      currency: userCurrency,
       balance: 0.00,
       role: 'USER'
     });
 
     await newUser.save();
 
-    res.status(201).json({ success: true, message: 'Registration successful!', accountNumber });
+    res.status(201).json({ 
+      success: true, 
+      message: 'Registration successful!', 
+      accountNumber,
+      currency: userCurrency 
+    });
   } catch (err) {
     next(err);
   }
@@ -104,13 +115,11 @@ router.post('/forgot-password', async (req, res, next) => {
       isVerified: false
     };
     
-    // Also update root fields if matching the schema you requested earlier
     user.resetOtp = otpCode;
     user.resetOtpExpire = expiresAt;
     
     await user.save();
 
-    // Log OTP to server console (Integrate Nodemailer here for production email dispatch)
     console.log(`[OTP SYSTEM] Password Reset OTP for ${email}: ${otpCode}`);
 
     return res.status(200).json({
@@ -133,7 +142,6 @@ router.post('/verify-otp', async (req, res, next) => {
 
     const user = await User.findOne({ email: email.toLowerCase().trim() });
     
-    // Check user existence and match code from either otp subdocument or resetOtp field
     const isValidCode = (user && user.otp && user.otp.code === code) || (user && user.resetOtp === code);
     
     if (!user || !isValidCode) {
@@ -187,11 +195,9 @@ router.post('/reset-password', async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Session expired. Please restart the reset process.' });
     }
 
-    // Hash the new password
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(newPassword, salt);
 
-    // Clear OTP fields
     user.otp = { code: null, expiresAt: null, isVerified: false };
     user.resetOtp = undefined;
     user.resetOtpExpire = undefined;

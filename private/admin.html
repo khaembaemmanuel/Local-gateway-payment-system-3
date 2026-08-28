@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Swift Royal Capital Bank - Admin Portal</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 20px; }
+    h1, h2 { color: #38bdf8; }
+    .container { max-width: 1250px; margin: auto; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #1e293b; }
+    th, td { padding: 12px; border: 1px solid #334155; text-align: left; }
+    th { background: #0284c7; color: white; }
+    button { padding: 6px 12px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; }
+    .btn-approve { background: #22c55e; color: white; }
+    .btn-reject { background: #ef4444; color: white; }
+    .btn-block { background: #f59e0b; color: white; }
+    .btn-unblock { background: #10b981; color: white; }
+    .btn-delete { background: #dc2626; color: white; }
+    .btn-history { background: #6366f1; color: white; }
+    .section { margin-bottom: 40px; }
+    
+    /* Modal Styles */
+    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); }
+    .modal-content { background: #1e293b; margin: 10% auto; padding: 20px; width: 80%; max-width: 700px; border-radius: 8px; border: 1px solid #334155; max-height: 80vh; overflow-y: auto; }
+    .close-btn { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+    .close-btn:hover { color: #fff; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>👑 Admin Control Panel</h1>
+    <p>Secure management interface for Swift Royal Capital Bank clients, balances, transaction histories, and security controls.</p>
+
+    <!-- Payout Requests Section -->
+    <div class="section">
+      <h2>Pending Payout Requests</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Client Name</th>
+            <th>Account No</th>
+            <th>Local Amount</th>
+            <th>USD Deducted</th>
+            <th>Phone / Payout Details</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="withdrawalsTable">
+          <tr><td colspan="6">Loading pending requests...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Clients Section -->
+    <div class="section">
+      <h2>Registered Clients & Account Management</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Country / Currency</th>
+            <th>USD / Local Balance</th>
+            <th>Status</th>
+            <th>Actions & Controls</th>
+          </tr>
+        </thead>
+        <tbody id="clientsTable">
+          <tr><td colspan="7">Loading clients...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Transaction History Modal -->
+  <div id="historyModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeHistoryModal()">&times;</span>
+      <h2>Client Transaction History</h2>
+      <p id="modalClientInfo" style="color: #38bdf8; margin-bottom: 15px;"></p>
+      <table>
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Payment Method</th>
+            <th>Native Amount</th>
+            <th>USD Amount</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody id="modalHistoryTable">
+          <tr><td colspan="6">Loading history...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // Automatic Authentication Check & Prompt on Page Load
+    async function checkAdminAuth() {
+      try {
+        const testRes = await fetch('/api/admin/clients');
+        if (testRes.status === 401 || testRes.status === 403) {
+          const password = prompt("Enter Administrator Password:");
+          if (!password) {
+            alert("Admin password required to access this dashboard.");
+            return;
+          }
+
+          const loginRes = await fetch('/api/admin/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password })
+          });
+          const loginData = await loginRes.json();
+
+          if (loginData.success) {
+            loadAdminData();
+          } else {
+            alert(loginData.message || 'Authentication failed.');
+            window.location.reload();
+          }
+        } else {
+          loadAdminData();
+        }
+      } catch (err) {
+        console.error('Auth check error:', err);
+        loadAdminData();
+      }
+    }
+
+    async function loadAdminData() {
+      try {
+        // 1. Load Pending Withdrawals
+        const wRes = await fetch('/api/admin/withdrawals/pending');
+        const wData = await wRes.json();
+        const wTable = document.getElementById('withdrawalsTable');
+        
+        if (wData.success && wData.withdrawals && wData.withdrawals.length > 0) {
+          wTable.innerHTML = wData.withdrawals.map(w => `
+            <tr>
+              <td>${w.userId ? w.userId.firstName + ' ' + w.userId.lastName : 'Unknown'}</td>
+              <td>${w.userId ? w.userId.accountNumber : 'N/A'}</td>
+              <td><b>${w.currency} ${w.payoutAmountLocal.toLocaleString()}</b></td>
+              <td>$${w.amountUSD.toFixed(2)}</td>
+              <td>${w.phoneNumber}</td>
+              <td>
+                <button class="btn-approve" onclick="processWithdrawal('${w._id}', 'complete')">Approve</button>
+                <button class="btn-reject" onclick="processWithdrawal('${w._id}', 'reject')">Reject</button>
+              </td>
+            </tr>
+          `).join('');
+        } else {
+          wTable.innerHTML = `<tr><td colspan="6">No pending withdrawal requests found.</td></tr>`;
+        }
+
+        // 2. Load All Clients
+        const cRes = await fetch('/api/admin/clients');
+        const cData = await cRes.json();
+        const cTable = document.getElementById('clientsTable');
+
+        if (cData.success && cData.clients && cData.clients.length > 0) {
+          cTable.innerHTML = cData.clients.map(c => {
+            const isBlocked = c.isBlocked || false;
+            return `
+              <tr>
+                <td>${c.firstName} ${c.lastName}</td>
+                <td>${c.username}</td>
+                <td>${c.email}</td>
+                <td>${c.country || 'N/A'} (${c.currency})</td>
+                <td>$${c.balance.toFixed(2)}<br><small style="color: #94a3b8;">${c.currency} ${c.localBalanceEquivalent.toLocaleString()}</small></td>
+                <td><span style="color: ${isBlocked ? '#ef4444' : '#22c55e'}; font-weight: bold;">${isBlocked ? 'Blocked' : 'Active'}</span></td>
+                <td>
+                  <button class="btn-history" onclick="viewHistory('${c._id}', '${c.firstName} ${c.lastName}', '${c.accountNumber || c.email}')">History</button>
+                  ${isBlocked 
+                    ? `<button class="btn-unblock" onclick="toggleBlockUser('${c._id}', false)">Unblock</button>` 
+                    : `<button class="btn-block" onclick="toggleBlockUser('${c._id}', true)">Block</button>`
+                  }
+                  <button class="btn-delete" onclick="deleteUser('${c._id}', '${c.email}')">Delete</button>
+                </td>
+              </tr>
+            `;
+          }).join('');
+        } else {
+          cTable.innerHTML = `<tr><td colspan="7">No registered clients found.</td></tr>`;
+        }
+
+      } catch (err) {
+        console.error('Error loading admin data:', err);
+      }
+    }
+
+    async function processWithdrawal(id, action) {
+      if (!confirm(`Are you sure you want to ${action} this withdrawal?`)) return;
+
+      const res = await fetch(`/api/admin/withdrawals/${id}/${action}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const data = await res.json();
+      alert(data.message);
+      loadAdminData();
+    }
+
+    async function toggleBlockUser(userId, blockStatus) {
+      const actionText = blockStatus ? 'block' : 'unblock';
+      if (!confirm(`Are you sure you want to ${actionText} this user?`)) return;
+
+      try {
+        const res = await fetch(`/api/admin/clients/${userId}/status`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ isBlocked: blockStatus })
+        });
+        const data = await res.json();
+        alert(data.message || 'Status updated successfully');
+        loadAdminData();
+      } catch (err) {
+        console.error('Error updating user status:', err);
+        alert('Failed to update user status.');
+      }
+    }
+
+    async function deleteUser(userId, email) {
+      if (!confirm(`WARNING: Are you sure you want to completely delete client account (${email})? This action cannot be undone.`)) return;
+
+      try {
+        const res = await fetch(`/api/admin/clients/${userId}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        alert(data.message || 'User deleted successfully');
+        loadAdminData();
+      } catch (err) {
+        console.error('Error deleting user:', err);
+        alert('Failed to delete user.');
+      }
+    }
+
+    async function viewHistory(userId, name, accountNum) {
+      document.getElementById('modalClientInfo').innerText = `Client: ${name} (Account: ${accountNum})`;
+      document.getElementById('modalHistoryTable').innerHTML = `<tr><td colspan="6">Loading transaction logs...</td></tr>`;
+      document.getElementById('historyModal').style.display = 'block';
+
+      try {
+        const res = await fetch(`/api/admin/clients/${userId}/transactions`);
+        const data = await res.json();
+        const historyTable = document.getElementById('modalHistoryTable');
+
+        if (data.success && data.transactions && data.transactions.length > 0) {
+          historyTable.innerHTML = data.transactions.map(tx => `
+            <tr>
+              <td>${tx.type}</td>
+              <td>${tx.paymentMethod || 'N/A'}</td>
+              <td>${tx.nativeCurrency || ''} ${tx.amountNative ? tx.amountNative.toLocaleString() : '0'}</td>
+              <td>$${tx.amountUSD ? tx.amountUSD.toFixed(2) : '0.00'}</td>
+              <td><b>${tx.status}</b></td>
+              <td>${new Date(tx.createdAt).toLocaleString()}</td>
+            </tr>
+          `).join('');
+        } else {
+          historyTable.innerHTML = `<tr><td colspan="6">No transaction records found for this client.</td></tr>`;
+        }
+      } catch (err) {
+        console.error('Error loading transaction history:', err);
+        document.getElementById('modalHistoryTable').innerHTML = `<tr><td colspan="6">Failed to load transaction history.</td></tr>`;
+      }
+    }
+
+    function closeHistoryModal() {
+      document.getElementById('historyModal').style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+      const modal = document.getElementById('historyModal');
+      if (event.target == modal) {
+        modal.style.display = 'none';
+      }
+    }
+
+    // Initialize security check and load data on page open
+    checkAdminAuth();
+  </script>
+</body>
+</html>

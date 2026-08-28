@@ -90,12 +90,9 @@ const userSchema = new mongoose.Schema({
     default: 0.00, 
     min: [0, 'Balance cannot be negative'] 
   },
-  role: { 
-    type: String, 
-    enum: ['USER', 'ADMIN', 'SUPERADMIN'], 
-    default: 'USER',
-    uppercase: true,
-    trim: true
+  isBlocked: {
+    type: Boolean,
+    default: false
   },
   otp: {
     code: { type: String, default: null },

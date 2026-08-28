@@ -7,6 +7,7 @@ const axios = require('axios');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const hpp = require('hpp');
+const cookieParser = require('cookie-parser');
 const connectDB = require('./config/db');
 
 const PORT = process.env.PORT || 4000;
@@ -77,9 +78,10 @@ app.use('/api/', globalLimiter);
 app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/register', authLimiter);
 
-// 4. Body Parsing & Input Protection (Payload limits & HPP)
+// 4. Body Parsing, Cookie Parsing & Input Protection
 app.use(express.json({ limit: '10kb' })); // Limit body size to 10kb to prevent payload injection
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+app.use(cookieParser()); // Enable cookie parser for HTTP-only JWT verification
 app.use(hpp()); // Prevent HTTP Parameter Pollution
 
 // 5. Serve Static Frontend Files (EXCLUSIVELY for the public directory)
@@ -105,10 +107,19 @@ app.get('/dashboard.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 
+// Secure Admin Dashboard Portal Page Delivery
+app.get('/secure-admin-portal', (req, res) => {
+  res.sendFile(path.join(__dirname, 'private', 'admin.html'));
+});
+
 // 6. API routers & Verification Endpoint
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/payment', require('./routes/payment'));
+app.use('/api/payment', require('./routes/withdraw')); // Added withdrawal routes under /api/payment
 app.use('/api/account', require('./routes/accountRouter'));
+
+// Mounted Admin Management Routes (Includes /api/admin/login and protected endpoints)
+app.use('/api/admin', require('./routes/adminRoutes'));
 
 // Google reCAPTCHA Verification Endpoint
 app.post('/verify-captcha', async (req, res) => {
