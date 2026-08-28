@@ -27,7 +27,20 @@
   </style>
 </head>
 <body>
-  <div class="container">
+  <!-- Login Overlay Box -->
+  <div id="loginOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; display: flex; justify-content: center; align-items: center; z-index: 9999;">
+      <div style="background: #1e293b; padding: 40px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); width: 100%; max-width: 400px; text-align: center; border: 1px solid #334155;">
+          <h2 style="margin-bottom: 20px; font-family: Arial, sans-serif; color: #38bdf8;">Admin Login</h2>
+          <form id="loginForm">
+              <input type="password" id="adminPasswordInput" placeholder="Enter Admin Password" required style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #334155; background: #0f172a; color: #f8fafc; border-radius: 4px; box-sizing: border-box; font-size: 16px;">
+              <button type="submit" style="width: 100%; padding: 12px; background: #0284c7; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; font-weight: bold;">Access Dashboard</button>
+          </form>
+          <p id="loginError" style="color: #ef4444; margin-top: 10px; font-size: 14px; display: none;"></p>
+      </div>
+  </div>
+
+  <!-- Main Admin Dashboard (Hidden by default until authenticated) -->
+  <div id="adminDashboardContent" class="container" style="display: none;">
     <h1>👑 Admin Control Panel</h1>
     <p>Secure management interface for Swift Royal Capital Bank clients, balances, transaction histories, and security controls.</p>
 
@@ -98,17 +111,37 @@
   </div>
 
   <script>
-    // Automatic Authentication Check & Prompt on Page Load
-    async function checkAdminAuth() {
-      try {
-        const testRes = await fetch('/api/admin/clients');
-        if (testRes.status === 401 || testRes.status === 403) {
-          const password = prompt("Enter Administrator Password:");
-          if (!password) {
-            alert("Admin password required to access this dashboard.");
-            return;
-          }
+    document.addEventListener("DOMContentLoaded", async () => {
+      const dashboardContent = document.getElementById('adminDashboardContent');
+      const loginOverlay = document.getElementById('loginOverlay');
+      const loginForm = document.getElementById('loginForm');
+      const passwordInput = document.getElementById('adminPasswordInput');
+      const errorMsg = document.getElementById('loginError');
 
+      // Check session cookie validity on page load
+      async function checkAdminAuth() {
+        try {
+          const testRes = await fetch('/api/admin/clients');
+          if (testRes.ok) {
+            loginOverlay.style.display = 'none';
+            dashboardContent.style.display = 'block';
+            loadAdminData();
+          } else {
+            loginOverlay.style.display = 'flex';
+          }
+        } catch (err) {
+          console.error('Auth check error:', err);
+          loginOverlay.style.display = 'flex';
+        }
+      }
+
+      // Handle custom login form submission
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const password = passwordInput.value;
+        errorMsg.style.display = 'none';
+
+        try {
           const loginRes = await fetch('/api/admin/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -116,20 +149,24 @@
           });
           const loginData = await loginRes.json();
 
-          if (loginData.success) {
+          if (loginRes.ok && loginData.success) {
+            loginOverlay.style.display = 'none';
+            dashboardContent.style.display = 'block';
             loadAdminData();
           } else {
-            alert(loginData.message || 'Authentication failed.');
-            window.location.reload();
+            errorMsg.textContent = loginData.message || 'Authentication failed. Incorrect password.';
+            errorMsg.style.display = 'block';
           }
-        } else {
-          loadAdminData();
+        } catch (err) {
+          console.error('Login network error:', err);
+          errorMsg.textContent = 'Network error. Please try again.';
+          errorMsg.style.display = 'block';
         }
-      } catch (err) {
-        console.error('Auth check error:', err);
-        loadAdminData();
-      }
-    }
+      });
+
+      // Run check on initial load
+      checkAdminAuth();
+    });
 
     async function loadAdminData() {
       try {
@@ -270,7 +307,7 @@
       }
     }
 
-    function closeHistoryModal() {
+    fn closeHistoryModal() {
       document.getElementById('historyModal').style.display = 'none';
     }
 
@@ -280,9 +317,6 @@
         modal.style.display = 'none';
       }
     }
-
-    // Initialize security check and load data on page open
-    checkAdminAuth();
   </script>
 </body>
 </html>
