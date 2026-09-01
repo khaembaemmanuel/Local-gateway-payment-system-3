@@ -34,7 +34,7 @@ router.post('/login', (req, res) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
-    maxAge: 2 * 60 * 60 * 1000 // 2 hours
+    maxAge: 40 * 24 * 60 * 60 * 1000 // 2 hours
   });
 
   return res.json({ success: true, message: 'Admin authentication successful' });
