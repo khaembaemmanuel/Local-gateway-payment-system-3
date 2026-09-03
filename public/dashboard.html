@@ -540,12 +540,12 @@
     <div class="modal-card">
       <div class="modal-header">
         <h3 id="mpesaModalTitle"><i class="fa-solid fa-mobile-screen-button" style="color: #a3e635;"></i> M-Pesa Transaction</h3>
-        <button class="modal-close-btn" onclick="closeMpesaModal()"><i class="fa-solid fa-xmark"></i></button>
+        <button id="modalCloseXBtn" class="modal-close-btn"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="modal-body">
         
         <!-- Form Input State -->
-        <form id="mpesaForm" onsubmit="submitMpesaTransaction(event)">
+        <form id="mpesaForm">
           <div class="form-group">
             <label for="mpesaAmount" id="mpesaAmountLabel">Amount (KES)</label>
             <input type="number" id="mpesaAmount" class="form-control" placeholder="Enter amount (e.g. 1000)" min="10" required>
@@ -573,7 +573,7 @@
           <p style="font-size: 13px; color: #475569; line-height: 1.5; margin-bottom: 20px;" id="successStateDesc">
             Your M-Pesa request has been successfully dispatched.
           </p>
-          <button type="button" class="modal-submit-btn" onclick="closeMpesaModal()">Done</button>
+          <button type="button" id="modalDoneBtn" class="modal-submit-btn">Done</button>
         </div>
 
       </div>
@@ -641,7 +641,7 @@
       </div>
       <div class="detail-row">
         <span class="detail-label">BANK CARD ?</span>
-        <button class="apply-badge-btn" onclick="alert('Your card request has been submitted to support.')">
+        <button id="applyCardBtn" class="apply-badge-btn">
           <i class="fa-solid fa-circle-plus"></i> APPLY NOW
         </button>
       </div>
@@ -649,7 +649,7 @@
 
     <!-- 1. Deposit Button First -->
     <div style="margin-bottom: 16px;">
-      <button class="dash-action-btn btn-deposit-action" onclick="handleDepositClick()">
+      <button id="depositPageBtn" class="dash-action-btn btn-deposit-action">
         <i class="fa-solid fa-arrow-down-to-bracket"></i> Deposit
       </button>
     </div>
@@ -659,8 +659,8 @@
       <div class="recommended-title">Recommended Deposit Methods</div>
       <div class="recommended-grid">
         
-        <!-- M-Pesa Deposit Option: Triggers modal -->
-        <div class="payment-card" onclick="handleGatewaySelect('MPesa', 'deposit')">
+        <!-- M-Pesa Deposit Option -->
+        <div class="payment-card" data-gateway="MPesa" data-action="deposit">
           <div class="payment-logo-container">
             <div class="mpesa-logo-text">
               <span class="m-box">M</span><span style="color: #438e24;">-</span><span class="pesa-text">PESA</span>
@@ -672,7 +672,7 @@
         </div>
 
         <!-- Airtel Money Option -->
-        <div class="payment-card" onclick="handleGatewaySelect('AirtelMoney', 'deposit')">
+        <div class="payment-card" data-gateway="AirtelMoney" data-action="deposit">
           <div class="promo-badge">+10%</div>
           <div class="payment-logo-container">
             <div class="airtel-logo-wrap">
@@ -688,7 +688,7 @@
         </div>
 
         <!-- PayPal Option -->
-        <div class="payment-card" onclick="handleGatewaySelect('PayPal', 'deposit')">
+        <div class="payment-card" data-gateway="PayPal" data-action="deposit">
           <div class="payment-logo-container">
             <div class="paypal-logo-wrap">
               <span class="pp-blue1">Pay</span><span class="pp-blue2">Pal</span>
@@ -704,7 +704,7 @@
 
     <!-- 3. Withdrawal Button Downwards -->
     <div style="margin-top: 24px; margin-bottom: 16px;">
-      <button class="dash-action-btn btn-withdraw-action" onclick="handleWithdrawClick()">
+      <button id="withdrawPageBtn" class="dash-action-btn btn-withdraw-action">
         <i class="fa-solid fa-arrow-up-from-bracket"></i> Withdrawal
       </button>
     </div>
@@ -714,8 +714,8 @@
       <div class="recommended-title">Recommended Withdrawal Methods</div>
       <div class="recommended-grid">
         
-        <!-- M-Pesa Withdrawal Option: Triggers modal -->
-        <div class="payment-card" onclick="handleGatewaySelect('MPesa', 'withdraw')">
+        <!-- M-Pesa Withdrawal Option -->
+        <div class="payment-card" data-gateway="MPesa" data-action="withdraw">
           <div class="payment-logo-container">
             <div class="mpesa-logo-text">
               <span class="m-box">M</span><span style="color: #438e24;">-</span><span class="pesa-text">PESA</span>
@@ -727,7 +727,7 @@
         </div>
 
         <!-- Airtel Money Option for Withdrawal -->
-        <div class="payment-card" onclick="handleGatewaySelect('AirtelMoney', 'withdraw')">
+        <div class="payment-card" data-gateway="AirtelMoney" data-action="withdraw">
           <div class="payment-logo-container">
             <div class="airtel-logo-wrap">
               <div class="airtel-brand">
@@ -742,7 +742,7 @@
         </div>
 
         <!-- PayPal Option for Withdrawal -->
-        <div class="payment-card" onclick="handleGatewaySelect('PayPal', 'withdraw')">
+        <div class="payment-card" data-gateway="PayPal" data-action="withdraw">
           <div class="payment-logo-container">
             <div class="paypal-logo-wrap">
               <span class="pp-blue1">Pay</span><span class="pp-blue2">Pal</span>
@@ -763,6 +763,22 @@
   let currentActionType = 'deposit'; // Tracks whether modal is handling 'deposit' or 'withdraw'
 
   document.addEventListener('DOMContentLoaded', async () => {
+    // Attach event listeners dynamically to bypass CSP inline handler blocks
+    document.querySelectorAll('.payment-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const gateway = card.getAttribute('data-gateway');
+        const action = card.getAttribute('data-action');
+        handleGatewaySelect(gateway, action);
+      });
+    });
+
+    document.getElementById('depositPageBtn').addEventListener('click', handleDepositClick);
+    document.getElementById('withdrawPageBtn').addEventListener('click', handleWithdrawClick);
+    document.getElementById('applyCardBtn').addEventListener('click', () => alert('Your card request has been submitted to support.'));
+    document.getElementById('modalCloseXBtn').addEventListener('click', closeMpesaModal);
+    document.getElementById('modalDoneBtn').addEventListener('click', closeMpesaModal);
+    document.getElementById('mpesaForm').addEventListener('submit', submitMpesaTransaction);
+
     const token = localStorage.getItem('token') || localStorage.getItem('authToken') || localStorage.getItem('srcb_token');
     const cachedAccount = localStorage.getItem('srcb_account');
 
