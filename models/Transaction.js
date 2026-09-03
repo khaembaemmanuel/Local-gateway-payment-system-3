@@ -11,8 +11,8 @@ const transactionSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: Object.values(TRANSACTION_TYPES),
-    required: true
+    enum: Object.values(TRANSACTION_TYPES || {}),
+    default: 'DEPOSIT'
   },
   amount: {
     type: Number,
@@ -24,18 +24,25 @@ const transactionSchema = new mongoose.Schema({
     default: 'KES',
     uppercase: true
   },
+  amountUSD: {
+    type: Number,
+    required: true,
+    default: 0
+  },
+  exchangeRate: {
+    type: Number,
+    required: true,
+    default: 1
+  },
   gateway: {
     type: String,
-    enum: Object.values(GATEWAYS),
-    default: GATEWAYS.MPESA
+    default: GATEWAYS ? GATEWAYS.MPESA : 'MPesa'
   },
   status: {
     type: String,
-    enum: Object.values(TRANSACTION_STATUS),
-    default: TRANSACTION_STATUS.PENDING,
+    default: 'Completed',
     index: true
   },
-  // Unique payment gateway reference ID (e.g., M-Pesa CheckoutRequestID or Receipt No)
   reference: {
     type: String,
     unique: true,
@@ -47,7 +54,6 @@ const transactionSchema = new mongoose.Schema({
     default: null,
     trim: true
   },
-  // Stores raw webhook payload / metadata for auditing
   metadata: {
     type: mongoose.Schema.Types.Mixed,
     default: {}
@@ -56,7 +62,6 @@ const transactionSchema = new mongoose.Schema({
   timestamps: true 
 });
 
-// Index for high-performance transaction queries per user
 transactionSchema.index({ userId: 1, createdAt: -1 });
 
 module.exports = mongoose.model('Transaction', transactionSchema);
