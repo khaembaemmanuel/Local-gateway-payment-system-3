@@ -45,7 +45,6 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow non-browser requests (like mobile apps, curl, or server-to-server webhooks)
     if (!origin) return callback(null, true);
     if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV !== 'production') {
       callback(null, true);
@@ -60,17 +59,16 @@ app.use(cors({
 
 // 3. Rate Limiting (Prevent Brute Force & DDoS)
 const globalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
+  windowMs: 15 * 60 * 1000,
+  max: 100,
   standardHeaders: true,
   legacyHeaders: false,
   message: { success: false, message: 'Too many requests from this IP, please try again after 15 minutes.' }
 });
 
-// Stricter rate limit for authentication routes
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10, // Max 10 login/register attempts per 15 minutes
+  max: 10,
   message: { success: false, message: 'Too many authentication attempts, please try again later.' }
 });
 
@@ -79,18 +77,18 @@ app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/register', authLimiter);
 
 // 4. Body Parsing, Cookie Parsing & Input Protection
-app.use(express.json({ limit: '10kb' })); // Limit body size to 10kb to prevent payload injection
+app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
-app.use(cookieParser()); // Enable cookie parser for HTTP-only JWT verification
-app.use(hpp()); // Prevent HTTP Parameter Pollution
+app.use(cookieParser());
+app.use(hpp());
 
-// 5. Serve Static Frontend Files (EXCLUSIVELY for the public directory)
+// 5. Serve Static Frontend Files
 app.use(express.static(path.join(__dirname, 'public'), {
   etag: true,
   lastModified: true,
   setHeaders: (res, path) => {
     if (path.endsWith('.html')) {
-      res.setHeader('Cache-Control', 'no-cache'); // Ensure users always get latest frontend updates
+      res.setHeader('Cache-Control', 'no-cache');
     }
   }
 }));
@@ -107,18 +105,17 @@ app.get('/dashboard.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 
-// Secure Admin Dashboard Portal Page Delivery
 app.get('/secure-admin-portal', (req, res) => {
   res.sendFile(path.join(__dirname, 'private', 'admin.html'));
 });
 
-// 6. API routers & Verification Endpoint
+// 6. API routers & Verification Endpoints (Mounted under both /api/payment and /api for compatibility)
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/payment', require('./routes/payment'));
-app.use('/api/payment', require('./routes/withdraw')); // Added withdrawal routes under /api/payment
+app.use('/api/payment', require('./routes/withdraw'));
+app.use('/api', require('./routes/payment')); // Direct fallback alias for /api/stk-push
+app.use('/api', require('./routes/withdraw')); // Direct fallback alias for /api/withdraw
 app.use('/api/account', require('./routes/accountRouter'));
-
-// Mounted Admin Management Routes (Includes /api/admin/login and protected endpoints)
 app.use('/api/admin', require('./routes/adminRoutes'));
 
 // Google reCAPTCHA Verification Endpoint
@@ -151,7 +148,7 @@ app.get('/health', (req, res) => {
   res.json({ success: true, status: 'UP', timestamp: new Date().toISOString() });
 });
 
-// 8. Global Error Handling Middleware (Never leak stack traces in production)
+// 8. Global Error Handling Middleware
 app.use((err, req, res, next) => {
   console.error('[Unhandled Error]', err.message);
   const statusCode = err.status || 500;

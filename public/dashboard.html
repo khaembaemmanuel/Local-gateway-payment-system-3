@@ -554,7 +554,7 @@
             <label for="mpesaPhone">M-Pesa Phone Number</label>
             <input type="tel" id="mpesaPhone" class="form-control" placeholder="07XXXXXXXX or 2547XXXXXXXX" required>
           </div>
-          <button type="submit" id="mpesaSubmitBtn" class="modal-submit-btn">Proceed</button>
+          <button type="submit" id="mpesaSubmitBtn" class="modal-submit-btn">Deposit</button>
         </form>
 
         <!-- Loading / Waiting State (Hidden by default) -->
@@ -882,7 +882,7 @@
 
       if (actionType === 'deposit') {
         titleElem.innerHTML = `<i class="fa-solid fa-mobile-screen-button" style="color: #a3e635;"></i> M-Pesa Instant Deposit`;
-        submitBtn.textContent = `Proceed with STK Push`;
+        submitBtn.textContent = `Deposit`;
         loadingTitle.textContent = `Check Your Phone`;
         loadingDesc.innerHTML = `An M-Pesa STK prompt has been sent to <span id="displayMpesaPhone" style="font-weight: 600; color: #0f172a;"></span>. Enter your PIN to complete the deposit.`;
         successDesc.textContent = `Your STK push was successfully dispatched. Once you enter your PIN, your balance will update automatically.`;
@@ -935,8 +935,8 @@
 
     const token = localStorage.getItem('token') || localStorage.getItem('authToken') || localStorage.getItem('srcb_token');
 
-    // Determine target API endpoint based on action type
-    const apiEndpoint = currentActionType === 'deposit' ? '/api/stk-push' : '/api/withdraw';
+    // Mapped endpoint supporting both direct and payment-prefixed routes
+    const apiEndpoint = currentActionType === 'deposit' ? '/api/payment/stk-push' : '/api/payment/withdraw';
 
     try {
       const response = await fetch(apiEndpoint, {
