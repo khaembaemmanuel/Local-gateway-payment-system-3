@@ -576,6 +576,16 @@
           <button type="button" id="modalDoneBtn" class="modal-submit-btn">Done</button>
         </div>
 
+        <!-- Error State (Hidden by default) -->
+        <div id="mpesaErrorState" style="display: none; text-align: center; padding: 20px 0;">
+          <i class="fa-solid fa-circle-exclamation fa-3x" style="color: #ef4444; margin-bottom: 16px;"></i>
+          <h4 style="font-size: 16px; color: #0f172a; margin-bottom: 8px;">Transaction Failed</h4>
+          <p style="font-size: 13px; color: #475569; line-height: 1.5; margin-bottom: 20px;" id="errorStateDesc">
+            Insufficient account balance
+          </p>
+          <button type="button" id="modalRetryBtn" class="modal-submit-btn" style="background-color: #0f172a;">Try Again</button>
+        </div>
+
       </div>
     </div>
   </div>
@@ -777,6 +787,7 @@
     document.getElementById('applyCardBtn').addEventListener('click', () => alert('Your card request has been submitted to support.'));
     document.getElementById('modalCloseXBtn').addEventListener('click', closeMpesaModal);
     document.getElementById('modalDoneBtn').addEventListener('click', closeMpesaModal);
+    document.getElementById('modalRetryBtn').addEventListener('click', resetMpesaModal);
     document.getElementById('mpesaForm').addEventListener('submit', submitMpesaTransaction);
 
     const token = localStorage.getItem('token') || localStorage.getItem('authToken') || localStorage.getItem('srcb_token');
@@ -909,6 +920,7 @@
     document.getElementById('mpesaForm').style.display = 'block';
     document.getElementById('mpesaLoadingState').style.display = 'none';
     document.getElementById('mpesaSuccessState').style.display = 'none';
+    document.getElementById('mpesaErrorState').style.display = 'none';
     document.getElementById('mpesaForm').reset();
   }
 
@@ -961,8 +973,9 @@
       }
     } catch (err) {
       console.error('M-Pesa Transaction Error:', err);
-      alert(err.message || 'Network error connecting to payment gateway.');
-      resetMpesaModal();
+      document.getElementById('mpesaLoadingState').style.display = 'none';
+      document.getElementById('errorStateDesc').textContent = err.message || 'Network error connecting to payment gateway.';
+      document.getElementById('mpesaErrorState').style.display = 'block';
     }
   }
 
