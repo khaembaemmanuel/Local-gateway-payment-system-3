@@ -92,15 +92,6 @@
       flex: 1;
     }
 
-    /* View Sections handling inline toggling */
-    .view-section {
-      display: none;
-    }
-
-    .view-section.active {
-      display: block;
-    }
-
     /* Bank Card Styling matching reference */
     .bank-card {
       background: linear-gradient(135deg, #0d4a22 0%, #155728 100%);
@@ -408,153 +399,6 @@
       }
     }
 
-    /* Embedded M-Pesa Form Styling */
-    .form-card {
-      background: #ffffff;
-      width: 100%;
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-      border: 1px solid #e2e8f0;
-      overflow: hidden;
-      margin-top: 10px;
-    }
-
-    .form-header {
-      background: #f8fafc;
-      padding: 18px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #e2e8f0;
-    }
-
-    .back-btn {
-      background: transparent;
-      border: none;
-      font-size: 15px;
-      color: #64748b;
-      cursor: pointer;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .back-btn:hover {
-      color: #0f172a;
-    }
-
-    .form-body {
-      padding: 24px 20px;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    .form-label {
-      font-size: 13px;
-      font-weight: 600;
-      color: #1e293b;
-      margin-bottom: 8px;
-      display: block;
-    }
-
-    .form-input {
-      width: 100%;
-      padding: 12px 14px;
-      border: 1px solid #cbd5e1;
-      border-radius: 6px;
-      font-size: 15px;
-      outline: none;
-      color: #0f172a;
-      background: #fff;
-    }
-
-    .form-input:focus {
-      border-color: #438e24;
-    }
-
-    .preset-instruction {
-      font-size: 13px;
-      color: #475569;
-      margin-bottom: 10px;
-    }
-
-    .preset-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-
-    @media (max-width: 480px) {
-      .preset-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
-    }
-
-    .preset-btn {
-      background: #ffffff;
-      border: 1px solid #cbd5e1;
-      border-radius: 6px;
-      padding: 10px 4px;
-      text-align: center;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      color: #1e293b;
-    }
-
-    .preset-btn:hover, .preset-btn.selected {
-      border-color: #438e24;
-      background: #f0fdf4;
-      color: #155728;
-    }
-
-    .phone-input-wrap {
-      display: flex;
-      border: 1px solid #cbd5e1;
-      border-radius: 6px;
-      overflow: hidden;
-      background: #fff;
-    }
-
-    .phone-prefix {
-      background: #f8fafc;
-      padding: 12px 14px;
-      font-size: 15px;
-      font-weight: 600;
-      color: #475569;
-      border-right: 1px solid #cbd5e1;
-    }
-
-    .phone-input-wrap input {
-      border: none;
-      outline: none;
-      padding: 12px 14px;
-      font-size: 15px;
-      width: 100%;
-      color: #0f172a;
-    }
-
-    .confirm-btn {
-      background-color: #65a30d;
-      color: white;
-      border: none;
-      width: 100%;
-      padding: 14px;
-      border-radius: 6px;
-      font-weight: 700;
-      font-size: 15px;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-
-    .confirm-btn:hover {
-      background-color: #4d7c0f;
-    }
-
     #loadingOverlay {
       position: fixed;
       top: 0;
@@ -571,6 +415,116 @@
       color: #0f172a;
       z-index: 1000;
     }
+
+    /* Modal Styling for M-Pesa Transaction Form */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      padding: 16px;
+    }
+
+    .modal-card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 420px;
+      border-radius: 16px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      overflow: hidden;
+      animation: modalSlideUp 0.3s ease;
+    }
+
+    @keyframes modalSlideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-header {
+      background: #0f172a;
+      color: #ffffff;
+      padding: 18px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-close-btn {
+      background: transparent;
+      border: none;
+      color: #cbd5e1;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .modal-close-btn:hover {
+      color: #ffffff;
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #475569;
+      margin-bottom: 6px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #0f172a;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-control:focus {
+      border-color: #00b074;
+      box-shadow: 0 0 0 3px rgba(0, 176, 116, 0.15);
+    }
+
+    .modal-submit-btn {
+      width: 100%;
+      background-color: #00b074;
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      margin-top: 8px;
+    }
+
+    .modal-submit-btn:hover {
+      background-color: #009663;
+    }
   </style>
 </head>
 <body>
@@ -579,6 +533,51 @@
   <div id="loadingOverlay">
     <i class="fa-solid fa-spinner fa-spin fa-2x" style="color: #00b074; margin-bottom: 12px;"></i>
     <span>Loading secure banking session...</span>
+  </div>
+
+  <!-- Interactive M-Pesa Modal Form (Handles both Deposit & Withdrawal) -->
+  <div id="mpesaModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="mpesaModalTitle"><i class="fa-solid fa-mobile-screen-button" style="color: #a3e635;"></i> M-Pesa Transaction</h3>
+        <button class="modal-close-btn" onclick="closeMpesaModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        
+        <!-- Form Input State -->
+        <form id="mpesaForm" onsubmit="submitMpesaTransaction(event)">
+          <div class="form-group">
+            <label for="mpesaAmount" id="mpesaAmountLabel">Amount (KES)</label>
+            <input type="number" id="mpesaAmount" class="form-control" placeholder="Enter amount (e.g. 1000)" min="10" required>
+          </div>
+          <div class="form-group">
+            <label for="mpesaPhone">M-Pesa Phone Number</label>
+            <input type="tel" id="mpesaPhone" class="form-control" placeholder="07XXXXXXXX or 2547XXXXXXXX" required>
+          </div>
+          <button type="submit" id="mpesaSubmitBtn" class="modal-submit-btn">Proceed</button>
+        </form>
+
+        <!-- Loading / Waiting State (Hidden by default) -->
+        <div id="mpesaLoadingState" style="display: none; text-align: center; padding: 20px 0;">
+          <i class="fa-solid fa-spinner fa-spin fa-3x" style="color: #00b074; margin-bottom: 16px;"></i>
+          <h4 style="font-size: 16px; color: #0f172a; margin-bottom: 8px;" id="loadingStateTitle">Processing Request</h4>
+          <p style="font-size: 13px; color: #475569; line-height: 1.5;" id="loadingStateDesc">
+            Please check your phone (<span id="displayMpesaPhone" style="font-weight: 600; color: #0f172a;"></span>) to complete the transaction.
+          </p>
+        </div>
+
+        <!-- Success State (Hidden by default) -->
+        <div id="mpesaSuccessState" style="display: none; text-align: center; padding: 20px 0;">
+          <i class="fa-solid fa-circle-check fa-3x" style="color: #22c55e; margin-bottom: 16px;"></i>
+          <h4 style="font-size: 16px; color: #0f172a; margin-bottom: 8px;">Request Submitted Successfully</h4>
+          <p style="font-size: 13px; color: #475569; line-height: 1.5; margin-bottom: 20px;" id="successStateDesc">
+            Your M-Pesa request has been successfully dispatched.
+          </p>
+          <button type="button" class="modal-submit-btn" onclick="closeMpesaModal()">Done</button>
+        </div>
+
+      </div>
+    </div>
   </div>
 
   <!-- Navbar -->
@@ -593,211 +592,167 @@
   <!-- Content Container -->
   <div class="dashboard-container">
     
-    <!-- VIEW 1: Main Dashboard View -->
-    <div id="mainDashboardView" class="view-section active">
+    <!-- Virtual Card Display -->
+    <div class="bank-card">
+      <div class="card-top">
+        <div class="card-brand-logo">
+          <span class="bank-title">Swift Royal</span>
+          <span class="bank-subtitle">Investment Bank</span>
+        </div>
+        <div class="card-balance-display" id="cardTopBalance">$0.00</div>
+      </div>
       
-      <!-- Virtual Card Display -->
-      <div class="bank-card">
-        <div class="card-top">
-          <div class="card-brand-logo">
-            <span class="bank-title">Swift Royal</span>
-            <span class="bank-subtitle">Investment Bank</span>
-          </div>
-          <div class="card-balance-display" id="cardTopBalance">$0.00</div>
-        </div>
-        
-        <div class="card-number" id="cardDisplayNumber">0000 0000 0000 0000</div>
+      <div class="card-number" id="cardDisplayNumber">0000 0000 0000 0000</div>
 
-        <div class="card-info-row">
-          <div>
-            Card Holder
-            <strong id="cardHolderName">NO NAME</strong>
-          </div>
-          <div>
-            Expires
-            <strong>12/28</strong>
-          </div>
+      <div class="card-info-row">
+        <div>
+          Card Holder
+          <strong id="cardHolderName">NO NAME</strong>
+        </div>
+        <div>
+          Expires
+          <strong>12/28</strong>
         </div>
       </div>
-
-      <!-- Account Details Table Section -->
-      <div class="details-section-title">Account Details</div>
-      <div class="account-details-card">
-        <div class="detail-row">
-          <span class="detail-label">Account Name :</span>
-          <span class="detail-value" id="detailAccountName">--</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Balance :</span>
-          <span class="detail-value" id="detailBalance">$0.00</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Account Type :</span>
-          <span class="detail-value" id="detailAccountType">--</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Account Number :</span>
-          <span class="detail-value" id="detailAccountNumber">--</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Swift Code :</span>
-          <span class="detail-value" id="detailSwiftCode">SRIBKE2X</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">BANK CARD ?</span>
-          <button class="apply-badge-btn" onclick="alert('Your card request has been submitted to support.')">
-            <i class="fa-solid fa-circle-plus"></i> APPLY NOW
-          </button>
-        </div>
-      </div>
-
-      <!-- 1. Deposit Button First -->
-      <div style="margin-bottom: 16px;">
-        <button class="dash-action-btn btn-deposit-action" onclick="handleDepositClick()">
-          <i class="fa-solid fa-arrow-down-to-bracket"></i> Deposit
-        </button>
-      </div>
-
-      <!-- 2. Recommended Deposit Methods (M-Pesa, Airtel, PayPal) -->
-      <div class="recommended-section">
-        <div class="recommended-title">Recommended Deposit Methods</div>
-        <div class="recommended-grid">
-          
-          <!-- M-Pesa Option (Opens inline form instantly) -->
-          <div class="payment-card" onclick="handleGatewaySelect('MPesa', 'deposit')">
-            <div class="payment-logo-container">
-              <div class="mpesa-logo-text">
-                <span class="m-box">M</span><span style="color: #438e24;">-</span><span class="pesa-text">PESA</span>
-              </div>
-            </div>
-            <div class="payment-action-bar" style="background-color: #3b82f6;">
-              M-Pesa
-            </div>
-          </div>
-
-          <!-- Airtel Money Option with +10% Badge -->
-          <div class="payment-card" onclick="handleGatewaySelect('AirtelMoney', 'deposit')">
-            <div class="promo-badge">+10%</div>
-            <div class="payment-logo-container">
-              <div class="airtel-logo-wrap">
-                <div class="airtel-brand">
-                  <i class="fa-solid fa-signal" style="font-size: 15px; transform: rotate(90deg);"></i> airtel
-                </div>
-                <div class="airtel-money-sub">money</div>
-              </div>
-            </div>
-            <div class="payment-action-bar" style="background-color: #3b82f6;">
-              Airtel
-            </div>
-          </div>
-
-          <!-- PayPal Option -->
-          <div class="payment-card" onclick="handleGatewaySelect('PayPal', 'deposit')">
-            <div class="payment-logo-container">
-              <div class="paypal-logo-wrap">
-                <span class="pp-blue1">Pay</span><span class="pp-blue2">Pal</span>
-              </div>
-            </div>
-            <div class="payment-action-bar" style="background-color: #3b82f6;">
-              PayPal
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- 3. Withdrawal Button Downwards -->
-      <div style="margin-top: 24px; margin-bottom: 16px;">
-        <button class="dash-action-btn btn-withdraw-action" onclick="handleWithdrawClick()">
-          <i class="fa-solid fa-arrow-up-from-bracket"></i> Withdrawal
-        </button>
-      </div>
-
-      <!-- 4. Recommended Withdrawal Methods (M-Pesa, Airtel, PayPal) -->
-      <div class="recommended-section">
-        <div class="recommended-title">Recommended Withdrawal Methods</div>
-        <div class="recommended-grid">
-          
-          <!-- M-Pesa Option for Withdrawal -->
-          <div class="payment-card" onclick="handleGatewaySelect('MPesa', 'withdraw')">
-            <div class="payment-logo-container">
-              <div class="mpesa-logo-text">
-                <span class="m-box">M</span><span style="color: #438e24;">-</span><span class="pesa-text">PESA</span>
-              </div>
-            </div>
-            <div class="payment-action-bar" style="background-color: #0f172a;">
-              M-Pesa
-            </div>
-          </div>
-
-          <!-- Airtel Money Option for Withdrawal -->
-          <div class="payment-card" onclick="handleGatewaySelect('AirtelMoney', 'withdraw')">
-            <div class="payment-logo-container">
-              <div class="airtel-logo-wrap">
-                <div class="airtel-brand">
-                  <i class="fa-solid fa-signal" style="font-size: 15px; transform: rotate(90deg);"></i> airtel
-                </div>
-                <div class="airtel-money-sub">money</div>
-              </div>
-            </div>
-            <div class="payment-action-bar" style="background-color: #0f172a;">
-              Airtel
-            </div>
-          </div>
-
-          <!-- PayPal Option for Withdrawal -->
-          <div class="payment-card" onclick="handleGatewaySelect('PayPal', 'withdraw')">
-            <div class="payment-logo-container">
-              <div class="paypal-logo-wrap">
-                <span class="pp-blue1">Pay</span><span class="pp-blue2">Pal</span>
-              </div>
-            </div>
-            <div class="payment-action-bar" style="background-color: #0f172a;">
-              PayPal
-            </div>
-          </div>
-
-        </div>
-      </div>
-
     </div>
 
-    <!-- VIEW 2: Embedded M-Pesa Deposit Form View -->
-    <div id="mpesaFormView" class="view-section">
-      <div class="form-card">
-        <div class="form-header">
-          <div class="mpesa-logo-text" style="font-size: 18px;">
-            <span class="m-box">M</span><span style="color: #438e24;">-</span><span class="pesa-text">PESA</span>
+    <!-- Account Details Table Section -->
+    <div class="details-section-title">Account Details</div>
+    <div class="account-details-card">
+      <div class="detail-row">
+        <span class="detail-label">Account Name :</span>
+        <span class="detail-value" id="detailAccountName">--</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Balance :</span>
+        <span class="detail-value" id="detailBalance">$0.00</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Account Type :</span>
+        <span class="detail-value" id="detailAccountType">--</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Account Number :</span>
+        <span class="detail-value" id="detailAccountNumber">--</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Swift Code :</span>
+        <span class="detail-value" id="detailSwiftCode">SRIBKE2X</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">BANK CARD ?</span>
+        <button class="apply-badge-btn" onclick="alert('Your card request has been submitted to support.')">
+          <i class="fa-solid fa-circle-plus"></i> APPLY NOW
+        </button>
+      </div>
+    </div>
+
+    <!-- 1. Deposit Button First -->
+    <div style="margin-bottom: 16px;">
+      <button class="dash-action-btn btn-deposit-action" onclick="handleDepositClick()">
+        <i class="fa-solid fa-arrow-down-to-bracket"></i> Deposit
+      </button>
+    </div>
+
+    <!-- 2. Recommended Deposit Methods (M-Pesa, Airtel, PayPal) -->
+    <div class="recommended-section">
+      <div class="recommended-title">Recommended Deposit Methods</div>
+      <div class="recommended-grid">
+        
+        <!-- M-Pesa Deposit Option: Triggers modal -->
+        <div class="payment-card" onclick="handleGatewaySelect('MPesa', 'deposit')">
+          <div class="payment-logo-container">
+            <div class="mpesa-logo-text">
+              <span class="m-box">M</span><span style="color: #438e24;">-</span><span class="pesa-text">PESA</span>
+            </div>
           </div>
-          <button type="button" class="back-btn" onclick="showDashboard()"><i class="fa-solid fa-arrow-left"></i> Back</button>
+          <div class="payment-action-bar" style="background-color: #3b82f6;">
+            M-Pesa
+          </div>
         </div>
-        <div class="form-body">
-          <form id="mpesaDepositForm" onsubmit="handleMpesaSubmit(event)">
-            <div class="form-group">
-              <label class="form-label">Amount (Min 100.00 KES / Max 150 000.00 KES):</label>
-              <input type="number" id="mpesaAmountInput" class="form-input" placeholder="200.00" min="100" max="150000" step="0.01" required>
-            </div>
 
-            <div class="preset-instruction">Please enter or select your deposit amount</div>
-            <div class="preset-grid">
-              <button type="button" class="preset-btn" onclick="setPreset(300)">300</button>
-              <button type="button" class="preset-btn" onclick="setPreset(200)">200</button>
-              <button type="button" class="preset-btn" onclick="setPreset(500)">500</button>
-              <button type="button" class="preset-btn" onclick="setPreset(100)">100</button>
-              <button type="button" class="preset-btn" onclick="setPreset(1000)">1 000</button>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Phone number:</label>
-              <div class="phone-input-wrap">
-                <span class="phone-prefix">254</span>
-                <input type="tel" id="mpesaPhoneInput" placeholder="703220773" value="703220773" required>
+        <!-- Airtel Money Option -->
+        <div class="payment-card" onclick="handleGatewaySelect('AirtelMoney', 'deposit')">
+          <div class="promo-badge">+10%</div>
+          <div class="payment-logo-container">
+            <div class="airtel-logo-wrap">
+              <div class="airtel-brand">
+                <i class="fa-solid fa-signal" style="font-size: 15px; transform: rotate(90deg);"></i> airtel
               </div>
+              <div class="airtel-money-sub">money</div>
             </div>
-
-            <button type="submit" id="mpesaSubmitBtn" class="confirm-btn">CONFIRM</button>
-          </form>
+          </div>
+          <div class="payment-action-bar" style="background-color: #3b82f6;">
+            Airtel
+          </div>
         </div>
+
+        <!-- PayPal Option -->
+        <div class="payment-card" onclick="handleGatewaySelect('PayPal', 'deposit')">
+          <div class="payment-logo-container">
+            <div class="paypal-logo-wrap">
+              <span class="pp-blue1">Pay</span><span class="pp-blue2">Pal</span>
+            </div>
+          </div>
+          <div class="payment-action-bar" style="background-color: #3b82f6;">
+            PayPal
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 3. Withdrawal Button Downwards -->
+    <div style="margin-top: 24px; margin-bottom: 16px;">
+      <button class="dash-action-btn btn-withdraw-action" onclick="handleWithdrawClick()">
+        <i class="fa-solid fa-arrow-up-from-bracket"></i> Withdrawal
+      </button>
+    </div>
+
+    <!-- 4. Recommended Withdrawal Methods (M-Pesa, Airtel, PayPal) -->
+    <div class="recommended-section">
+      <div class="recommended-title">Recommended Withdrawal Methods</div>
+      <div class="recommended-grid">
+        
+        <!-- M-Pesa Withdrawal Option: Triggers modal -->
+        <div class="payment-card" onclick="handleGatewaySelect('MPesa', 'withdraw')">
+          <div class="payment-logo-container">
+            <div class="mpesa-logo-text">
+              <span class="m-box">M</span><span style="color: #438e24;">-</span><span class="pesa-text">PESA</span>
+            </div>
+          </div>
+          <div class="payment-action-bar" style="background-color: #0f172a;">
+            M-Pesa
+          </div>
+        </div>
+
+        <!-- Airtel Money Option for Withdrawal -->
+        <div class="payment-card" onclick="handleGatewaySelect('AirtelMoney', 'withdraw')">
+          <div class="payment-logo-container">
+            <div class="airtel-logo-wrap">
+              <div class="airtel-brand">
+                <i class="fa-solid fa-signal" style="font-size: 15px; transform: rotate(90deg);"></i> airtel
+              </div>
+              <div class="airtel-money-sub">money</div>
+            </div>
+          </div>
+          <div class="payment-action-bar" style="background-color: #0f172a;">
+            Airtel
+          </div>
+        </div>
+
+        <!-- PayPal Option for Withdrawal -->
+        <div class="payment-card" onclick="handleGatewaySelect('PayPal', 'withdraw')">
+          <div class="payment-logo-container">
+            <div class="paypal-logo-wrap">
+              <span class="pp-blue1">Pay</span><span class="pp-blue2">Pal</span>
+            </div>
+          </div>
+          <div class="payment-action-bar" style="background-color: #0f172a;">
+            PayPal
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -805,6 +760,7 @@
 
  <script>
   let activeUser = null;
+  let currentActionType = 'deposit'; // Tracks whether modal is handling 'deposit' or 'withdraw'
 
   document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('token') || localStorage.getItem('authToken') || localStorage.getItem('srcb_token');
@@ -899,71 +855,98 @@
   }
 
   function handleGatewaySelect(gatewayName, actionType) {
-    if (gatewayName === 'MPesa' && actionType === 'deposit') {
-      showMpesaForm();
+    if (gatewayName === 'MPesa') {
+      currentActionType = actionType; // 'deposit' or 'withdraw'
+      
+      const titleElem = document.getElementById('mpesaModalTitle');
+      const submitBtn = document.getElementById('mpesaSubmitBtn');
+      const loadingTitle = document.getElementById('loadingStateTitle');
+      const loadingDesc = document.getElementById('loadingStateDesc');
+      const successDesc = document.getElementById('successStateDesc');
+
+      if (actionType === 'deposit') {
+        titleElem.innerHTML = `<i class="fa-solid fa-mobile-screen-button" style="color: #a3e635;"></i> M-Pesa Instant Deposit`;
+        submitBtn.textContent = `Proceed with STK Push`;
+        loadingTitle.textContent = `Check Your Phone`;
+        loadingDesc.innerHTML = `An M-Pesa STK prompt has been sent to <span id="displayMpesaPhone" style="font-weight: 600; color: #0f172a;"></span>. Enter your PIN to complete the deposit.`;
+        successDesc.textContent = `Your STK push was successfully dispatched. Once you enter your PIN, your balance will update automatically.`;
+      } else {
+        titleElem.innerHTML = `<i class="fa-solid fa-mobile-screen-button" style="color: #a3e635;"></i> M-Pesa Withdrawal`;
+        submitBtn.textContent = `Withdraw Funds`;
+        loadingTitle.textContent = `Processing Withdrawal`;
+        loadingDesc.innerHTML = `Sending withdrawal request to <span id="displayMpesaPhone" style="font-weight: 600; color: #0f172a;"></span>. Please wait...`;
+        successDesc.textContent = `Your M-Pesa withdrawal request has been submitted successfully and is being processed.`;
+      }
+
+      document.getElementById('mpesaModal').style.display = 'flex';
     } else {
       window.location.href = `/${actionType}.html?gateway=${gatewayName}`;
     }
   }
 
-  function showMpesaForm() {
-    document.getElementById('mainDashboardView').classList.remove('active');
-    document.getElementById('mpesaFormView').classList.add('active');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  function closeMpesaModal() {
+    document.getElementById('mpesaModal').style.display = 'none';
+    resetMpesaModal();
   }
 
-  function showDashboard() {
-    document.getElementById('mpesaFormView').classList.remove('active');
-    document.getElementById('mainDashboardView').classList.add('active');
+  function resetMpesaModal() {
+    document.getElementById('mpesaForm').style.display = 'block';
+    document.getElementById('mpesaLoadingState').style.display = 'none';
+    document.getElementById('mpesaSuccessState').style.display = 'none';
+    document.getElementById('mpesaForm').reset();
   }
 
-  function setPreset(val) {
-    document.getElementById('mpesaAmountInput').value = val;
-    document.querySelectorAll('.preset-btn').forEach(btn => {
-      if (btn.textContent.replace(/\s+/g, '') === String(val)) {
-        btn.classList.add('selected');
-      } else {
-        btn.classList.remove('selected');
-      }
-    });
-  }
+  async function submitMpesaTransaction(event) {
+    event.preventDefault();
+    
+    const rawAmount = document.getElementById('mpesaAmount').value.trim();
+    const rawPhone = document.getElementById('mpesaPhone').value.trim();
+    
+    // Normalize Kenyan phone numbers securely to 2547XXXXXXXX
+    let phone = rawPhone;
+    if (phone.startsWith('0')) {
+      phone = '254' + phone.slice(1);
+    } else if (phone.startsWith('+')) {
+      phone = phone.slice(1);
+    } else if (phone.length === 9) {
+      phone = '254' + phone;
+    }
 
-  async function handleMpesaSubmit(e) {
-    e.preventDefault();
-    const amount = document.getElementById('mpesaAmountInput').value;
-    const phoneInput = document.getElementById('mpesaPhoneInput').value.trim();
-    const phone = '254' + phoneInput;
-    const submitBtn = document.getElementById('mpesaSubmitBtn');
+    // Switch modal view to active waiting/loading state
+    document.getElementById('mpesaForm').style.display = 'none';
+    document.getElementById('displayMpesaPhone').textContent = phone;
+    document.getElementById('mpesaLoadingState').style.display = 'block';
 
     const token = localStorage.getItem('token') || localStorage.getItem('authToken') || localStorage.getItem('srcb_token');
 
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Processing STK Push...';
+    // Determine target API endpoint based on action type
+    const apiEndpoint = currentActionType === 'deposit' ? '/api/stk-push' : '/api/withdraw';
 
     try {
-      const response = await fetch('/api/payments/stkpush', {
+      const response = await fetch(apiEndpoint, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ amount, phone })
+        body: JSON.stringify({ 
+          phone: phone, 
+          amount: rawAmount 
+        })
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        alert(data.message || `STK Push successfully initiated for KES ${amount}. Please check your phone to enter your PIN.`);
-        showDashboard();
+        document.getElementById('mpesaLoadingState').style.display = 'none';
+        document.getElementById('mpesaSuccessState').style.display = 'block';
       } else {
-        alert(data.error || data.message || 'Failed to initiate M-Pesa STK Push. Please try again.');
+        throw new Error(data.message || data.error || `Failed to process M-Pesa ${currentActionType}.`);
       }
     } catch (err) {
-      console.error('M-Pesa API error:', err);
-      alert('Network error connecting to payment gateway. Please check your connection.');
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'CONFIRM';
+      console.error('M-Pesa Transaction Error:', err);
+      alert(err.message || 'Network error connecting to payment gateway.');
+      resetMpesaModal();
     }
   }
 
