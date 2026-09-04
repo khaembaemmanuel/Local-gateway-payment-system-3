@@ -235,11 +235,21 @@
       if (e.target.classList.contains('btn-action-withdrawal')) {
         const id = e.target.getAttribute('data-id');
         const action = e.target.getAttribute('data-action');
-        if (!confirm(`Are you sure you want to ${action} this withdrawal?`)) return;
+        
+        let payload = {};
+
+        if (action === 'complete') {
+          const receiptCode = prompt("Enter M-Pesa Transaction Confirmation Code (Receipt Number):");
+          if (!receiptCode) return; // Abort if admin cancels or leaves it blank
+          payload.mpesaReceiptNumber = receiptCode;
+        } else {
+          if (!confirm("Are you sure you want to reject this withdrawal and refund the balance?")) return;
+        }
 
         const res = await fetch(`/api/admin/withdrawals/${id}/${action}`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
         });
         const data = await res.json();
         alert(data.message);

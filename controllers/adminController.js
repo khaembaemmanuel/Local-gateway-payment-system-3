@@ -43,10 +43,11 @@ const getPendingWithdrawals = async (req, res, next) => {
   }
 };
 
-// 3. Mark a withdrawal as completed (Indicates manual disbursement was done)
+// 3. Mark a withdrawal as completed with an M-Pesa Receipt Number
 const completeWithdrawal = async (req, res, next) => {
   try {
     const { id } = req.params;
+    const { mpesaReceiptNumber } = req.body;
 
     const withdrawal = await WithdrawalRequest.findById(id);
     if (!withdrawal) {
@@ -58,11 +59,14 @@ const completeWithdrawal = async (req, res, next) => {
     }
 
     withdrawal.status = 'Completed';
+    if (mpesaReceiptNumber) {
+      withdrawal.referenceCode = mpesaReceiptNumber; // Save confirmation code reference
+    }
     await withdrawal.save();
 
     return res.status(200).json({
       success: true,
-      message: `Withdrawal marked as completed. Disburse ${withdrawal.currency} ${withdrawal.payoutAmountLocal.toLocaleString()} manually to ${withdrawal.phoneNumber}.`
+      message: `Withdrawal successfully completed. M-Pesa Receipt: ${mpesaReceiptNumber || 'N/A'}`
     });
   } catch (err) {
     next(err);
