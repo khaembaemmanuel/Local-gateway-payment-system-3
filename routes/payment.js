@@ -12,9 +12,10 @@ const { BASE_URL, getOAuthToken, generateStkPassword, formatPhoneNumber } = requ
 // ==========================================
 router.post('/stk-push', auth, async (req, res) => {
   try {
-    const { amount, phone } = req.body;
+    const rawAmount = req.body.amount || req.body.amountLocal;
+    const { phone } = req.body;
 
-    if (!amount || amount <= 0) {
+    if (!rawAmount || rawAmount <= 0) {
       return res.status(400).json({ success: false, message: 'Please enter a valid amount' });
     }
 
@@ -32,7 +33,7 @@ router.post('/stk-push', auth, async (req, res) => {
     // Create a pending transaction
     const transaction = new Transaction({
       userId: req.user.userId,
-      amount: Number(amount),
+      amount: Number(rawAmount),
       type: 'Deposit',
       gateway: 'M-Pesa',
       status: 'Pending'
@@ -44,7 +45,7 @@ router.post('/stk-push', auth, async (req, res) => {
       Password: password,
       Timestamp: timestamp,
       TransactionType: 'CustomerPayBillOnline',
-      Amount: Math.ceil(Number(amount)),
+      Amount: Math.ceil(Number(rawAmount)),
       PartyA: formattedPhone,
       PartyB: shortCode,
       PhoneNumber: formattedPhone,
