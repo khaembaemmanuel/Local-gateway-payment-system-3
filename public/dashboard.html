@@ -415,6 +415,190 @@
       }
     }
 
+    /* Professional Transaction History Styles */
+    .tx-history-section {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      overflow: hidden;
+      margin-top: 24px;
+    }
+
+    .tx-history-header {
+      padding: 20px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #f1f5f9;
+      gap: 16px;
+    }
+
+    .tx-history-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .tx-filter-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .tx-search-input {
+      padding: 8px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 13px;
+      outline: none;
+      color: #0f172a;
+      width: 200px;
+      transition: border-color 0.2s;
+    }
+
+    .tx-search-input:focus {
+      border-color: #00b074;
+    }
+
+    .tx-filter-select {
+      padding: 8px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 13px;
+      background: #ffffff;
+      color: #0f172a;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .tx-table-container {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .tx-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .tx-table th {
+      background-color: #f8fafc;
+      color: #475569;
+      font-weight: 600;
+      padding: 14px 20px;
+      border-bottom: 1px solid #e2e8f0;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+    }
+
+    .tx-table td {
+      padding: 14px 20px;
+      border-bottom: 1px solid #f1f5f9;
+      color: #1e293b;
+    }
+
+    .tx-table tbody tr:hover {
+      background-color: #f8fafc;
+    }
+
+    .tx-type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+
+    .tx-type-deposit {
+      background-color: #dcfce7;
+      color: #166534;
+    }
+
+    .tx-type-withdrawal {
+      background-color: #fee2e2;
+      color: #991b1b;
+    }
+
+    .tx-status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: capitalize;
+    }
+
+    .tx-status-completed, .tx-status-success {
+      background-color: #dcfce7;
+      color: #15803d;
+    }
+
+    .tx-status-pending {
+      background-color: #fef9c3;
+      color: #a16207;
+    }
+
+    .tx-status-failed, .tx-status-rejected {
+      background-color: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .tx-empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #64748b;
+      font-size: 14px;
+    }
+
+    .tx-pagination {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      background-color: #ffffff;
+      border-top: 1px solid #f1f5f9;
+      font-size: 13px;
+      color: #64748b;
+    }
+
+    .tx-page-btns {
+      display: flex;
+      gap: 8px;
+    }
+
+    .tx-page-btn {
+      padding: 6px 12px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      border-radius: 6px;
+      cursor: pointer;
+      color: #334155;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    .tx-page-btn:hover:not(:disabled) {
+      background-color: #f1f5f9;
+    }
+
+    .tx-page-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
     #loadingOverlay {
       position: fixed;
       top: 0;
@@ -806,11 +990,66 @@
       </div>
 
     </div>
+
+    <!-- Professional Responsive Transaction History Tab Section -->
+    <div class="tx-history-section">
+      <div class="tx-history-header">
+        <div class="tx-history-title">
+          <i class="fa-solid fa-clock-rotate-left" style="color: #00b074;"></i> Transaction History
+        </div>
+        <div class="tx-filter-group">
+          <input type="text" id="txSearchInput" class="tx-search-input" placeholder="Search reference, phone...">
+          <select id="txFilterType" class="tx-filter-select">
+            <option value="all">All Types</option>
+            <option value="deposit">Deposits</option>
+            <option value="withdrawal">Withdrawals</option>
+          </select>
+          <select id="txFilterStatus" class="tx-filter-select">
+            <option value="all">All Status</option>
+            <option value="completed">Completed</option>
+            <option value="pending">Pending</option>
+            <option value="failed">Failed</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="tx-table-container">
+        <table class="tx-table">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Reference / Phone</th>
+              <th>Amount (Local)</th>
+              <th>Amount (USD)</th>
+              <th>Date & Time</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="txTableBody">
+            <tr>
+              <td colspan="6" class="tx-empty-state">
+                <i class="fa-solid fa-spinner fa-spin" style="margin-right: 8px;"></i> Loading transaction history...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="tx-pagination">
+        <span id="txPaginationInfo">Showing 0 transactions</span>
+        <div class="tx-page-btns">
+          <button id="txPrevBtn" class="tx-page-btn" disabled><i class="fa-solid fa-chevron-left"></i> Prev</button>
+          <button id="txNextBtn" class="tx-page-btn" disabled>Next <i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+      </div>
+    </div>
+
   </div>
 
  <script>
   let activeUser = null;
   let currentActionType = 'deposit'; // Tracks whether modal is handling 'deposit' or 'withdraw'
+  let allTransactions = []; // Holds fetched transaction history items
 
   document.addEventListener('DOMContentLoaded', async () => {
     // Attach event listeners dynamically to bypass CSP inline handler blocks
@@ -830,6 +1069,11 @@
     document.getElementById('modalRetryBtn').addEventListener('click', resetMpesaModal);
     document.getElementById('mpesaForm').addEventListener('submit', submitMpesaTransaction);
 
+    // Transaction History Filter Listeners
+    document.getElementById('txSearchInput').addEventListener('input', renderFilteredTransactions);
+    document.getElementById('txFilterType').addEventListener('change', renderFilteredTransactions);
+    document.getElementById('txFilterStatus').addEventListener('change', renderFilteredTransactions);
+
     const token = localStorage.getItem('token') || localStorage.getItem('authToken') || localStorage.getItem('srcb_token');
     const cachedAccount = localStorage.getItem('srcb_account');
 
@@ -843,6 +1087,7 @@
         activeUser = JSON.parse(cachedAccount);
         renderUserContext(activeUser);
         document.getElementById('loadingOverlay').style.display = 'none';
+        fetchTransactionHistory(token);
         return;
       } catch (e) {
         console.error('Failed to parse cached user object:', e);
@@ -865,6 +1110,7 @@
         localStorage.setItem('srcb_account', JSON.stringify(activeUser));
         renderUserContext(activeUser);
         document.getElementById('loadingOverlay').style.display = 'none';
+        fetchTransactionHistory(token);
       } else {
         localStorage.clear();
         window.location.replace('/login.html');
@@ -902,7 +1148,6 @@
     const userCurrency = (user.currency || 'KES').toUpperCase();
     const symbol = getCurrencySymbol(userCurrency);
     
-    // Dynamic rate parsing or fallback conversion approximation based on currency
     const exchangeRate = user.exchangeRate || (userCurrency === 'UGX' ? 3700 : userCurrency === 'KES' ? 130 : userCurrency === 'TZS' ? 2600 : 1);
     const localAmount = balanceNum * exchangeRate;
     const formattedLocal = `${symbol}${localAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -926,6 +1171,109 @@
     document.getElementById('detailAccountType').textContent = user.accountType || 'Current';
     document.getElementById('detailAccountNumber').textContent = maskAccountNumber(user.accountNumber);
     document.getElementById('detailSwiftCode').textContent = user.swiftCode || 'SRIBKE2X';
+  }
+
+  // Fetch transaction history from backend endpoints
+  async function fetchTransactionHistory(token) {
+    try {
+      // Trying standard user transaction endpoints
+      const response = await fetch('/api/payment/transactions', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        allTransactions = data.transactions || data.history || data.data || [];
+        renderFilteredTransactions();
+      } else {
+        // Fallback check if withdrawals and deposits are queried separately or empty state
+        allTransactions = [];
+        renderFilteredTransactions();
+      }
+    } catch (err) {
+      console.error('Error fetching transactions:', err);
+      document.getElementById('txTableBody').innerHTML = `
+        <tr><td colspan="6" class="tx-empty-state" style="color: #ef4444;">Failed to load transaction history. Please refresh.</td></tr>
+      `;
+    }
+  }
+
+  function renderFilteredTransactions() {
+    const searchTerm = document.getElementById('txSearchInput').value.toLowerCase();
+    const typeFilter = document.getElementById('txFilterType').value;
+    const statusFilter = document.getElementById('txFilterStatus').value;
+
+    const filtered = allTransactions.filter(tx => {
+      const type = (tx.type || tx.category || 'deposit').toLowerCase();
+      const status = (tx.status || 'completed').toLowerCase();
+      const ref = (tx.reference || tx.phone || tx.receiptNumber || tx._id || '').toLowerCase();
+
+      const matchesSearch = ref.includes(searchTerm) || String(tx.amount || '').includes(searchTerm);
+      const matchesType = typeFilter === 'all' || type.includes(typeFilter);
+      const matchesStatus = statusFilter === 'all' || status.includes(statusFilter);
+
+      return matchesSearch && matchesType && matchesStatus;
+    });
+
+    const tbody = document.getElementById('txTableBody');
+    tbody.innerHTML = '';
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" class="tx-empty-state">
+            <i class="fa-solid fa-folder-open" style="font-size: 24px; margin-bottom: 8px; display: block; color: #94a3b8;"></i>
+            No transaction records found matching your criteria.
+          </td>
+        </tr>
+      `;
+      document.getElementById('txPaginationInfo').textContent = 'Showing 0 transactions';
+      return;
+    }
+
+    const currencySymbol = getCurrencySymbol(activeUser?.currency || 'KES');
+
+    filtered.forEach(tx => {
+      const tr = document.createElement('tr');
+      
+      const typeRaw = (tx.type || tx.category || 'Deposit').toLowerCase();
+      const isDeposit = typeRaw.includes('deposit');
+      const typeClass = isDeposit ? 'tx-type-deposit' : 'tx-type-withdrawal';
+      const typeIcon = isDeposit ? 'fa-arrow-down' : 'fa-arrow-up';
+      const typeLabel = isDeposit ? 'Deposit' : 'Withdrawal';
+
+      const statusRaw = (tx.status || 'Completed').toLowerCase();
+      let statusClass = 'tx-status-completed';
+      if (statusRaw.includes('pending')) statusClass = 'tx-status-pending';
+      else if (statusRaw.includes('fail') || statusRaw.includes('reject')) statusClass = 'tx-status-failed';
+
+      const localAmt = parseFloat(tx.amountLocal || tx.amount || 0);
+      const usdAmt = parseFloat(tx.amountUSD || (localAmt / (activeUser?.exchangeRate || 130)) || 0);
+      const formattedDate = tx.createdAt ? new Date(tx.createdAt).toLocaleString() : 'Just now';
+      const identifier = tx.reference || tx.phone || tx.receiptNumber || 'M-Pesa STK';
+
+      tr.innerHTML = `
+        <td>
+          <span class="tx-type-badge ${typeClass}">
+            <i class="fa-solid ${typeIcon}"></i> ${typeLabel}
+          </span>
+        </td>
+        <td style="font-family: monospace; font-weight: 600;">${identifier}</td>
+        <td style="font-weight: 600;">${currencySymbol}${localAmt.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+        <td style="color: #64748b;">$${usdAmt.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+        <td style="color: #64748b; font-size: 12px;">${formattedDate}</td>
+        <td>
+          <span class="tx-status-badge ${statusClass}">${tx.status || 'Completed'}</span>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById('txPaginationInfo').textContent = `Showing ${filtered.length} transaction(s)`;
   }
 
   function handleDepositClick() {
@@ -972,6 +1320,8 @@
   function closeMpesaModal() {
     document.getElementById('mpesaModal').style.display = 'none';
     resetMpesaModal();
+    const token = localStorage.getItem('token') || localStorage.getItem('authToken') || localStorage.getItem('srcb_token');
+    if (token) fetchTransactionHistory(token);
   }
 
   function resetMpesaModal() {
@@ -988,7 +1338,6 @@
     const rawAmount = document.getElementById('mpesaAmount').value.trim();
     const rawPhone = document.getElementById('mpesaPhone').value.trim();
     
-    // Normalize Kenyan phone numbers securely to 2547XXXXXXXX
     let phone = rawPhone;
     if (phone.startsWith('0')) {
       phone = '254' + phone.slice(1);
@@ -998,14 +1347,11 @@
       phone = '254' + phone;
     }
 
-    // Switch modal view to active waiting/loading state
     document.getElementById('mpesaForm').style.display = 'none';
     document.getElementById('displayMpesaPhone').textContent = phone;
     document.getElementById('mpesaLoadingState').style.display = 'block';
 
     const token = localStorage.getItem('token') || localStorage.getItem('authToken') || localStorage.getItem('srcb_token');
-
-    // Mapped endpoint supporting both direct and payment-prefixed routes
     const apiEndpoint = currentActionType === 'deposit' ? '/api/payment/stk-push' : '/api/payment/withdraw';
 
     try {
