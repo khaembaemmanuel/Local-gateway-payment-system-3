@@ -168,7 +168,7 @@ app.use((err, req, res, next) => {
 connectDB()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`🚀 Secure server running in ${process.env.NODE_ENV \vert{}\vert{} 'development'} mode on port${PORT}`);
+      console.log(`🚀 Secure server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
     });
   })
   .catch((err) => {
