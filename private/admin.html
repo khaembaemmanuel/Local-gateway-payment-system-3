@@ -89,7 +89,7 @@
   <!-- Transaction History Modal -->
   <div id="historyModal" class="modal">
     <div class="modal-content">
-      <span class="close-btn" onclick="closeHistoryModal()">&times;</span>
+      <span class="close-btn" id="closeModalBtn">&times;</span>
       <h2>Client Transaction History</h2>
       <p id="modalClientInfo" style="color: #38bdf8; margin-bottom: 15px;"></p>
       <table>
@@ -184,8 +184,8 @@
               <td>$${w.amountUSD.toFixed(2)}</td>
               <td>${w.phoneNumber}</td>
               <td>
-                <button class="btn-approve" onclick="processWithdrawal('${w._id}', 'complete')">Approve</button>
-                <button class="btn-reject" onclick="processWithdrawal('${w._id}', 'reject')">Reject</button>
+                <button class="btn-approve btn-action-withdrawal" data-id="${w._id}" data-action="complete">Approve</button>
+                <button class="btn-reject btn-action-withdrawal" data-id="${w._id}" data-action="reject">Reject</button>
               </td>
             </tr>
           `).join('');
@@ -210,12 +210,12 @@
                 <td>$${c.balance.toFixed(2)}<br><small style="color: #94a3b8;">${c.currency} ${c.localBalanceEquivalent.toLocaleString()}</small></td>
                 <td><span style="color: ${isBlocked ? '#ef4444' : '#22c55e'}; font-weight: bold;">${isBlocked ? 'Blocked' : 'Active'}</span></td>
                 <td>
-                  <button class="btn-history" onclick="viewHistory('${c._id}', '${c.firstName} ${c.lastName}', '${c.accountNumber || c.email}')">History</button>
+                  <button class="btn-history btn-action-history" data-id="${c._id}" data-name="${c.firstName} ${c.lastName}" data-account="${c.accountNumber || c.email}">History</button>
                   ${isBlocked 
-                    ? `<button class="btn-unblock" onclick="toggleBlockUser('${c._id}', false)">Unblock</button>` 
-                    : `<button class="btn-block" onclick="toggleBlockUser('${c._id}', true)">Block</button>`
+                    ? `<button class="btn-unblock btn-action-block" data-id="${c._id}" data-block="false">Unblock</button>` 
+                    : `<button class="btn-block btn-action-block" data-id="${c._id}" data-block="true">Block</button>`
                   }
-                  <button class="btn-delete" onclick="deleteUser('${c._id}', '${c.email}')">Delete</button>
+                  <button class="btn-delete btn-action-delete" data-id="${c._id}" data-email="${c.email}">Delete</button>
                 </td>
               </tr>
             `;
@@ -229,53 +229,73 @@
       }
     }
 
-    async function processWithdrawal(id, action) {
-      if (!confirm(`Are you sure you want to ${action} this withdrawal?`)) return;
+    // Event Delegation for Table Action Buttons (CSP Compliant)
+    document.addEventListener('click', async (e) => {
+      // Withdrawal Actions
+      if (e.target.classList.contains('btn-action-withdrawal')) {
+        const id = e.target.getAttribute('data-id');
+        const action = e.target.getAttribute('data-action');
+        if (!confirm(`Are you sure you want to ${action} this withdrawal?`)) return;
 
-      const res = await fetch(`/api/admin/withdrawals/${id}/${action}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      const data = await res.json();
-      alert(data.message);
-      loadAdminData();
-    }
-
-    async function toggleBlockUser(userId, blockStatus) {
-      const actionText = blockStatus ? 'block' : 'unblock';
-      if (!confirm(`Are you sure you want to ${actionText} this user?`)) return;
-
-      try {
-        const res = await fetch(`/api/admin/clients/${userId}/status`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ isBlocked: blockStatus })
-        });
-        const data = await res.json();
-        alert(data.message || 'Status updated successfully');
-        loadAdminData();
-      } catch (err) {
-        console.error('Error updating user status:', err);
-        alert('Failed to update user status.');
-      }
-    }
-
-    async function deleteUser(userId, email) {
-      if (!confirm(`WARNING: Are you sure you want to completely delete client account (${email})? This action cannot be undone.`)) return;
-
-      try {
-        const res = await fetch(`/api/admin/clients/${userId}`, {
-          method: 'DELETE',
+        const res = await fetch(`/api/admin/withdrawals/${id}/${action}`, {
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' }
         });
         const data = await res.json();
-        alert(data.message || 'User deleted successfully');
+        alert(data.message);
         loadAdminData();
-      } catch (err) {
-        console.error('Error deleting user:', err);
-        alert('Failed to delete user.');
       }
-    }
+
+      // History Action
+      if (e.target.classList.contains('btn-action-history')) {
+        const userId = e.target.getAttribute('data-id');
+        const name = e.target.getAttribute('data-name');
+        const accountNum = e.target.getAttribute('data-account');
+        viewHistory(userId, name, accountNum);
+      }
+
+      // Block/Unblock Action
+      if (e.target.classList.contains('btn-action-block')) {
+        const userId = e.target.getAttribute('data-id');
+        const blockStatus = e.target.getAttribute('data-block') === 'true';
+        const actionText = blockStatus ? 'block' : 'unblock';
+        if (!confirm(`Are you sure you want to ${actionText} this user?`)) return;
+
+        try {
+          const res = await fetch(`/api/admin/clients/${userId}/status`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ isBlocked: blockStatus })
+          });
+          const data = await res.json();
+          alert(data.message || 'Status updated successfully');
+          loadAdminData();
+        } catch (err) {
+          console.error('Error updating user status:', err);
+          alert('Failed to update user status.');
+        }
+      }
+
+      // Delete Action
+      if (e.target.classList.contains('btn-action-delete')) {
+        const userId = e.target.getAttribute('data-id');
+        const email = e.target.getAttribute('data-email');
+        if (!confirm(`WARNING: Are you sure you want to completely delete client account (${email})? This action cannot be undone.`)) return;
+
+        try {
+          const res = await fetch(`/api/admin/clients/${userId}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+          });
+          const data = await res.json();
+          alert(data.message || 'User deleted successfully');
+          loadAdminData();
+        } catch (err) {
+          console.error('Error deleting user:', err);
+          alert('Failed to delete user.');
+        }
+      }
+    });
 
     async function viewHistory(userId, name, accountNum) {
       document.getElementById('modalClientInfo').innerText = `Client: ${name} (Account: ${accountNum})`;
@@ -306,6 +326,8 @@
         document.getElementById('modalHistoryTable').innerHTML = `<tr><td colspan="6">Failed to load transaction history.</td></tr>`;
       }
     }
+
+    document.getElementById('closeModalBtn').addEventListener('click', closeHistoryModal);
 
     function closeHistoryModal() {
       document.getElementById('historyModal').style.display = 'none';
