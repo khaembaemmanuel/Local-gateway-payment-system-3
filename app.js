@@ -105,6 +105,11 @@ app.get('/dashboard.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 
+// Admin portal route paths (supports both options)
+app.get('/admin.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'private', 'admin.html'));
+});
+
 app.get('/secure-admin-portal', (req, res) => {
   res.sendFile(path.join(__dirname, 'private', 'admin.html'));
 });
@@ -163,7 +168,7 @@ app.use((err, req, res, next) => {
 connectDB()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`🚀 Secure server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+      console.log(`🚀 Secure server running in ${process.env.NODE_ENV \vert{}\vert{} 'development'} mode on port${PORT}`);
     });
   })
   .catch((err) => {
