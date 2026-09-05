@@ -876,7 +876,7 @@
         
         <!-- Deposit Action & Methods -->
         <div style="display: flex; flex-direction: column; gap: 16px;">
-          <button id="depositPageBtn" class="dash-action-btn btn-deposit-action">
+          <button id="depositPageBtn" class="dash-action-btn btn-deposit-action" style="opacity: 0.6; cursor: not-allowed; pointer-events: none;" disabled>
             <i class="fa-solid fa-arrow-down-to-bracket"></i> Deposit Funds
           </button>
 
@@ -884,8 +884,8 @@
             <div class="recommended-title">Recommended Deposit Methods</div>
             <div class="recommended-grid" style="grid-template-columns: 1fr;">
               
-              <!-- M-Pesa Deposit Option (Unresponsive / Static redirect to deposit page) -->
-              <a href="/deposit.html?gateway=MPesa" class="payment-card">
+              <!-- M-Pesa Deposit Option (Unresponsive) -->
+              <div class="payment-card" style="opacity: 0.6; cursor: not-allowed; pointer-events: none;">
                 <div class="payment-logo-container">
                   <div class="mpesa-logo-text">
                     <span class="m-box">M</span><span style="color: #438e24;">-</span><span class="pesa-text">PESA</span>
@@ -894,10 +894,10 @@
                 <div class="payment-action-bar" style="background-color: #3b82f6;">
                   M-Pesa Deposit
                 </div>
-              </a>
+              </div>
 
-              <!-- Airtel Money Deposit Option (Unresponsive / Static redirect to deposit page) -->
-              <a href="/deposit.html?gateway=AirtelMoney" class="payment-card">
+              <!-- Airtel Money Deposit Option (Unresponsive) -->
+              <div class="payment-card" style="opacity: 0.6; cursor: not-allowed; pointer-events: none;">
                 <div class="promo-badge">+10%</div>
                 <div class="payment-logo-container">
                   <div class="airtel-logo-wrap">
@@ -910,10 +910,10 @@
                 <div class="payment-action-bar" style="background-color: #3b82f6;">
                   Airtel Deposit
                 </div>
-              </a>
+              </div>
 
-              <!-- PayPal Deposit Option (Unresponsive / Static redirect to deposit page) -->
-              <a href="/deposit.html?gateway=PayPal" class="payment-card">
+              <!-- PayPal Deposit Option (Unresponsive) -->
+              <div class="payment-card" style="opacity: 0.6; cursor: not-allowed; pointer-events: none;">
                 <div class="payment-logo-container">
                   <div class="paypal-logo-wrap">
                     <span class="pp-blue1">Pay</span><span class="pp-blue2">Pal</span>
@@ -922,7 +922,7 @@
                 <div class="payment-action-bar" style="background-color: #3b82f6;">
                   PayPal Deposit
                 </div>
-              </a>
+              </div>
 
             </div>
           </div>
@@ -930,7 +930,7 @@
 
         <!-- Withdrawal Action & Methods -->
         <div style="display: flex; flex-direction: column; gap: 16px;">
-          <button id="withdrawPageBtn" class="dash-action-btn btn-withdraw-action">
+          <button id="withdrawPageBtn" class="dash-action-btn btn-withdraw-action" style="opacity: 0.6; cursor: not-allowed; pointer-events: none;" disabled>
             <i class="fa-solid fa-arrow-up-from-bracket"></i> Withdrawal
           </button>
 
@@ -938,8 +938,8 @@
             <div class="recommended-title">Recommended Withdrawal Methods</div>
             <div class="recommended-grid" style="grid-template-columns: 1fr;">
               
-              <!-- M-Pesa Withdrawal Option (Unresponsive / Static redirect to withdraw page) -->
-              <a href="/withdraw.html?gateway=MPesa" class="payment-card">
+              <!-- M-Pesa Withdrawal Option (Unresponsive) -->
+              <div class="payment-card" style="opacity: 0.6; cursor: not-allowed; pointer-events: none;">
                 <div class="payment-logo-container">
                   <div class="mpesa-logo-text">
                     <span class="m-box">M</span><span style="color: #438e24;">-</span><span class="pesa-text">PESA</span>
@@ -948,10 +948,10 @@
                 <div class="payment-action-bar" style="background-color: #0f172a;">
                   M-Pesa Withdrawal
                 </div>
-              </a>
+              </div>
 
-              <!-- Airtel Money Withdrawal Option (Unresponsive / Static redirect to withdraw page) -->
-              <a href="/withdraw.html?gateway=AirtelMoney" class="payment-card">
+              <!-- Airtel Money Withdrawal Option (Unresponsive) -->
+              <div class="payment-card" style="opacity: 0.6; cursor: not-allowed; pointer-events: none;">
                 <div class="payment-logo-container">
                   <div class="airtel-logo-wrap">
                     <div class="airtel-brand">
@@ -963,10 +963,10 @@
                 <div class="payment-action-bar" style="background-color: #0f172a;">
                   Airtel Withdrawal
                 </div>
-              </a>
+              </div>
 
-              <!-- PayPal Withdrawal Option (Unresponsive / Static redirect to withdraw page) -->
-              <a href="/withdraw.html?gateway=PayPal" class="payment-card">
+              <!-- PayPal Withdrawal Option (Unresponsive) -->
+              <div class="payment-card" style="opacity: 0.6; cursor: not-allowed; pointer-events: none;">
                 <div class="payment-logo-container">
                   <div class="paypal-logo-wrap">
                     <span class="pp-blue1">Pay</span><span class="pp-blue2">Pal</span>
@@ -975,7 +975,7 @@
                 <div class="payment-action-bar" style="background-color: #0f172a;">
                   PayPal Withdrawal
                 </div>
-              </a>
+              </div>
 
             </div>
           </div>
@@ -1032,7 +1032,7 @@
       <div class="tx-pagination">
         <span id="txPaginationInfo">Showing 0 transactions</span>
         <div class="tx-page-btns">
-          <button id="txPrevBtn" class="tx-page-btn" disabled><i class="fa-solid fa-chevron-left"></i> Prev</button>
+          <button id="txPrevBtn" class="tx-page-btn" disabled><i class="fa-solid fa-chevron-left"><span></span></i> Prev</button>
           <button id="txNextBtn" class="tx-page-btn" disabled>Next <i class="fa-solid fa-chevron-right"></i></button>
         </div>
       </div>
@@ -1045,9 +1045,7 @@
   let allTransactions = []; // Holds fetched transaction history items
 
   document.addEventListener('DOMContentLoaded', async () => {
-    // Action and general button listeners
-    document.getElementById('depositPageBtn').addEventListener('click', handleDepositClick);
-    document.getElementById('withdrawPageBtn').addEventListener('click', handleWithdrawClick);
+    // Action button listeners removed to prevent functionality
     document.getElementById('applyCardBtn').addEventListener('click', () => alert('Your card request has been submitted to support.'));
 
     // Transaction History Filter Listeners
@@ -1253,14 +1251,6 @@
     });
 
     document.getElementById('txPaginationInfo').textContent = `Showing ${filtered.length} transaction(s)`;
-  }
-
-  function handleDepositClick() {
-    window.location.href = '/deposit.html';
-  }
-
-  function handleWithdrawClick() {
-    window.location.href = '/withdraw.html';
   }
 
   document.getElementById('logoutBtn').addEventListener('click', () => {
