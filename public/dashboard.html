@@ -409,6 +409,12 @@
       font-size: 13px;
     }
 
+    @media (max-width: 640px) {
+      .recommended-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
     /* Professional Transaction History Styles */
     .tx-history-section {
       background: #ffffff;
@@ -884,20 +890,20 @@
             <div class="recommended-title">Recommended Deposit Methods</div>
             <div class="recommended-grid" style="grid-template-columns: 1fr;">
               
-              <!-- M-Pesa Deposit Option (Active) -->
-              <div class="payment-card" id="mpesaDepositCard">
+              <!-- M-Pesa Deposit Option -->
+              <div class="payment-card" data-gateway="MPesa" data-action="deposit">
                 <div class="payment-logo-container">
                   <div class="mpesa-logo-text">
                     <span class="m-box">M</span><span style="color: #438e24;">-</span><span class="pesa-text">PESA</span>
                   </div>
                 </div>
-                <div class="payment-action-bar" style="background-color: #00b074;">
-                  Deposit via M-Pesa
+                <div class="payment-action-bar" style="background-color: #3b82f6;">
+                  M-Pesa Deposit
                 </div>
               </div>
 
-              <!-- Airtel Money Deposit Option (Disabled) -->
-              <div class="payment-card" style="opacity: 0.6; cursor: not-allowed; pointer-events: none;">
+              <!-- Airtel Money Option -->
+              <div class="payment-card" data-gateway="AirtelMoney" data-action="deposit">
                 <div class="promo-badge">+10%</div>
                 <div class="payment-logo-container">
                   <div class="airtel-logo-wrap">
@@ -908,19 +914,19 @@
                   </div>
                 </div>
                 <div class="payment-action-bar" style="background-color: #3b82f6;">
-                  Airtel Deposit (Offline)
+                  Airtel Deposit
                 </div>
               </div>
 
-              <!-- PayPal Deposit Option (Disabled) -->
-              <div class="payment-card" style="opacity: 0.6; cursor: not-allowed; pointer-events: none;">
+              <!-- PayPal Option -->
+              <div class="payment-card" data-gateway="PayPal" data-action="deposit">
                 <div class="payment-logo-container">
                   <div class="paypal-logo-wrap">
                     <span class="pp-blue1">Pay</span><span class="pp-blue2">Pal</span>
                   </div>
                 </div>
                 <div class="payment-action-bar" style="background-color: #3b82f6;">
-                  PayPal Deposit (Offline)
+                  PayPal Deposit
                 </div>
               </div>
 
@@ -938,20 +944,20 @@
             <div class="recommended-title">Recommended Withdrawal Methods</div>
             <div class="recommended-grid" style="grid-template-columns: 1fr;">
               
-              <!-- M-Pesa Withdrawal Option (Active) -->
-              <div class="payment-card" id="mpesaWithdrawCard">
+              <!-- M-Pesa Withdrawal Option -->
+              <div class="payment-card" data-gateway="MPesa" data-action="withdraw">
                 <div class="payment-logo-container">
                   <div class="mpesa-logo-text">
                     <span class="m-box">M</span><span style="color: #438e24;">-</span><span class="pesa-text">PESA</span>
                   </div>
                 </div>
                 <div class="payment-action-bar" style="background-color: #0f172a;">
-                  Withdraw via M-Pesa
+                  M-Pesa Withdrawal
                 </div>
               </div>
 
-              <!-- Airtel Money Withdrawal Option (Disabled) -->
-              <div class="payment-card" style="opacity: 0.6; cursor: not-allowed; pointer-events: none;">
+              <!-- Airtel Money Option for Withdrawal -->
+              <div class="payment-card" data-gateway="AirtelMoney" data-action="withdraw">
                 <div class="payment-logo-container">
                   <div class="airtel-logo-wrap">
                     <div class="airtel-brand">
@@ -961,19 +967,19 @@
                   </div>
                 </div>
                 <div class="payment-action-bar" style="background-color: #0f172a;">
-                  Airtel Withdrawal (Offline)
+                  Airtel Withdrawal
                 </div>
               </div>
 
-              <!-- PayPal Withdrawal Option (Disabled) -->
-              <div class="payment-card" style="opacity: 0.6; cursor: not-allowed; pointer-events: none;">
+              <!-- PayPal Option for Withdrawal -->
+              <div class="payment-card" data-gateway="PayPal" data-action="withdraw">
                 <div class="payment-logo-container">
                   <div class="paypal-logo-wrap">
                     <span class="pp-blue1">Pay</span><span class="pp-blue2">Pal</span>
                   </div>
                 </div>
                 <div class="payment-action-bar" style="background-color: #0f172a;">
-                  PayPal Withdrawal (Offline)
+                  PayPal Withdrawal
                 </div>
               </div>
 
@@ -1032,7 +1038,7 @@
       <div class="tx-pagination">
         <span id="txPaginationInfo">Showing 0 transactions</span>
         <div class="tx-page-btns">
-          <button id="txPrevBtn" class="tx-page-btn" disabled><i class="fa-solid fa-chevron-left"><span></span></i> Prev</button>
+          <button id="txPrevBtn" class="tx-page-btn" disabled><i class="fa-solid fa-chevron-left"></i> Prev</button>
           <button id="txNextBtn" class="tx-page-btn" disabled>Next <i class="fa-solid fa-chevron-right"></i></button>
         </div>
       </div>
@@ -1042,99 +1048,26 @@
 
  <script>
   let activeUser = null;
-  let allTransactions = []; 
-  let currentActionType = 'deposit'; // 'deposit' or 'withdrawal'
+  let currentActionType = 'deposit'; // Tracks whether modal is handling 'deposit' or 'withdraw'
+  let allTransactions = []; // Holds fetched transaction history items
 
   document.addEventListener('DOMContentLoaded', async () => {
+    // Attach event listeners dynamically to bypass CSP inline handler blocks
+    document.querySelectorAll('.payment-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const gateway = card.getAttribute('data-gateway');
+        const action = card.getAttribute('data-action');
+        handleGatewaySelect(gateway, action);
+      });
+    });
+
+    document.getElementById('depositPageBtn').addEventListener('click', handleDepositClick);
+    document.getElementById('withdrawPageBtn').addEventListener('click', handleWithdrawClick);
     document.getElementById('applyCardBtn').addEventListener('click', () => alert('Your card request has been submitted to support.'));
-
-    // Modal Triggers for M-Pesa / Deposit & Withdraw Buttons
-    const mpesaModal = document.getElementById('mpesaModal');
-    const modalCloseXBtn = document.getElementById('modalCloseXBtn');
-    const modalDoneBtn = document.getElementById('modalDoneBtn');
-    const modalRetryBtn = document.getElementById('modalRetryBtn');
-
-    function openMpesaModal(type) {
-      currentActionType = type;
-      const titleEl = document.getElementById('mpesaModalTitle');
-      const submitBtn = document.getElementById('mpesaSubmitBtn');
-      const amountLabel = document.getElementById('mpesaAmountLabel');
-
-      // Reset modal views
-      document.getElementById('mpesaForm').style.display = 'block';
-      document.getElementById('mpesaLoadingState').style.display = 'none';
-      document.getElementById('mpesaSuccessState').style.display = 'none';
-      document.getElementById('mpesaErrorState').style.display = 'none';
-      document.getElementById('mpesaAmount').value = '';
-      document.getElementById('mpesaPhone').value = '';
-
-      if (type === 'deposit') {
-        titleEl.innerHTML = '<i class="fa-solid fa-mobile-screen-button" style="color: #a3e635;"></i> M-Pesa Deposit (STK Push)';
-        submitBtn.textContent = 'Deposit Funds';
-        submitBtn.style.backgroundColor = '#00b074';
-        amountLabel.textContent = 'Deposit Amount (KES)';
-      } else {
-        titleEl.innerHTML = '<i class="fa-solid fa-mobile-screen-button" style="color: #a3e635;"></i> M-Pesa Withdrawal';
-        submitBtn.textContent = 'Withdraw Funds';
-        submitBtn.style.backgroundColor = '#0f172a';
-        amountLabel.textContent = 'Withdrawal Amount (KES)';
-      }
-      mpesaModal.style.display = 'flex';
-    }
-
-    document.getElementById('depositPageBtn').addEventListener('click', () => openMpesaModal('deposit'));
-    document.getElementById('mpesaDepositCard').addEventListener('click', () => openMpesaModal('deposit'));
-    document.getElementById('withdrawPageBtn').addEventListener('click', () => openMpesaModal('withdrawal'));
-    document.getElementById('mpesaWithdrawCard').addEventListener('click', () => openMpesaModal('withdrawal'));
-
-    modalCloseXBtn.addEventListener('click', () => { mpesaModal.style.display = 'none'; });
-    modalDoneBtn.addEventListener('click', () => { mpesaModal.style.display = 'none'; location.reload(); });
-    modalRetryBtn.addEventListener('click', () => {
-      document.getElementById('mpesaErrorState').style.display = 'none';
-      document.getElementById('mpesaForm').style.display = 'block';
-    });
-
-    // Handle M-Pesa Form Submission
-    document.getElementById('mpesaForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const amount = document.getElementById('mpesaAmount').value;
-      const phone = document.getElementById('mpesaPhone').value;
-      const token = localStorage.getItem('token') || localStorage.getItem('authToken') || localStorage.getItem('srcb_token');
-
-      // Switch to loading state
-      document.getElementById('mpesaForm').style.display = 'none';
-      document.getElementById('displayMpesaPhone').textContent = phone;
-      document.getElementById('mpesaLoadingState').style.display = 'block';
-
-      const endpoint = currentActionType === 'deposit' ? '/api/payment/deposit/mpesa' : '/api/payment/withdraw/mpesa';
-
-      try {
-        const response = await fetch(endpoint, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ amount, phone })
-        });
-
-        const data = await response.json();
-        document.getElementById('mpesaLoadingState').style.display = 'none';
-
-        if (response.ok && data.success) {
-          document.getElementById('successStateDesc').textContent = data.message || 'Transaction processed successfully.';
-          document.getElementById('mpesaSuccessState').style.display = 'block';
-        } else {
-          document.getElementById('errorStateDesc').textContent = data.message || 'Transaction could not be completed.';
-          document.getElementById('mpesaErrorState').style.display = 'block';
-        }
-      } catch (err) {
-        console.error('M-Pesa API error:', err);
-        document.getElementById('mpesaLoadingState').style.display = 'none';
-        document.getElementById('errorStateDesc').textContent = 'Network connection error. Please try again.';
-        document.getElementById('mpesaErrorState').style.display = 'block';
-      }
-    });
+    document.getElementById('modalCloseXBtn').addEventListener('click', closeMpesaModal);
+    document.getElementById('modalDoneBtn').addEventListener('click', closeMpesaModal);
+    document.getElementById('modalRetryBtn').addEventListener('click', resetMpesaModal);
+    document.getElementById('mpesaForm').addEventListener('submit', submitMpesaTransaction);
 
     // Transaction History Filter Listeners
     document.getElementById('txSearchInput').addEventListener('input', renderFilteredTransactions);
@@ -1240,8 +1173,10 @@
     document.getElementById('detailSwiftCode').textContent = user.swiftCode || 'SRIBKE2X';
   }
 
+  // Fetch transaction history from backend endpoints
   async function fetchTransactionHistory(token) {
     try {
+      // Trying standard user transaction endpoints
       const response = await fetch('/api/payment/transactions', {
         method: 'GET',
         headers: {
@@ -1255,6 +1190,7 @@
         allTransactions = data.transactions || data.history || data.data || [];
         renderFilteredTransactions();
       } else {
+        // Fallback check if withdrawals and deposits are queried separately or empty state
         allTransactions = [];
         renderFilteredTransactions();
       }
@@ -1338,6 +1274,114 @@
     });
 
     document.getElementById('txPaginationInfo').textContent = `Showing ${filtered.length} transaction(s)`;
+  }
+
+  function handleDepositClick() {
+    window.location.href = '/deposit.html';
+  }
+
+  function handleWithdrawClick() {
+    window.location.href = '/withdraw.html';
+  }
+
+  function handleGatewaySelect(gatewayName, actionType) {
+    if (gatewayName === 'MPesa') {
+      currentActionType = actionType; // 'deposit' or 'withdraw'
+      
+      const titleElem = document.getElementById('mpesaModalTitle');
+      const submitBtn = document.getElementById('mpesaSubmitBtn');
+      const loadingTitle = document.getElementById('loadingStateTitle');
+      const loadingDesc = document.getElementById('loadingStateDesc');
+      const successDesc = document.getElementById('successStateDesc');
+      const amountLabel = document.getElementById('mpesaAmountLabel');
+
+      amountLabel.textContent = `Amount (${activeUser?.currency || 'KES'})`;
+
+      if (actionType === 'deposit') {
+        titleElem.innerHTML = `<i class="fa-solid fa-mobile-screen-button" style="color: #a3e635;"></i> M-Pesa Instant Deposit`;
+        submitBtn.textContent = `Deposit`;
+        loadingTitle.textContent = `Check Your Phone`;
+        loadingDesc.innerHTML = `An M-Pesa STK prompt has been sent to <span id="displayMpesaPhone" style="font-weight: 600; color: #0f172a;"></span>. Enter your PIN to complete the deposit.`;
+        successDesc.textContent = `Your STK push was successfully dispatched. Once you enter your PIN, your balance will update automatically.`;
+      } else {
+        titleElem.innerHTML = `<i class="fa-solid fa-mobile-screen-button" style="color: #a3e635;"></i> M-Pesa Withdrawal`;
+        submitBtn.textContent = `Withdraw Funds`;
+        loadingTitle.textContent = `Processing Withdrawal`;
+        loadingDesc.innerHTML = `Sending withdrawal request to <span id="displayMpesaPhone" style="font-weight: 600; color: #0f172a;"></span>. Please wait...`;
+        successDesc.textContent = `Your M-Pesa withdrawal request has been submitted successfully and is being processed.`;
+      }
+
+      document.getElementById('mpesaModal').style.display = 'flex';
+    } else {
+      window.location.href = `/${actionType}.html?gateway=${gatewayName}`;
+    }
+  }
+
+  function closeMpesaModal() {
+    document.getElementById('mpesaModal').style.display = 'none';
+    resetMpesaModal();
+    const token = localStorage.getItem('token') || localStorage.getItem('authToken') || localStorage.getItem('srcb_token');
+    if (token) fetchTransactionHistory(token);
+  }
+
+  function resetMpesaModal() {
+    document.getElementById('mpesaForm').style.display = 'block';
+    document.getElementById('mpesaLoadingState').style.display = 'none';
+    document.getElementById('mpesaSuccessState').style.display = 'none';
+    document.getElementById('mpesaErrorState').style.display = 'none';
+    document.getElementById('mpesaForm').reset();
+  }
+
+  async function submitMpesaTransaction(event) {
+    event.preventDefault();
+    
+    const rawAmount = document.getElementById('mpesaAmount').value.trim();
+    const rawPhone = document.getElementById('mpesaPhone').value.trim();
+    
+    let phone = rawPhone;
+    if (phone.startsWith('0')) {
+      phone = '254' + phone.slice(1);
+    } else if (phone.startsWith('+')) {
+      phone = phone.slice(1);
+    } else if (phone.length === 9) {
+      phone = '254' + phone;
+    }
+
+    document.getElementById('mpesaForm').style.display = 'none';
+    document.getElementById('displayMpesaPhone').textContent = phone;
+    document.getElementById('mpesaLoadingState').style.display = 'block';
+
+    const token = localStorage.getItem('token') || localStorage.getItem('authToken') || localStorage.getItem('srcb_token');
+    const apiEndpoint = currentActionType === 'deposit' ? '/api/payment/stk-push' : '/api/payment/withdraw';
+
+    try {
+      const response = await fetch(apiEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ 
+          phone: phone, 
+          amountLocal: rawAmount,
+          currencyLocal: activeUser?.currency || 'KES'
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        document.getElementById('mpesaLoadingState').style.display = 'none';
+        document.getElementById('mpesaSuccessState').style.display = 'block';
+      } else {
+        throw new Error(data.message || data.error || `Failed to process M-Pesa ${currentActionType}.`);
+      }
+    } catch (err) {
+      console.error('M-Pesa Transaction Error:', err);
+      document.getElementById('mpesaLoadingState').style.display = 'none';
+      document.getElementById('errorStateDesc').textContent = err.message || 'Network error connecting to payment gateway.';
+      document.getElementById('mpesaErrorState').style.display = 'block';
+    }
   }
 
   document.getElementById('logoutBtn').addEventListener('click', () => {
