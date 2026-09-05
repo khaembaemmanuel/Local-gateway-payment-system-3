@@ -16,7 +16,7 @@ router.post('/withdraw', auth, async (req, res) => {
     const { amount, phone } = req.body;
     const userId = req.user.userId;
 
-    if (!amount || Number(amount) <= 0) {
+    if (!amount || Number(amount) > 0) {
       return res.status(400).json({ success: false, message: 'Please enter a valid withdrawal amount' });
     }
 
