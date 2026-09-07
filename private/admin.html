@@ -96,9 +96,9 @@
         <thead>
           <tr>
             <th>Type</th>
-            <th>Payment Method</th>
-            <th>Native Amount</th>
-            <th>USD Amount</th>
+            <th>Payment Gateway</th>
+            <th>Amount</th>
+            <th>USD Value</th>
             <th>Status</th>
             <th>Date</th>
           </tr>
@@ -179,7 +179,7 @@
           wTable.innerHTML = wData.withdrawals.map(w => `
             <tr>
               <td>${w.userId ? w.userId.firstName + ' ' + w.userId.lastName : 'Unknown'}</td>
-              <td>${w.userId ? w.userId.accountNumber : 'N/A'}</td>
+              <td>${w.userId ? (w.userId.accountNumber || 'N/A') : 'N/A'}</td>
               <td><b>${w.currency} ${w.payoutAmountLocal.toLocaleString()}</b></td>
               <td>$${w.amountUSD.toFixed(2)}</td>
               <td>${w.phoneNumber}</td>
@@ -321,8 +321,8 @@
           historyTable.innerHTML = data.transactions.map(tx => `
             <tr>
               <td>${tx.type}</td>
-              <td>${tx.paymentMethod || 'N/A'}</td>
-              <td>${tx.nativeCurrency || ''} ${tx.amountNative ? tx.amountNative.toLocaleString() : '0'}</td>
+              <td>${tx.gateway || 'N/A'}</td>
+              <td>${tx.currency || ''} ${tx.amount ? tx.amount.toLocaleString() : '0'}</td>
               <td>$${tx.amountUSD ? tx.amountUSD.toFixed(2) : '0.00'}</td>
               <td><b>${tx.status}</b></td>
               <td>${new Date(tx.createdAt).toLocaleString()}</td>

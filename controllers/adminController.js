@@ -146,8 +146,9 @@ const deleteUserAccount = async (req, res, next) => {
 
     await User.findByIdAndDelete(id);
 
-    // Clean up related transaction logs
+    // Clean up related transaction logs & withdrawal requests
     await Transaction.deleteMany({ userId: id });
+    await WithdrawalRequest.deleteMany({ userId: id });
 
     return res.status(200).json({
       success: true,
