@@ -26,6 +26,9 @@
 <!-- Font -->
 <link href="https://fonts.googleapis.com/css2?family=Saira&amp;display=swap" rel="stylesheet">
 
+<!-- Google reCAPTCHA API Script -->
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
 <!-- Responsive -->
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
@@ -667,6 +670,22 @@
 </div>
 <!--End pagewrapper-->
 
+<!-- reCAPTCHA Modal Overlay -->
+<div id="recaptcha-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center;">
+    <div style="background:#fff; padding:30px; border-radius:8px; position:relative; max-width:400px; width:100%; text-align:center;">
+        <span id="close-recaptcha" style="position:absolute; top:10px; right:15px; font-size:24px; cursor:pointer;">&times;</span>
+        <h4 style="margin-bottom: 10px; font-family: 'Saira', serif;">Security Verification</h4>
+        <p style="margin-bottom: 20px; color: #666;">Please complete the verification to proceed to your account.</p>
+        
+        <form id="recaptcha-form">
+            <!-- Replace YOUR_SITE_KEY_HERE with your actual Google reCAPTCHA site key -->
+            <div class="g-recaptcha" data-sitekey="6LcWJIwtAAAAAMige81HZ-jAqmxMYqbCKJuHa_tI" style="display:inline-block; margin-bottom:20px;"></div>
+            <br>
+            <button type="submit" class="theme-btn btn-style-one">Continue</button>
+        </form>
+    </div>
+</div>
+
 <script src="/js/jquery.js"></script>
 <script src="/js/popper.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
@@ -677,5 +696,53 @@
 <script src="/js/wow.js"></script>
 <script src="/js/jquery-ui.js"></script>
 <script src="/js/main.js"></script>
+
+<!-- reCAPTCHA Modal Trigger & AJAX Validation Script -->
+<script>
+$(document).ready(function() {
+    // Intercept clicks on online banking and login links
+    $('a[href="login.html"], a[href="/login.html"]').on('click', function(e) {
+        e.preventDefault(); 
+        $('#recaptcha-modal').css('display', 'flex'); 
+    });
+
+    // Close modal when clicking the 'X' button
+    $('#close-recaptcha').on('click', function() {
+        $('#recaptcha-modal').hide();
+    });
+
+    // Handle form submission via backend verification route
+    $('#recaptcha-form').on('submit', function(e) {
+        e.preventDefault();
+        var token = grecaptcha.getResponse();
+        
+        if (token.length === 0) {
+            alert("Please complete the reCAPTCHA verification.");
+            return;
+        }
+
+        // Send token to backend endpoint for cryptographic validation
+        $.ajax({
+            url: '/verify-captcha',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ token: token }),
+            success: function(response) {
+                if (response.success) {
+                    // Verification passed, proceed to login page
+                    window.location.href = 'login.html';
+                } else {
+                    alert(response.message || "Verification failed. Please try again.");
+                    grecaptcha.reset();
+                }
+            },
+            error: function(xhr) {
+                alert("An error occurred during verification. Please try again.");
+                grecaptcha.reset();
+            }
+        });
+    });
+});
+</script>
 </body>
 </html>

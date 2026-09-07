@@ -16,7 +16,7 @@ const app = express();
 // Trust proxy if behind a reverse proxy like Render
 app.set('trust proxy', 1);
 
-// 1. Professional Security Headers (Helmet)
+// 1. Professional Security Headers (Helmet) - Whitelisted for Google reCAPTCHA
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -132,6 +132,11 @@ app.post('/verify-captcha', async (req, res) => {
     }
 
     const secretKey = process.env.RECAPTCHA_SECRET_KEY;
+
+    if (!secretKey) {
+        console.error('❌ RECAPTCHA_SECRET_KEY is missing from environment variables.');
+        return res.status(500).json({ success: false, message: 'Server configuration error.' });
+    }
 
     try {
         const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${token}`;
