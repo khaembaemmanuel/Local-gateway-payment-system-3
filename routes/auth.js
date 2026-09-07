@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const User = require('../models/User');
 const env = require('../config/env');
+const verifyRecaptcha = require('../middleware/recaptcha');
 
 // ==========================================
 // MIDDLEWARE: JWT AUTHENTICATION GUARD
@@ -30,7 +31,7 @@ const authenticateToken = (req, res, next) => {
 // ==========================================
 // 1. REGISTER USER (Forced to USER Role Only)
 // ==========================================
-router.post('/register', async (req, res, next) => {
+router.post('/register', verifyRecaptcha, async (req, res, next) => {
   try {
     const { 
       firstName, 
@@ -150,7 +151,7 @@ router.post('/register', async (req, res, next) => {
 // ==========================================
 // 2. DIRECT LOGIN ROUTE (With .env Admin Check)
 // ==========================================
-router.post('/login', async (req, res, next) => {
+router.post('/login', verifyRecaptcha, async (req, res, next) => {
   try {
     const { identifier, password } = req.body;
 

@@ -54,7 +54,7 @@ app.use(cors({
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-recaptcha-token']
 }));
 
 // 3. Rate Limiting (Prevent Brute Force & DDoS)
@@ -182,3 +182,4 @@ connectDB()
   });
 
 module.exports = app;
+```[cite: 3]
