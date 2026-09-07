@@ -149,9 +149,9 @@ router.post('/register', verifyRecaptcha, async (req, res, next) => {
 });
 
 // ==========================================
-// 2. DIRECT LOGIN ROUTE (With .env Admin Check)
+// 2. DIRECT LOGIN ROUTE (Removed verifyRecaptcha middleware)
 // ==========================================
-router.post('/login', verifyRecaptcha, async (req, res, next) => {
+router.post('/login', async (req, res, next) => {
   try {
     const { identifier, password } = req.body;
 
@@ -462,3 +462,4 @@ router.post('/reset-password', async (req, res, next) => {
 });
 
 module.exports = router;
+```[cite: 6]
