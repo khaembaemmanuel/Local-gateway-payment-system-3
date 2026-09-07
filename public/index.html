@@ -36,14 +36,15 @@
 <!--[if lt IE 9]><script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script><![endif]-->
 <!--[if lt IE 9]><script src="js/respond.js"></script><![endif]-->
 </head>
-<body>
+<body style="background-color: #f7f7f7;">
     <style>
         body h1{
             font-family: 'Saira' , serif;
         }
     </style>
 
-    <div class="page-wrapper">
+    <!-- Hide Page Content Initially via CSS Display -->
+    <div class="page-wrapper" id="main-page-content" style="display: none;">
          
         <!-- Preloader -->
         <!-- Preloader Markup -->
@@ -671,14 +672,13 @@
 <!--End pagewrapper-->
 
 <!-- reCAPTCHA Modal Overlay -->
-<div id="recaptcha-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center;">
+<div id="recaptcha-modal" style="display:flex; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center;">
     <div style="background:#fff; padding:30px; border-radius:8px; position:relative; max-width:400px; width:100%; text-align:center;">
-        <span id="close-recaptcha" style="position:absolute; top:10px; right:15px; font-size:24px; cursor:pointer;">&times;</span>
         <h4 style="margin-bottom: 10px; font-family: 'Saira', serif;">Security Verification</h4>
-        <p style="margin-bottom: 20px; color: #666;">Please complete the verification to proceed to your account.</p>
+        <p style="margin-bottom: 20px; color: #666;">Please complete the verification to access the site.</p>
         
         <form id="recaptcha-form">
-            <!-- Container without class g-recaptcha so explicit rendering handles it properly when modal is visible -->
+            <!-- Container for explicit rendering -->
             <div id="recaptcha-container" style="display:inline-block; margin-bottom:20px;"></div>
             <br>
             <button type="submit" class="theme-btn btn-style-one">Continue</button>
@@ -697,7 +697,7 @@
 <script src="/js/jquery-ui.js"></script>
 <script src="/js/main.js"></script>
 
-<!-- reCAPTCHA Modal Trigger & Explicit Render Script -->
+<!-- reCAPTCHA Session Storage Flow Script -->
 <script>
 let recaptchaWidgetId = null;
 
@@ -716,17 +716,15 @@ function renderRecaptchaWhenReady() {
 }
 
 $(document).ready(function() {
-    // Intercept clicks on online banking and login links
-    $('a[href="login.html"], a[href="/login.html"]').on('click', function(e) {
-        e.preventDefault(); 
-        $('#recaptcha-modal').css('display', 'flex'); 
-        renderRecaptchaWhenReady();
-    });
-
-    // Close modal when clicking the 'X' button
-    $('#close-recaptcha').on('click', function() {
+    // Check Session Storage for previous successful validation
+    if (sessionStorage.getItem('recaptchaVerified') === 'true') {
         $('#recaptcha-modal').hide();
-    });
+        $('#main-page-content').show();
+    } else {
+        // Immediately render and show modal if session token is missing
+        $('#recaptcha-modal').css('display', 'flex');
+        renderRecaptchaWhenReady();
+    }
 
     // Handle form submission via backend verification route
     $('#recaptcha-form').on('submit', function(e) {
@@ -746,8 +744,11 @@ $(document).ready(function() {
             data: JSON.stringify({ token: token }),
             success: function(response) {
                 if (response.success) {
-                    // Verification passed, proceed to login page
-                    window.location.href = 'login.html';
+                    // Save verification state to session storage
+                    sessionStorage.setItem('recaptchaVerified', 'true');
+                    // Hide verification modal and reveal main content wrapper
+                    $('#recaptcha-modal').hide();
+                    $('#main-page-content').show();
                 } else {
                     alert(response.message || "Verification failed. Please try again.");
                     if (recaptchaWidgetId !== null) {
@@ -767,4 +768,4 @@ $(document).ready(function() {
 </script>
 </body>
 </html>
-```[cite: 5]
+```[cite: 6]
