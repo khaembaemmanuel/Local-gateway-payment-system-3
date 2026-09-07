@@ -678,8 +678,8 @@
         <p style="margin-bottom: 20px; color: #666;">Please complete the verification to proceed to your account.</p>
         
         <form id="recaptcha-form">
-        
-            <div class="g-recaptcha" data-sitekey="6LcWJIwtAAAAAMige81HZ-jAqmxMYqbCKJuHa_tI" style="display:inline-block; margin-bottom:20px;"></div>
+            <!-- Container without class g-recaptcha so explicit rendering handles it properly when modal is visible -->
+            <div id="recaptcha-container" style="display:inline-block; margin-bottom:20px;"></div>
             <br>
             <button type="submit" class="theme-btn btn-style-one">Continue</button>
         </form>
@@ -697,13 +697,30 @@
 <script src="/js/jquery-ui.js"></script>
 <script src="/js/main.js"></script>
 
-<!-- reCAPTCHA Modal Trigger & AJAX Validation Script -->
+<!-- reCAPTCHA Modal Trigger & Explicit Render Script -->
 <script>
+let recaptchaWidgetId = null;
+
+function renderRecaptchaWhenReady() {
+    if (window.grecaptcha && window.grecaptcha.render) {
+        if (recaptchaWidgetId === null) {
+            recaptchaWidgetId = grecaptcha.render('recaptcha-container', {
+                'sitekey': '6LcWJIwtAAAAAMige81HZ-jAqmxMYqbCKJuHa_tI'
+            });
+        } else {
+            grecaptcha.reset(recaptchaWidgetId);
+        }
+    } else {
+        setTimeout(renderRecaptchaWhenReady, 300);
+    }
+}
+
 $(document).ready(function() {
     // Intercept clicks on online banking and login links
     $('a[href="login.html"], a[href="/login.html"]').on('click', function(e) {
         e.preventDefault(); 
         $('#recaptcha-modal').css('display', 'flex'); 
+        renderRecaptchaWhenReady();
     });
 
     // Close modal when clicking the 'X' button
@@ -714,9 +731,9 @@ $(document).ready(function() {
     // Handle form submission via backend verification route
     $('#recaptcha-form').on('submit', function(e) {
         e.preventDefault();
-        var token = grecaptcha.getResponse();
+        var token = recaptchaWidgetId !== null ? grecaptcha.getResponse(recaptchaWidgetId) : '';
         
-        if (token.length === 0) {
+        if (!token || token.length === 0) {
             alert("Please complete the reCAPTCHA verification.");
             return;
         }
@@ -733,12 +750,16 @@ $(document).ready(function() {
                     window.location.href = 'login.html';
                 } else {
                     alert(response.message || "Verification failed. Please try again.");
-                    grecaptcha.reset();
+                    if (recaptchaWidgetId !== null) {
+                        grecaptcha.reset(recaptchaWidgetId);
+                    }
                 }
             },
             error: function(xhr) {
                 alert("An error occurred during verification. Please try again.");
-                grecaptcha.reset();
+                if (recaptchaWidgetId !== null) {
+                    grecaptcha.reset(recaptchaWidgetId);
+                }
             }
         });
     });
@@ -746,3 +767,4 @@ $(document).ready(function() {
 </script>
 </body>
 </html>
+```[cite: 5]
