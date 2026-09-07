@@ -182,4 +182,3 @@ connectDB()
   });
 
 module.exports = app;
-```[cite: 3]
