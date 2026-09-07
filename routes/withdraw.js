@@ -5,19 +5,22 @@ const crypto = require('crypto');
 const auth = require('../middleware/auth');
 const User = require('../models/User');
 const Transaction = require('../models/Transaction');
-const WithdrawalRequest = require('../models/WithdrawalRequest'); // Optional: if using separate model
-const { TRANSACTION_TYPES, TRANSACTION_STATUS, GATEWAYS } = require('../config/constants');
+const WithdrawalRequest = require('../models/WithdrawalRequest');
 
 // ==========================================
 // 1. INITIATE MANUAL M-PESA/GATEWAY WITHDRAWAL
 // ==========================================
 router.post('/withdraw', auth, async (req, res) => {
   try {
-    const { amount, phone, currencyLocal } = req.body;
+    // Accept multiple possible payload field names from different frontend forms
+    const rawAmount = req.body.amount || req.body.withdrawalAmount || req.body.amountLocal;
+    const phone = req.body.phone || req.body.phoneNumber;
+    const currencyLocal = req.body.currencyLocal || req.body.currency;
     const userId = req.user.userId;
 
-    // Fix validation bug: check if amount is missing or less than/equal to 0
-    if (!amount || Number(amount) <= 0) {
+    const parsedAmount = Number(rawAmount);
+
+    if (!rawAmount || isNaN(parsedAmount) || parsedAmount <= 0) {
       return res.status(400).json({ success: false, message: 'Please enter a valid withdrawal amount' });
     }
 
@@ -26,8 +29,11 @@ router.post('/withdraw', auth, async (req, res) => {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    // Check if user has sufficient balance
-    if (user.balance < Number(amount)) {
+    const exchangeRate = user.exchangeRate || 130;
+    const amountUSD = parsedAmount / exchangeRate;
+
+    // Check if user has sufficient USD balance
+    if (user.balance < amountUSD) {
       return res.status(400).json({ success: false, message: 'Insufficient account balance' });
     }
 
@@ -36,17 +42,12 @@ router.post('/withdraw', auth, async (req, res) => {
       return res.status(400).json({ success: false, message: 'Recipient phone number is required' });
     }
 
-    // Generate a unique tracking reference ID
     const referenceID = `WD-${crypto.randomBytes(6).toString('hex').toUpperCase()}`;
 
-    // Calculate exchange rate and USD amount (using user's exchange rate or default 130)
-    const exchangeRate = user.exchangeRate || 130;
-    const amountUSD = Number(amount) / exchangeRate;
-
-    // Create a Pending withdrawal transaction record for the admin portal & user history
+    // Create Transaction record
     const transaction = new Transaction({
       userId,
-      amount: Number(amount),
+      amount: parsedAmount,
       amountUSD: amountUSD,
       exchangeRate: exchangeRate,
       currency: currencyLocal || user.currency || 'KES',
@@ -58,22 +59,22 @@ router.post('/withdraw', auth, async (req, res) => {
     });
     await transaction.save();
 
-    // Optionally save to WithdrawalRequest model if your admin portal reads from it
+    // Create WithdrawalRequest record for admin portal
     await WithdrawalRequest.create({
       userId,
       amountUSD: amountUSD,
-      payoutAmountLocal: Number(amount),
+      payoutAmountLocal: parsedAmount,
       currency: currencyLocal || user.currency || 'KES',
       phoneNumber: targetPhone,
       status: 'Pending'
     });
 
-    // Deduct balance immediately or hold it until admin approves (deducting here prevents double spending)
+    // Deduct USD balance immediately
     await User.findByIdAndUpdate(userId, {
-      $inc: { balance: -amountUSD } // Deducting USD equivalent from user balance
+      $inc: { balance: -amountUSD }
     });
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Withdrawal request submitted successfully and is pending admin approval.',
       reference: referenceID
@@ -81,10 +82,32 @@ router.post('/withdraw', auth, async (req, res) => {
 
   } catch (err) {
     console.error('Manual Withdrawal Error:', err.message);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Failed to process withdrawal request',
       error: err.message
+    });
+  }
+});
+
+// ==========================================
+// 2. GET USER TRANSACTION HISTORY (Fixes 404)
+// ==========================================
+router.get('/transactions', auth, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const transactions = await Transaction.find({ userId }).sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      count: transactions.length,
+      transactions
+    });
+  } catch (err) {
+    console.error('Fetch Transactions Error:', err.message);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to load transaction history'
     });
   }
 });

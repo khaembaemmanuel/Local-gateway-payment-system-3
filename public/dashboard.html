@@ -748,7 +748,7 @@
         <form id="mpesaForm">
           <div class="form-group">
             <label for="mpesaAmount" id="mpesaAmountLabel">Amount</label>
-            <input type="number" id="mpesaAmount" class="form-control" placeholder="Enter amount" min="10" required>
+            <input type="number" id="mpesaAmount" class="form-control" placeholder="Enter amount" min="1" step="any" required>
           </div>
           <div class="form-group">
             <label for="mpesaPhone">M-Pesa Phone Number / Reference</label>
@@ -1048,11 +1048,10 @@
 
  <script>
   let activeUser = null;
-  let currentActionType = 'deposit'; // Tracks whether modal is handling 'deposit' or 'withdraw'
-  let allTransactions = []; // Holds fetched transaction history items
+  let currentActionType = 'deposit'; 
+  let allTransactions = []; 
 
   document.addEventListener('DOMContentLoaded', async () => {
-    // Attach event listeners dynamically to bypass CSP inline handler blocks
     document.querySelectorAll('.payment-card').forEach(card => {
       card.addEventListener('click', () => {
         const gateway = card.getAttribute('data-gateway');
@@ -1069,7 +1068,6 @@
     document.getElementById('modalRetryBtn').addEventListener('click', resetMpesaModal);
     document.getElementById('mpesaForm').addEventListener('submit', submitMpesaTransaction);
 
-    // Transaction History Filter Listeners
     document.getElementById('txSearchInput').addEventListener('input', renderFilteredTransactions);
     document.getElementById('txFilterType').addEventListener('change', renderFilteredTransactions);
     document.getElementById('txFilterStatus').addEventListener('change', renderFilteredTransactions);
@@ -1173,10 +1171,8 @@
     document.getElementById('detailSwiftCode').textContent = user.swiftCode || 'SRIBKE2X';
   }
 
-  // Fetch transaction history from backend endpoints
   async function fetchTransactionHistory(token) {
     try {
-      // Trying standard user transaction endpoints
       const response = await fetch('/api/payment/transactions', {
         method: 'GET',
         headers: {
@@ -1190,7 +1186,6 @@
         allTransactions = data.transactions || data.history || data.data || [];
         renderFilteredTransactions();
       } else {
-        // Fallback check if withdrawals and deposits are queried separately or empty state
         allTransactions = [];
         renderFilteredTransactions();
       }
@@ -1286,7 +1281,7 @@
 
   function handleGatewaySelect(gatewayName, actionType) {
     if (gatewayName === 'MPesa') {
-      currentActionType = actionType; // 'deposit' or 'withdraw'
+      currentActionType = actionType; 
       
       const titleElem = document.getElementById('mpesaModalTitle');
       const submitBtn = document.getElementById('mpesaSubmitBtn');
