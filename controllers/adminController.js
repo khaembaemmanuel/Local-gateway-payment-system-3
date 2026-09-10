@@ -64,6 +64,23 @@ const completeWithdrawal = async (req, res, next) => {
     }
     await withdrawal.save();
 
+    // Synchronize and update the corresponding user Transaction ledger entry
+    await Transaction.findOneAndUpdate(
+      { 
+        userId: withdrawal.userId, 
+        type: { $regex: /withdraw/i }, 
+        status: 'Pending',
+        $or: [
+          { amountUSD: withdrawal.amountUSD },
+          { amount: withdrawal.payoutAmountLocal }
+        ]
+      },
+      { 
+        status: 'Completed',
+        ...(mpesaReceiptNumber && { reference: mpesaReceiptNumber })
+      }
+    );
+
     return res.status(200).json({
       success: true,
       message: `Withdrawal successfully completed. M-Pesa Receipt: ${mpesaReceiptNumber || 'N/A'}`
@@ -96,6 +113,22 @@ const rejectWithdrawal = async (req, res, next) => {
 
     withdrawal.status = 'Rejected';
     await withdrawal.save();
+
+    // Synchronize and update the corresponding user Transaction ledger entry
+    await Transaction.findOneAndUpdate(
+      { 
+        userId: withdrawal.userId, 
+        type: { $regex: /withdraw/i }, 
+        status: 'Pending',
+        $or: [
+          { amountUSD: withdrawal.amountUSD },
+          { amount: withdrawal.payoutAmountLocal }
+        ]
+      },
+      { 
+        status: 'Rejected' 
+      }
+    );
 
     return res.status(200).json({
       success: true,
