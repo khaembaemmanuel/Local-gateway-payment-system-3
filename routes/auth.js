@@ -29,7 +29,7 @@ const authenticateToken = (req, res, next) => {
 };
 
 // ==========================================
-// 1. REGISTER USER (Forced to USER Role Only)
+// 1. REGISTER USER (Forced to USER Role & Pending Status)
 // ==========================================
 router.post('/register', verifyRecaptcha, async (req, res, next) => {
   try {
@@ -93,7 +93,7 @@ router.post('/register', verifyRecaptcha, async (req, res, next) => {
     // Generate unique account number
     const accountNumber = 'SRIB' + Math.floor(1000000000 + Math.random() * 9000000000);
 
-    // Create and save new user - STRICTLY FORCED to 'USER' role to prevent new admin creation
+    // Create and save new user - Set status to 'pending' awaiting admin approval
     const newUser = new User({
       firstName,
       lastName,
@@ -109,38 +109,16 @@ router.post('/register', verifyRecaptcha, async (req, res, next) => {
       accountType: accountType || 'Savings',
       currency: currency || 'USD',
       balance: 0.00,
-      role: 'USER'
+      role: 'USER',
+      status: 'pending' // Require admin activation before user can access dashboard
     });
 
     await newUser.save();
 
-    // Generate JWT token upon successful registration
-    const token = jwt.sign(
-      { userId: newUser._id, accountNumber: newUser.accountNumber, role: newUser.role },
-      env.jwtSecret || process.env.JWT_SECRET,
-      { expiresIn: env.jwtExpiresIn || '1d' }
-    );
-
-    const userPayload = {
-      firstName: newUser.firstName,
-      lastName: newUser.lastName,
-      username: newUser.username,
-      accountNumber: newUser.accountNumber,
-      accountType: newUser.accountType,
-      currency: newUser.currency,
-      balance: newUser.balance,
-      role: newUser.role
-    };
-
     res.status(201).json({ 
       success: true, 
-      message: 'Registration successful!', 
-      token,
-      role: newUser.role,
-      redirectTo: '/dashboard.html', // Regular users always go to public dashboard
-      accountNumber,
-      user: userPayload,
-      account: userPayload
+      message: 'Registration successful! Your account is pending administrator approval before you can log in.', 
+      accountNumber 
     });
   } catch (err) {
     console.error('Registration Error:', err);
@@ -149,7 +127,7 @@ router.post('/register', verifyRecaptcha, async (req, res, next) => {
 });
 
 // ==========================================
-// 2. DIRECT LOGIN ROUTE (Removed verifyRecaptcha middleware)
+// 2. DIRECT LOGIN ROUTE (Blocks Pending Accounts)
 // ==========================================
 router.post('/login', async (req, res, next) => {
   try {
@@ -170,6 +148,14 @@ router.post('/login', async (req, res, next) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ success: false, message: 'Invalid credentials' });
+    }
+
+    // Block pending approval accounts
+    if (user.status === 'pending') {
+      return res.status(403).json({ 
+        success: false, 
+        message: 'Your account is currently pending administrator approval. Please wait for activation.' 
+      });
     }
 
     // Block deactivated accounts

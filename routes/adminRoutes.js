@@ -12,6 +12,7 @@ const {
   getClientTransactionHistory
 } = require('../controllers/adminController');
 const verifyHardcodedAdmin = require('../middleware/adminAuth');
+const User = require('../models/User'); // Required for admin user approval workflow
 
 // --- Admin Authentication Endpoint ---
 router.post('/login', (req, res) => {
@@ -53,5 +54,39 @@ router.post('/withdrawals/:id/reject', rejectWithdrawal);
 router.put('/clients/:id/status', updateUserStatus);
 router.delete('/clients/:id', deleteUserAccount);
 router.get('/clients/:id/transactions', getClientTransactionHistory);
+
+// ==========================================
+// PENDING USER REGISTRATION APPROVAL ENDPOINTS
+// ==========================================
+
+// GET: Fetch all users pending approval
+router.get('/pending-users', async (req, res, next) => {
+  try {
+    const pendingUsers = await User.find({ status: 'pending' }).select('-password -otp');
+    res.status(200).json({ success: true, count: pendingUsers.length, users: pendingUsers });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// POST: Approve a user account
+router.post('/approve-user/:id', async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    user.status = 'active'; // Activate account so they can log in
+    await user.save();
+
+    res.status(200).json({ 
+      success: true, 
+      message: `User ${user.firstName} ${user.lastName} has been successfully approved!` 
+    });
+  } catch (err) {
+    next(err);
+  }
+});
 
 module.exports = router;

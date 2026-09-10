@@ -1,3 +1,4 @@
+<!-- admin.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43,6 +44,24 @@
   <div id="adminDashboardContent" class="container" style="display: none;">
     <h1>👑 Admin Control Panel</h1>
     <p>Secure management interface for Swift Royal Investment Bank clients, balances, transaction histories, and security controls.</p>
+
+    <!-- Pending User Approvals Section -->
+    <div class="section">
+      <h2>Pending New User Registrations</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Client Name</th>
+            <th>Email</th>
+            <th>Account No</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="pendingUsersTable">
+          <tr><td colspan="4">Loading pending user registrations...</td></tr>
+        </tbody>
+      </table>
+    </div>
 
     <!-- Payout Requests Section -->
     <div class="section">
@@ -170,6 +189,26 @@
 
     async function loadAdminData() {
       try {
+        // 0. Load Pending User Registrations
+        const pUserRes = await fetch('/api/admin/pending-users');
+        const pUserData = await pUserRes.json();
+        const pUserTable = document.getElementById('pendingUsersTable');
+
+        if (pUserData.success && pUserData.users && pUserData.users.length > 0) {
+          pUserTable.innerHTML = pUserData.users.map(u => `
+            <tr>
+              <td>${u.firstName} ${u.lastName}</td>
+              <td>${u.email}</td>
+              <td>${u.accountNumber || 'N/A'}</td>
+              <td>
+                <button class="btn-approve btn-action-approve-user" data-id="${u._id}">Approve</button>
+              </td>
+            </tr>
+          `).join('');
+        } else {
+          pUserTable.innerHTML = `<tr><td colspan="4">No pending user registrations.</td></tr>`;
+        }
+
         // 1. Load Pending Withdrawals
         const wRes = await fetch('/api/admin/withdrawals/pending');
         const wData = await wRes.json();
@@ -231,6 +270,23 @@
 
     // Event Delegation for Table Action Buttons (CSP Compliant)
     document.addEventListener('click', async (e) => {
+      // Approve Pending User Registration
+      if (e.target.classList.contains('btn-action-approve-user')) {
+        const userId = e.target.getAttribute('data-id');
+        try {
+          const res = await fetch(`/api/admin/approve-user/${userId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+          });
+          const data = await res.json();
+          alert(data.message || 'User approved successfully');
+          loadAdminData();
+        } catch (err) {
+          console.error('Error approving user:', err);
+          alert('Failed to approve user.');
+        }
+      }
+
       // Withdrawal Actions
       if (e.target.classList.contains('btn-action-withdrawal')) {
         const id = e.target.getAttribute('data-id');
