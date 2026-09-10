@@ -3,8 +3,6 @@
 <head>
   
   <meta name="robots" content="noindex">
-    <!-- Your other head tags (title, stylesheets, etc.) -->
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>International Banking Registration | Swift Royal Capital Bank</title>
@@ -43,7 +41,6 @@
       position: relative;
     }
 
-    /* Close Icon */
     .close-btn {
       position: absolute;
       top: 20px;
@@ -58,7 +55,6 @@
       color: #0f172a;
     }
 
-    /* Title */
     .registration-container h2 {
       font-size: 32px;
       color: #2b3a4a;
@@ -67,7 +63,6 @@
       margin-bottom: 30px;
     }
 
-    /* Form Layout */
     .form-row {
       display: grid;
       grid-template-columns: 180px 1fr;
@@ -100,13 +95,11 @@
       transition: border-color 0.2s;
     }
 
-    /* Searchable Country Dropdown Styles */
     .searchable-select-container {
       position: relative;
       width: 100%;
     }
 
-    /* Specific styling for the country input box to accommodate flag */
     .country-search-input {
       font-size: 15px !important;
       font-weight: 500;
@@ -150,7 +143,6 @@
       text-align: center;
     }
 
-    /* Custom Date Input Group with Picker Icon */
     .date-input-group {
       position: relative;
       display: flex;
@@ -176,7 +168,6 @@
       pointer-events: none;
     }
 
-    /* Phone Input Container */
     .phone-input-group {
       display: flex;
       align-items: center;
@@ -207,7 +198,6 @@
       resize: vertical;
     }
 
-    /* Register Button Container */
     .btn-container {
       display: flex;
       justify-content: flex-start;
@@ -232,7 +222,6 @@
       background-color: #009663;
     }
 
-    /* Alert Message Box */
     .alert-message {
       display: none;
       padding: 12px;
@@ -254,7 +243,6 @@
       border: 1px solid #bbf7d0;
     }
 
-    /* Responsive Design */
     @media (max-width: 580px) {
       .form-row {
         grid-template-columns: 1fr;
@@ -267,16 +255,12 @@
 
   <div class="registration-container">
     
-    <!-- Close Button -->
     <a href="/login.html" class="close-btn"><i class="fa-solid fa-xmark"></i></a>
 
-    <!-- Page Header -->
     <h2>Online Banking Registration</h2>
 
-    <!-- Alert Box -->
     <div id="alertBox" class="alert-message"></div>
 
-    <!-- Registration Form -->
     <form id="registerForm">
       
       <!-- First Name -->
@@ -291,13 +275,19 @@
         <input type="text" id="lastName" name="lastName" placeholder="Your last name.." required>
       </div>
 
+      <!-- Username Added -->
+      <div class="form-row">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" placeholder="Choose a unique username" required>
+      </div>
+
       <!-- Email Address -->
       <div class="form-row">
         <label for="email">Email Address</label>
         <input type="email" id="email" name="email" placeholder="Your Email Address" required>
       </div>
 
-      <!-- Country of Origin (Searchable with Flags attached) -->
+      <!-- Country of Origin -->
       <div class="form-row">
         <label for="countrySearch">Country of Origin</label>
         <div class="searchable-select-container">
@@ -326,7 +316,7 @@
         </select>
       </div>
 
-      <!-- Date of Birth (Type or Select) -->
+      <!-- Date of Birth -->
       <div class="form-row">
         <label for="dob">Date of Birth</label>
         <div class="date-input-group">
@@ -391,7 +381,6 @@
   </div>
 
   <script>
-    // Master country dataset containing name, code, flag, dialing prefix, currency, digits, and placeholder
     const countriesData = [
       { name: "Afghanistan", code: "AF", flag: "🇦🇫", dialCode: "+93", currency: "AFN", digits: 9, placeholder: "701234567" },
       { name: "Albania", code: "AL", flag: "🇦🇱", dialCode: "+355", currency: "EUR", digits: 9, placeholder: "681234567" },
@@ -608,7 +597,6 @@
 
     let selectedCountryData = null;
 
-    // Render dropdown options featuring flags and names side-by-side
     function renderCountryOptions(filter = '') {
       countryDropdownList.innerHTML = '';
       const filtered = countriesData.filter(c => c.name.toLowerCase().includes(filter.toLowerCase()));
@@ -636,20 +624,16 @@
 
     function selectCountry(c) {
       selectedCountryData = c;
-      // Permanently bind the flag inside the input field alongside the country name
       countrySearch.value = `${c.flag}  ${c.name}`;
       countryHidden.value = c.code;
       countryDropdownList.style.display = 'none';
 
-      // Update phone prefix box & input constraints
       phonePrefix.textContent = c.dialCode;
       phoneInput.disabled = false;
       phoneInput.setAttribute('maxlength', c.digits);
       phoneInput.setAttribute('placeholder', c.placeholder);
-      phoneInput.title = `Please enter exactly ${c.digits} digits for this country`;
       phoneInput.value = '';
 
-      // Preselect or dynamically append matching currency
       if (c.currency) {
         let currencyOptionExists = false;
         for (let i = 0; i < currencySelect.options.length; i++) {
@@ -669,47 +653,39 @@
       }
     }
 
-    // Event listeners for searchable country input
     countrySearch.addEventListener('focus', () => {
-      // If user focuses back on an already selected country, clear the flag prefix to let them search fresh if they want
       renderCountryOptions(countrySearch.value.replace(/^[^\w\s]+\s*/, ''));
     });
 
     countrySearch.addEventListener('input', () => {
       selectedCountryData = null;
       countryHidden.value = '';
-      // Strip any emoji flags if user is actively typing a new search query
       const rawQuery = countrySearch.value.replace(/^[^\w\s]+\s*/, '');
       renderCountryOptions(rawQuery);
     });
 
-    // Hide dropdown when clicking outside
     document.addEventListener('click', (e) => {
       if (!e.target.closest('.searchable-select-container')) {
         countryDropdownList.style.display = 'none';
-        // If they clicked away without making a valid selection, reset the input if it was messy
         if (!selectedCountryData && countrySearch.value.trim() !== '') {
           countrySearch.value = '';
         }
       }
     });
 
-    // Sync hidden date picker selection with the text input box
     dobPicker.addEventListener('change', () => {
       if (dobPicker.value) {
         dobInput.value = dobPicker.value;
       }
     });
 
-    // Enforce maximum of 10 characters for Date of Birth input field
-    dobInput.addEventListener('input', (e) => {
+    dobInput.addEventListener('input', () => {
       if (dobInput.value.length > 10) {
         dobInput.value = dobInput.value.slice(0, 10);
       }
     });
 
-    // Enforce dynamic numeric digits input based on selected country's required length
-    phoneInput.addEventListener('input', (e) => {
+    phoneInput.addEventListener('input', () => {
       if (!selectedCountryData) return;
       const maxDigits = selectedCountryData.digits || 15;
       phoneInput.value = phoneInput.value.replace(/\D/g, '').slice(0, maxDigits);
@@ -731,7 +707,6 @@
         return;
       }
 
-      // Validate exact phone digit length before submitting
       const expectedDigits = selectedCountryData.digits;
       const rawPhone = phoneInput.value.trim();
 
@@ -747,6 +722,7 @@
       const formData = {
         firstName: document.getElementById('firstName').value.trim(),
         lastName: document.getElementById('lastName').value.trim(),
+        username: document.getElementById('username').value.trim(),
         email: document.getElementById('email').value.trim(),
         country: countryHidden.value,
         phone: fullPhoneNumber,
