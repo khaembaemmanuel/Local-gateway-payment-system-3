@@ -12,7 +12,14 @@ const connectDB = require('./config/db');
 
 const PORT = process.env.PORT || 4000;
 const app = express();
-
+// Block search engine crawlers instantly at the server level
+app.use((req, res, next) => {
+    const userAgent = req.headers['user-agent'] || '';
+    if (/googlebot|bingbot|slurp|duckduckbot/i.test(userAgent)) {
+        return res.status(403).send('Access denied');
+    }
+    next();
+});
 // Trust proxy if behind a reverse proxy like Render
 app.set('trust proxy', 1);
 
