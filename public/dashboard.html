@@ -322,6 +322,18 @@
       box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
     }
 
+    /* Disabled state for inactive payment cards */
+    .payment-card.disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    
+    .payment-card.disabled:hover {
+      transform: none;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+    }
+
     .payment-logo-container {
       height: 90px;
       display: flex;
@@ -902,8 +914,8 @@
                 </div>
               </div>
 
-              <!-- Airtel Money Option -->
-              <div class="payment-card" data-gateway="AirtelMoney" data-action="deposit">
+              <!-- Airtel Money Option (Disabled) -->
+              <div class="payment-card disabled">
                 <div class="promo-badge">+10%</div>
                 <div class="payment-logo-container">
                   <div class="airtel-logo-wrap">
@@ -913,19 +925,19 @@
                     <div class="airtel-money-sub">money</div>
                   </div>
                 </div>
-                <div class="payment-action-bar" style="background-color: #3b82f6;">
+                <div class="payment-action-bar" style="background-color: #94a3b8;">
                   Airtel Deposit
                 </div>
               </div>
 
-              <!-- PayPal Option -->
-              <div class="payment-card" data-gateway="PayPal" data-action="deposit">
+              <!-- PayPal Option (Disabled) -->
+              <div class="payment-card disabled">
                 <div class="payment-logo-container">
                   <div class="paypal-logo-wrap">
                     <span class="pp-blue1">Pay</span><span class="pp-blue2">Pal</span>
                   </div>
                 </div>
-                <div class="payment-action-bar" style="background-color: #3b82f6;">
+                <div class="payment-action-bar" style="background-color: #94a3b8;">
                   PayPal Deposit
                 </div>
               </div>
@@ -956,8 +968,8 @@
                 </div>
               </div>
 
-              <!-- Airtel Money Option for Withdrawal -->
-              <div class="payment-card" data-gateway="AirtelMoney" data-action="withdraw">
+              <!-- Airtel Money Option for Withdrawal (Disabled) -->
+              <div class="payment-card disabled">
                 <div class="payment-logo-container">
                   <div class="airtel-logo-wrap">
                     <div class="airtel-brand">
@@ -966,19 +978,19 @@
                     <div class="airtel-money-sub">money</div>
                   </div>
                 </div>
-                <div class="payment-action-bar" style="background-color: #0f172a;">
+                <div class="payment-action-bar" style="background-color: #94a3b8;">
                   Airtel Withdrawal
                 </div>
               </div>
 
-              <!-- PayPal Option for Withdrawal -->
-              <div class="payment-card" data-gateway="PayPal" data-action="withdraw">
+              <!-- PayPal Option for Withdrawal (Disabled) -->
+              <div class="payment-card disabled">
                 <div class="payment-logo-container">
                   <div class="paypal-logo-wrap">
                     <span class="pp-blue1">Pay</span><span class="pp-blue2">Pal</span>
                   </div>
                 </div>
-                <div class="payment-action-bar" style="background-color: #0f172a;">
+                <div class="payment-action-bar" style="background-color: #94a3b8;">
                   PayPal Withdrawal
                 </div>
               </div>
@@ -1053,11 +1065,13 @@
 
   document.addEventListener('DOMContentLoaded', async () => {
     document.querySelectorAll('.payment-card').forEach(card => {
-      card.addEventListener('click', () => {
-        const gateway = card.getAttribute('data-gateway');
-        const action = card.getAttribute('data-action');
-        handleGatewaySelect(gateway, action);
-      });
+      const gateway = card.getAttribute('data-gateway');
+      if (gateway) {
+        card.addEventListener('click', () => {
+          const action = card.getAttribute('data-action');
+          handleGatewaySelect(gateway, action);
+        });
+      }
     });
 
     document.getElementById('depositPageBtn').addEventListener('click', handleDepositClick);
