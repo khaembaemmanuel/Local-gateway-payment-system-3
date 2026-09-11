@@ -90,6 +90,16 @@ const userSchema = new mongoose.Schema({
     default: 0.00, 
     min: [0, 'Balance cannot be negative'] 
   },
+  role: {
+    type: String,
+    enum: ['USER', 'ADMIN', 'SUPERADMIN'],
+    default: 'USER'
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'active', 'deactivated'],
+    default: 'pending'
+  },
   isBlocked: {
     type: Boolean,
     default: false
