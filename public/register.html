@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  
   <meta name="robots" content="noindex">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -93,6 +92,28 @@
       color: #1e293b;
       background-color: #ffffff;
       transition: border-color 0.2s;
+    }
+
+    .password-input-group {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .password-input-group input {
+      padding-right: 40px;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      color: #64748b;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .toggle-password:hover {
+      color: #0f172a;
     }
 
     .searchable-select-container {
@@ -272,10 +293,10 @@
       <!-- Last Name -->
       <div class="form-row">
         <label for="lastName">Last Name</label>
-        <input type="text" id="lastName" name="lastName" placeholder="Your last name.." required>
+        <input type="text" id="lastName" name="lastName" placeholder="Your Last Name" required>
       </div>
 
-      <!-- Username Added -->
+      <!-- Username -->
       <div class="form-row">
         <label for="username">Username</label>
         <input type="text" id="username" name="username" placeholder="Choose a unique username" required>
@@ -369,7 +390,19 @@
       <!-- Choose Password -->
       <div class="form-row">
         <label for="password">Choose Password</label>
-        <input type="password" id="password" name="password" placeholder="***********" required>
+        <div class="password-input-group">
+          <input type="password" id="password" name="password" placeholder="***********" required minlength="6">
+          <i class="fa-regular fa-eye toggle-password" id="togglePassword"></i>
+        </div>
+      </div>
+
+      <!-- Confirm Password -->
+      <div class="form-row">
+        <label for="confirmPassword">Confirm Password</label>
+        <div class="password-input-group">
+          <input type="password" id="confirmPassword" name="confirmPassword" placeholder="***********" required minlength="6">
+          <i class="fa-regular fa-eye toggle-password" id="toggleConfirmPassword"></i>
+        </div>
       </div>
 
       <!-- Action Button -->
@@ -595,7 +628,27 @@
     const dobInput = document.getElementById('dob');
     const dobPicker = document.getElementById('dobPicker');
 
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirmPassword');
+    const togglePassword = document.getElementById('togglePassword');
+    const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+
     let selectedCountryData = null;
+
+    // Toggle password visibility
+    togglePassword.addEventListener('click', () => {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      togglePassword.classList.toggle('fa-eye');
+      togglePassword.classList.toggle('fa-eye-slash');
+    });
+
+    toggleConfirmPassword.addEventListener('click', () => {
+      const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      confirmPasswordInput.setAttribute('type', type);
+      toggleConfirmPassword.classList.toggle('fa-eye');
+      toggleConfirmPassword.classList.toggle('fa-eye-slash');
+    });
 
     function renderCountryOptions(filter = '') {
       countryDropdownList.innerHTML = '';
@@ -716,6 +769,12 @@
         return;
       }
 
+      if (passwordInput.value !== confirmPasswordInput.value) {
+        showAlert('Passwords do not match. Please re-enter.');
+        confirmPasswordInput.focus();
+        return;
+      }
+
       const prefix = phonePrefix.textContent;
       const fullPhoneNumber = prefix + rawPhone;
 
@@ -731,7 +790,7 @@
         address: document.getElementById('address').value.trim(),
         accountType: document.getElementById('accountType').value,
         currency: currencySelect.value,
-        password: document.getElementById('password').value
+        password: passwordInput.value
       };
 
       registerBtn.disabled = true;
