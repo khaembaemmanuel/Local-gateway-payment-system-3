@@ -1,4 +1,3 @@
-// app.js
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -109,7 +108,34 @@ app.get('/login.html', (req, res) => {
 });
 
 app.get('/dashboard.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+    const isUnderMaintenance = true; // Set to false when maintenance is over
+
+    if (isUnderMaintenance) {
+        return res.send(`
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Dashboard Under Maintenance</title>
+                <style>
+                    body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: #f4f4f4; margin: 0; }
+                    .card { background: white; padding: 40px; border-radius: 8px; display: inline-block; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-top: 100px; max-width: 500px; }
+                    h1 { color: #333; margin-top: 0; }
+                    p { color: #666; font-size: 18px; line-height: 1.5; }
+                </style>
+            </head>
+            <body>
+                <div class="card">
+                    <h1>Under Maintenance</h1>
+                    <p>Dashboard is currently under maintenance, please be patient for 12 hours.</p>
+                </div>
+            </body>
+            </html>
+        `);
+    }
+
+    res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 
 // Admin portal route paths (supports both options)
