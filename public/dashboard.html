@@ -755,6 +755,34 @@
             `;
         });
     }
+
+  // Function to perform logout and clear stored credentials
+  function forceLogout() {
+    // 1. Clear local session/token storage
+    localStorage.removeItem('token'); 
+    localStorage.removeItem('user');
+    sessionStorage.clear();
+
+    
+    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    window.location.reload(true);
+  }
+
+  // Check server status every 30 seconds
+  setInterval(async () => {
+    try {
+      // Fetch the dashboard route
+      const response = await fetch('/dashboard.html', { method: 'HEAD' });
+      
+      // If server responds with non-OK or html content changes, trigger logout/reload
+      if (!response.ok) {
+        forceLogout();
+      }
+    } catch (err) {
+      // If network fails or route changes, reload page
+      forceLogout();
+    }
+  }, 30000); // 30000 ms = 30 seconds
 </script>
 <body>
 
