@@ -828,7 +828,9 @@
             <div class="card-brand-logo">
               <span class="bank-title">Swift Royal</span>
               <span class="bank-subtitle">Investment Bank</span>
-      
+            </div>
+            <div class="card-balance-display" id="cardTopBalance">$0.00</div>
+          </div>
 
           <div class="card-info-row">
             <div>
@@ -1127,6 +1129,13 @@
     return str.substring(0, 5) + '*****' + str.substring(str.length - 2);
   }
 
+  function setTextContent(id, text) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.textContent = text;
+    }
+  }
+
   function renderUserContext(user) {
     const balanceNum = parseFloat(user.balance || 0);
     const symbol = '$';
@@ -1135,17 +1144,17 @@
 
     const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username || 'Client';
 
-    document.getElementById('navUserName').textContent = fullName;
-    document.getElementById('cardTopBalance').textContent = formattedBalance;
-    document.getElementById('cardHolderName').textContent = fullName.toUpperCase();
+    setTextContent('navUserName', fullName);
+    setTextContent('cardTopBalance', formattedBalance);
+    setTextContent('cardHolderName', fullName.toUpperCase());
 
-    document.getElementById('detailAccountName').textContent = fullName.toUpperCase();
-    document.getElementById('detailBalance').textContent = formattedBalance;
-    document.getElementById('detailCountry').textContent = user.country || 'Kenya';
-    document.getElementById('detailCurrency').textContent = 'USD';
-    document.getElementById('detailAccountType').textContent = user.accountType || 'Current';
-    document.getElementById('detailAccountNumber').textContent = maskAccountNumber(user.accountNumber);
-    document.getElementById('detailSwiftCode').textContent = user.swiftCode || 'SRIBKE2X';
+    setTextContent('detailAccountName', fullName.toUpperCase());
+    setTextContent('detailBalance', formattedBalance);
+    setTextContent('detailCountry', user.country || 'Kenya');
+    setTextContent('detailCurrency', 'USD');
+    setTextContent('detailAccountType', user.accountType || 'Current');
+    setTextContent('detailAccountNumber', maskAccountNumber(user.accountNumber));
+    setTextContent('detailSwiftCode', user.swiftCode || 'SRIBKE2X');
   }
 
   async function fetchTransactionHistory(token) {
@@ -1175,9 +1184,13 @@
   }
 
   function renderFilteredTransactions() {
-    const searchTerm = document.getElementById('txSearchInput').value.toLowerCase();
-    const typeFilter = document.getElementById('txFilterType').value;
-    const statusFilter = document.getElementById('txFilterStatus').value;
+    const searchInput = document.getElementById('txSearchInput');
+    const typeFilterSelect = document.getElementById('txFilterType');
+    const statusFilterSelect = document.getElementById('txFilterStatus');
+
+    const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+    const typeFilter = typeFilterSelect ? typeFilterSelect.value : 'all';
+    const statusFilter = statusFilterSelect ? statusFilterSelect.value : 'all';
 
     const filtered = allTransactions.filter(tx => {
       const type = (tx.type || tx.category || 'deposit').toLowerCase();
@@ -1192,6 +1205,7 @@
     });
 
     const tbody = document.getElementById('txTableBody');
+    if (!tbody) return;
     tbody.innerHTML = '';
 
     if (filtered.length === 0) {
@@ -1203,7 +1217,7 @@
           </td>
         </tr>
       `;
-      document.getElementById('txPaginationInfo').textContent = 'Showing 0 transactions';
+      setTextContent('txPaginationInfo', 'Showing 0 transactions');
       return;
     }
 
@@ -1243,7 +1257,7 @@
       tbody.appendChild(tr);
     });
 
-    document.getElementById('txPaginationInfo').textContent = `Showing ${filtered.length} transaction(s)`;
+    setTextContent('txPaginationInfo', `Showing ${filtered.length} transaction(s)`);
   }
 
   function handleDepositClick() {
@@ -1269,49 +1283,60 @@
       const userCurrency = 'USD';
 
       if (actionType === 'deposit') {
-        amountLabel.textContent = `Amount (${userCurrency})`;
-        amountInput.placeholder = `Enter amount in ${userCurrency} (e.g. 10)`;
-        titleElem.innerHTML = `<i class="fa-solid fa-mobile-screen-button" style="color: #a3e635;"></i> M-Pesa Instant Deposit`;
-        submitBtn.textContent = `Deposit`;
-        loadingTitle.textContent = `Check Your Phone`;
-        loadingDesc.innerHTML = `An M-Pesa STK prompt has been sent to <span id="displayMpesaPhone" style="font-weight: 600; color: #0f172a;"></span>. Enter your PIN to complete the deposit.`;
-        successDesc.textContent = `Your STK push was successfully dispatched. Once you enter your PIN, your balance will update automatically.`;
+        if (amountLabel) amountLabel.textContent = `Amount (${userCurrency})`;
+        if (amountInput) amountInput.placeholder = `Enter amount in ${userCurrency} (e.g. 10)`;
+        if (titleElem) titleElem.innerHTML = `<i class="fa-solid fa-mobile-screen-button" style="color: #a3e635;"></i> M-Pesa Instant Deposit`;
+        if (submitBtn) submitBtn.textContent = `Deposit`;
+        if (loadingTitle) loadingTitle.textContent = `Check Your Phone`;
+        if (loadingDesc) loadingDesc.innerHTML = `An M-Pesa STK prompt has been sent to <span id="displayMpesaPhone" style="font-weight: 600; color: #0f172a;"></span>. Enter your PIN to complete the deposit.`;
+        if (successDesc) successDesc.textContent = `Your STK push was successfully dispatched. Once you enter your PIN, your balance will update automatically.`;
       } else {
-        amountLabel.textContent = `Amount (${userCurrency})`;
-        amountInput.placeholder = `Enter amount in ${userCurrency} (e.g. 10)`;
-        titleElem.innerHTML = `<i class="fa-solid fa-mobile-screen-button" style="color: #a3e635;"></i> M-Pesa Withdrawal`;
-        submitBtn.textContent = `Withdraw Funds`;
-        loadingTitle.textContent = `Processing Withdrawal`;
-        loadingDesc.innerHTML = `Sending withdrawal request to <span id="displayMpesaPhone" style="font-weight: 600; color: #0f172a;"></span>. Please wait...`;
-        successDesc.textContent = `Your M-Pesa withdrawal request has been submitted successfully and is being processed.`;
+        if (amountLabel) amountLabel.textContent = `Amount (${userCurrency})`;
+        if (amountInput) amountInput.placeholder = `Enter amount in ${userCurrency} (e.g. 10)`;
+        if (titleElem) titleElem.innerHTML = `<i class="fa-solid fa-mobile-screen-button" style="color: #a3e635;"></i> M-Pesa Withdrawal`;
+        if (submitBtn) submitBtn.textContent = `Withdraw Funds`;
+        if (loadingTitle) loadingTitle.textContent = `Processing Withdrawal`;
+        if (loadingDesc) loadingDesc.innerHTML = `Sending withdrawal request to <span id="displayMpesaPhone" style="font-weight: 600; color: #0f172a;"></span>. Please wait...`;
+        if (successDesc) successDesc.textContent = `Your M-Pesa withdrawal request has been submitted successfully and is being processed.`;
       }
 
-      document.getElementById('mpesaModal').style.display = 'flex';
+      const modal = document.getElementById('mpesaModal');
+      if (modal) modal.style.display = 'flex';
     } else {
       window.location.href = `/${actionType}.html?gateway=${gatewayName}`;
     }
   }
 
   function closeMpesaModal() {
-    document.getElementById('mpesaModal').style.display = 'none';
+    const modal = document.getElementById('mpesaModal');
+    if (modal) modal.style.display = 'none';
     resetMpesaModal();
     const token = localStorage.getItem('token') || localStorage.getItem('authToken') || localStorage.getItem('srcb_token');
     if (token) fetchTransactionHistory(token);
   }
 
   function resetMpesaModal() {
-    document.getElementById('mpesaForm').style.display = 'block';
-    document.getElementById('mpesaLoadingState').style.display = 'none';
-    document.getElementById('mpesaSuccessState').style.display = 'none';
-    document.getElementById('mpesaErrorState').style.display = 'none';
-    document.getElementById('mpesaForm').reset();
+    const mpesaForm = document.getElementById('mpesaForm');
+    const loadingState = document.getElementById('mpesaLoadingState');
+    const successState = document.getElementById('mpesaSuccessState');
+    const errorState = document.getElementById('mpesaErrorState');
+
+    if (mpesaForm) {
+      mpesaForm.style.display = 'block';
+      mpesaForm.reset();
+    }
+    if (loadingState) loadingState.style.display = 'none';
+    if (successState) successState.style.display = 'none';
+    if (errorState) errorState.style.display = 'none';
   }
 
   async function submitMpesaTransaction(event) {
     event.preventDefault();
     
-    const rawAmount = document.getElementById('mpesaAmount').value.trim();
-    const rawPhone = document.getElementById('mpesaPhone').value.trim();
+    const amountInput = document.getElementById('mpesaAmount');
+    const phoneInput = document.getElementById('mpesaPhone');
+    const rawAmount = amountInput ? amountInput.value.trim() : '';
+    const rawPhone = phoneInput ? phoneInput.value.trim() : '';
     
     let phone = rawPhone;
     if (phone.startsWith('0')) {
@@ -1322,9 +1347,11 @@
       phone = '254' + phone;
     }
 
-    document.getElementById('mpesaForm').style.display = 'none';
-    document.getElementById('displayMpesaPhone').textContent = phone;
-    document.getElementById('mpesaLoadingState').style.display = 'block';
+    const mpesaForm = document.getElementById('mpesaForm');
+    if (mpesaForm) mpesaForm.style.display = 'none';
+    setTextContent('displayMpesaPhone', phone);
+    const loadingState = document.getElementById('mpesaLoadingState');
+    if (loadingState) loadingState.style.display = 'block';
 
     const token = localStorage.getItem('token') || localStorage.getItem('authToken') || localStorage.getItem('srcb_token');
     const apiEndpoint = currentActionType === 'deposit' ? '/api/payment/stk-push' : '/api/payment/withdraw';
@@ -1348,23 +1375,28 @@
       const data = await response.json();
 
       if (response.ok) {
-        document.getElementById('mpesaLoadingState').style.display = 'none';
-        document.getElementById('mpesaSuccessState').style.display = 'block';
+        if (loadingState) loadingState.style.display = 'none';
+        const successState = document.getElementById('mpesaSuccessState');
+        if (successState) successState.style.display = 'block';
       } else {
         throw new Error(data.message || data.error || `Failed to process M-Pesa ${currentActionType}.`);
       }
     } catch (err) {
       console.error('M-Pesa Transaction Error:', err);
-      document.getElementById('mpesaLoadingState').style.display = 'none';
-      document.getElementById('errorStateDesc').textContent = err.message || 'Network error connecting to payment gateway.';
-      document.getElementById('mpesaErrorState').style.display = 'block';
+      if (loadingState) loadingState.style.display = 'none';
+      setTextContent('errorStateDesc', err.message || 'Network error connecting to payment gateway.');
+      const errorState = document.getElementById('mpesaErrorState');
+      if (errorState) errorState.style.display = 'block';
     }
   }
 
-  document.getElementById('logoutBtn').addEventListener('click', () => {
-    localStorage.clear();
-    window.location.replace('/login.html');
-  });
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      localStorage.clear();
+      window.location.replace('/login.html');
+    });
+  }
 </script>
 </body>
 </html>
