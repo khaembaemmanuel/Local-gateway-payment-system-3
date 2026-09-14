@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Customer Dashboard | Swift Royal Investment Bank</title>
+  <title>User | Swift Royal Investment Bank</title>
 
   <!-- Google Fonts & Icons -->
   <link href="https://fonts.googleapis.com/css2?family=Saira:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -18,7 +18,7 @@
     }
 
     body {
-      background-color: #f1f5f9;
+      background-color: #0d4a22;
       color: #1e293b;
       min-height: 100vh;
       display: flex;
@@ -117,8 +117,9 @@
       color: #ffffff;
       padding: 24px;
       border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(13, 74, 34, 0.25);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
       position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .card-top {
@@ -154,14 +155,6 @@
       color: #ffffff;
     }
 
-    .card-number {
-      font-family: monospace;
-      font-size: 22px;
-      letter-spacing: 3px;
-      margin-bottom: 30px;
-      color: #ffffff;
-    }
-
     .card-info-row {
       display: flex;
       justify-content: space-between;
@@ -184,14 +177,14 @@
     .details-section-title {
       font-size: 20px;
       font-weight: 700;
-      color: #0f172a;
+      color: #ffffff;
       margin-bottom: 14px;
     }
 
     .account-details-card {
       background: #ffffff;
       border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       border: 1px solid #e2e8f0;
       overflow: hidden;
     }
@@ -251,7 +244,7 @@
       font-size: 15px;
       cursor: pointer;
       border: none;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       transition: transform 0.15s, background-color 0.2s;
       text-decoration: none;
       width: 100%;
@@ -281,10 +274,10 @@
 
     /* Recommended Section */
     .recommended-section {
-      background-color: #e2e8f0;
+      background-color: rgba(255, 255, 255, 0.1);
       border-radius: 16px;
       padding: 20px;
-      border: 1px solid #cbd5e1;
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .recommended-title {
@@ -293,7 +286,7 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 1px;
-      color: #0f172a;
+      color: #ffffff;
       margin-bottom: 16px;
     }
 
@@ -307,7 +300,7 @@
       background: #ffffff;
       border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
       display: flex;
       flex-direction: column;
       cursor: pointer;
@@ -319,10 +312,9 @@
 
     .payment-card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
     }
 
-    /* Disabled state for inactive payment cards */
     .payment-card.disabled {
       opacity: 0.6;
       cursor: not-allowed;
@@ -331,7 +323,7 @@
     
     .payment-card.disabled:hover {
       transform: none;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
 
     .payment-logo-container {
@@ -344,7 +336,6 @@
       position: relative;
     }
 
-    /* Logo Styling */
     .mpesa-logo-text {
       font-weight: 800;
       font-size: 20px;
@@ -410,6 +401,7 @@
       font-weight: 700;
       padding: 3px 8px;
       border-bottom-left-radius: 8px;
+      z-index: 2;
     }
 
     .payment-action-bar {
@@ -432,7 +424,7 @@
       background: #ffffff;
       border-radius: 16px;
       border: 1px solid #e2e8f0;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       overflow: hidden;
       margin-top: 24px;
     }
@@ -617,14 +609,14 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(255, 255, 255, 0.95);
+      background: rgba(13, 74, 34, 0.95);
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       font-size: 15px;
       font-weight: 600;
-      color: #0f172a;
+      color: #ffffff;
       z-index: 1000;
     }
 
@@ -635,7 +627,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(15, 23, 42, 0.6);
+      background: rgba(15, 23, 42, 0.75);
       backdrop-filter: blur(4px);
       display: none;
       justify-content: center;
@@ -649,7 +641,7 @@
       width: 100%;
       max-width: 420px;
       border-radius: 16px;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
       overflow: hidden;
       animation: modalSlideUp 0.3s ease;
     }
@@ -740,59 +732,31 @@
   </style>
 </head>
 <script>
-    //activate maintenance mode
-    const isUnderMaintenance = true;
+    // Client-side maintenance flag configuration
+    const isUnderMaintenance = false;
 
     if (isUnderMaintenance) {
         document.addEventListener("DOMContentLoaded", () => {
             document.body.innerHTML = `
-                <div style="font-family: Arial, sans-serif; text-align: center; padding: 100px; background: #f4f4f4;">
-                    <div style="background: white; padding: 40px; border-radius: 8px; display: inline-block; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                <div style="font-family: Arial, sans-serif; text-align: center; padding: 100px; background: #0d4a22;">
+                    <div style="background: white; padding: 40px; border-radius: 8px; display: inline-block; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
                         <h1 style="color: #333;">Under Maintenance</h1>
-                        <p style="color: #666; font-size: 18px;">The System is currently under maintenance, please be patient and check again after 12hours.</p>
+                        <p style="color: #666; font-size: 18px;">The System is currently under maintenance, please be patient and check again after 12 hours.</p>
                     </div>
                 </div>
             `;
         });
     }
-
-  // Function to perform logout and clear stored credentials
-  function forceLogout() {
-    // 1. Clear local session/token storage
-    localStorage.removeItem('token'); 
-    localStorage.removeItem('user');
-    sessionStorage.clear();
-
-    
-    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    window.location.reload(true);
-  }
-
-  // Check server status every 30 seconds
-  setInterval(async () => {
-    try {
-      // Fetch the dashboard route
-      const response = await fetch('/dashboard.html', { method: 'HEAD' });
-      
-      // If server responds with non-OK or html content changes, trigger logout/reload
-      if (!response.ok) {
-        forceLogout();
-      }
-    } catch (err) {
-      // If network fails or route changes, reload page
-      forceLogout();
-    }
-  }, 30000); // 30000 ms = 30 seconds
 </script>
 <body>
 
   <!-- Loading Overlay -->
   <div id="loadingOverlay">
-    <i class="fa-solid fa-spinner fa-spin fa-2x" style="color: #00b074; margin-bottom: 12px;"></i>
+    <i class="fa-solid fa-spinner fa-spin fa-2x" style="color: #a3e635; margin-bottom: 12px;"></i>
     <span>Loading secure banking session...</span>
   </div>
 
-  <!-- Interactive M-Pesa Modal Form (Handles both Deposit & Withdrawal) -->
+  <!-- Interactive M-Pesa Modal Form -->
   <div id="mpesaModal" class="modal-overlay">
     <div class="modal-card">
       <div class="modal-header">
@@ -801,7 +765,6 @@
       </div>
       <div class="modal-body">
         
-        <!-- Form Input State -->
         <form id="mpesaForm">
           <div class="form-group">
             <label for="mpesaAmount" id="mpesaAmountLabel">Amount</label>
@@ -814,7 +777,6 @@
           <button type="submit" id="mpesaSubmitBtn" class="modal-submit-btn">Deposit</button>
         </form>
 
-        <!-- Loading / Waiting State (Hidden by default) -->
         <div id="mpesaLoadingState" style="display: none; text-align: center; padding: 20px 0;">
           <i class="fa-solid fa-spinner fa-spin fa-3x" style="color: #00b074; margin-bottom: 16px;"></i>
           <h4 style="font-size: 16px; color: #0f172a; margin-bottom: 8px;" id="loadingStateTitle">Processing Request</h4>
@@ -823,7 +785,6 @@
           </p>
         </div>
 
-        <!-- Success State (Hidden by default) -->
         <div id="mpesaSuccessState" style="display: none; text-align: center; padding: 20px 0;">
           <i class="fa-solid fa-circle-check fa-3x" style="color: #22c55e; margin-bottom: 16px;"></i>
           <h4 style="font-size: 16px; color: #0f172a; margin-bottom: 8px;">Request Submitted Successfully</h4>
@@ -833,7 +794,6 @@
           <button type="button" id="modalDoneBtn" class="modal-submit-btn">Done</button>
         </div>
 
-        <!-- Error State (Hidden by default) -->
         <div id="mpesaErrorState" style="display: none; text-align: center; padding: 20px 0;">
           <i class="fa-solid fa-circle-exclamation fa-3x" style="color: #ef4444; margin-bottom: 16px;"></i>
           <h4 style="font-size: 16px; color: #0f172a; margin-bottom: 8px;">Transaction Failed</h4>
@@ -856,14 +816,13 @@
     </div>
   </nav>
 
-  <!-- Content Container with Professional Rows and Two-Column Grid -->
+  <!-- Content Container -->
   <div class="dashboard-container">
     <div class="dashboard-grid">
       
-      <!-- Left Column: Virtual Card, Account Details & Deposit Actions -->
+      <!-- Left Column -->
       <div class="dashboard-column">
         
-        <!-- Virtual Card Display -->
         <div class="bank-card">
           <div class="card-top">
             <div class="card-brand-logo">
@@ -872,8 +831,6 @@
             </div>
             <div class="card-balance-display" id="cardTopBalance">$0.00</div>
           </div>
-          
-          <div class="card-number" id="cardDisplayNumber">0000 0000 0000 0000</div>
 
           <div class="card-info-row">
             <div>
@@ -887,27 +844,22 @@
           </div>
         </div>
 
-        <!-- Account Details Table Section -->
         <div>
           <div class="details-section-title">Account Details</div>
           <div class="account-details-card">
-            <div class="detail-row">
+            <div class="detail-row" style="display: none;">
               <span class="detail-label">Account Name :</span>
               <span class="detail-value" id="detailAccountName">--</span>
             </div>
             <div class="detail-row">
-              <span class="detail-label">Balance (USD) :</span>
+              <span class="detail-label">Balance :</span>
               <span class="detail-value" id="detailBalance">$0.00</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Local Equivalent :</span>
-              <span class="detail-value" id="detailLocalBalance">-- 0.00</span>
             </div>
             <div class="detail-row">
               <span class="detail-label">Country :</span>
               <span class="detail-value" id="detailCountry">--</span>
             </div>
-            <div class="detail-row">
+            <div class="detail-row" style="display: none;">
               <span class="detail-label">Currency :</span>
               <span class="detail-value" id="detailCurrency">--</span>
             </div>
@@ -934,10 +886,9 @@
 
       </div>
 
-      <!-- Right Column: Recommended Deposit & Withdrawal Methods -->
+      <!-- Right Column -->
       <div class="dashboard-column">
         
-        <!-- Deposit Action & Methods -->
         <div style="display: flex; flex-direction: column; gap: 16px;">
           <button id="depositPageBtn" class="dash-action-btn btn-deposit-action">
             <i class="fa-solid fa-arrow-down-to-bracket"></i> Deposit Funds
@@ -947,7 +898,6 @@
             <div class="recommended-title">Recommended Deposit Methods</div>
             <div class="recommended-grid" style="grid-template-columns: 1fr;">
               
-              <!-- M-Pesa Deposit Option -->
               <div class="payment-card" data-gateway="MPesa" data-action="deposit">
                 <div class="payment-logo-container">
                   <div class="mpesa-logo-text">
@@ -959,7 +909,6 @@
                 </div>
               </div>
 
-              <!-- Airtel Money Option (Disabled) -->
               <div class="payment-card disabled">
                 <div class="promo-badge">+10%</div>
                 <div class="payment-logo-container">
@@ -975,7 +924,6 @@
                 </div>
               </div>
 
-              <!-- PayPal Option (Disabled) -->
               <div class="payment-card disabled">
                 <div class="payment-logo-container">
                   <div class="paypal-logo-wrap">
@@ -991,7 +939,6 @@
           </div>
         </div>
 
-        <!-- Withdrawal Action & Methods -->
         <div style="display: flex; flex-direction: column; gap: 16px;">
           <button id="withdrawPageBtn" class="dash-action-btn btn-withdraw-action">
             <i class="fa-solid fa-arrow-up-from-bracket"></i> Withdrawal
@@ -1001,7 +948,6 @@
             <div class="recommended-title">Recommended Withdrawal Methods</div>
             <div class="recommended-grid" style="grid-template-columns: 1fr;">
               
-              <!-- M-Pesa Withdrawal Option -->
               <div class="payment-card" data-gateway="MPesa" data-action="withdraw">
                 <div class="payment-logo-container">
                   <div class="mpesa-logo-text">
@@ -1013,7 +959,6 @@
                 </div>
               </div>
 
-              <!-- Airtel Money Option for Withdrawal (Disabled) -->
               <div class="payment-card disabled">
                 <div class="payment-logo-container">
                   <div class="airtel-logo-wrap">
@@ -1028,7 +973,6 @@
                 </div>
               </div>
 
-              <!-- PayPal Option for Withdrawal (Disabled) -->
               <div class="payment-card disabled">
                 <div class="payment-logo-container">
                   <div class="paypal-logo-wrap">
@@ -1048,7 +992,7 @@
 
     </div>
 
-    <!-- Professional Responsive Transaction History Tab Section -->
+    <!-- Transaction History Section -->
     <div class="tx-history-section">
       <div class="tx-history-header">
         <div class="tx-history-title">
@@ -1076,15 +1020,14 @@
             <tr>
               <th>Type</th>
               <th>Reference / Phone</th>
-              <th>Amount (Local)</th>
-              <th>Amount (KSh)</th>
+              <th>Amount</th>
               <th>Date & Time</th>
               <th>Status</th>
             </tr>
           </thead>
           <tbody id="txTableBody">
             <tr>
-              <td colspan="6" class="tx-empty-state">
+              <td colspan="5" class="tx-empty-state">
                 <i class="fa-solid fa-spinner fa-spin" style="margin-right: 8px;"></i> Loading transaction history...
               </td>
             </tr>
@@ -1179,18 +1122,6 @@
     }
   });
 
-  function getCurrencySymbol(currency) {
-    switch((currency || '').toUpperCase()) {
-      case 'UGX': return 'USh ';
-      case 'TZS': return 'TSh ';
-      case 'KES': return 'KSh ';
-      case 'EUR': return '€';
-      case 'GBP': return '£';
-      case 'USD': return '$';
-      default: return currency + ' ';
-    }
-  }
-
   function maskAccountNumber(accNum) {
     if (!accNum) return '4954*****57';
     const str = String(accNum);
@@ -1200,31 +1131,20 @@
 
   function renderUserContext(user) {
     const balanceNum = parseFloat(user.balance || 0);
-    const formattedUSD = `$${balanceNum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    const symbol = '$';
     
-    const userCurrency = (user.currency || 'KES').toUpperCase();
-    const symbol = getCurrencySymbol(userCurrency);
-    
-    const exchangeRate = user.exchangeRate || (userCurrency === 'UGX' ? 3700 : userCurrency === 'KES' ? 130 : userCurrency === 'TZS' ? 2600 : 1);
-    const localAmount = balanceNum * exchangeRate;
-    const formattedLocal = `${symbol}${localAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    const formattedBalance = `${symbol}${balanceNum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
     const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username || 'Client';
 
     document.getElementById('navUserName').textContent = fullName;
-    document.getElementById('cardTopBalance').textContent = formattedUSD;
+    document.getElementById('cardTopBalance').textContent = formattedBalance;
     document.getElementById('cardHolderName').textContent = fullName.toUpperCase();
-    
-    const rawAcc = user.accountNumber || '495412345657';
-    document.getElementById('cardDisplayNumber').textContent = rawAcc.length >= 16 
-      ? rawAcc.match(/.{1,4}/g).join(' ') 
-      : '4954 8272 8282 0057';
 
     document.getElementById('detailAccountName').textContent = fullName.toUpperCase();
-    document.getElementById('detailBalance').textContent = formattedUSD;
-    document.getElementById('detailLocalBalance').textContent = formattedLocal;
+    document.getElementById('detailBalance').textContent = formattedBalance;
     document.getElementById('detailCountry').textContent = user.country || 'Kenya';
-    document.getElementById('detailCurrency').textContent = userCurrency;
+    document.getElementById('detailCurrency').textContent = 'USD';
     document.getElementById('detailAccountType').textContent = user.accountType || 'Current';
     document.getElementById('detailAccountNumber').textContent = maskAccountNumber(user.accountNumber);
     document.getElementById('detailSwiftCode').textContent = user.swiftCode || 'SRIBKE2X';
@@ -1251,7 +1171,7 @@
     } catch (err) {
       console.error('Error fetching transactions:', err);
       document.getElementById('txTableBody').innerHTML = `
-        <tr><td colspan="6" class="tx-empty-state" style="color: #ef4444;">Failed to load transaction history. Please refresh.</td></tr>
+        <tr><td colspan="5" class="tx-empty-state" style="color: #ef4444;">Failed to load transaction history. Please refresh.</td></tr>
       `;
     }
   }
@@ -1279,7 +1199,7 @@
     if (filtered.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="6" class="tx-empty-state">
+          <td colspan="5" class="tx-empty-state">
             <i class="fa-solid fa-folder-open" style="font-size: 24px; margin-bottom: 8px; display: block; color: #94a3b8;"></i>
             No transaction records found matching your criteria.
           </td>
@@ -1289,7 +1209,7 @@
       return;
     }
 
-    const currencySymbol = getCurrencySymbol(activeUser?.currency || 'KES');
+    const currencySymbol = '$';
 
     filtered.forEach(tx => {
       const tr = document.createElement('tr');
@@ -1305,8 +1225,7 @@
       if (statusRaw.includes('pending')) statusClass = 'tx-status-pending';
       else if (statusRaw.includes('fail') || statusRaw.includes('reject')) statusClass = 'tx-status-failed';
 
-      const localAmt = parseFloat(tx.amountLocal || tx.amount || 0);
-      const usdAmt = parseFloat(tx.amountUSD || (localAmt / (activeUser?.exchangeRate || 130)) || 0);
+      const amt = parseFloat(tx.amount || 0);
       const formattedDate = tx.createdAt ? new Date(tx.createdAt).toLocaleString() : 'Just now';
       const identifier = tx.reference || tx.phone || tx.receiptNumber || 'M-Pesa STK';
 
@@ -1317,8 +1236,7 @@
           </span>
         </td>
         <td style="font-family: monospace; font-weight: 600;">${identifier}</td>
-        <td style="font-weight: 600;">${currencySymbol}${localAmt.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
-        <td style="color: #64748b;">$${usdAmt.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+        <td style="font-weight: 600;">${currencySymbol}${amt.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
         <td style="color: #64748b; font-size: 12px;">${formattedDate}</td>
         <td>
           <span class="tx-status-badge ${statusClass}">${tx.status || 'Completed'}</span>
@@ -1350,17 +1268,19 @@
       const amountLabel = document.getElementById('mpesaAmountLabel');
       const amountInput = document.getElementById('mpesaAmount');
 
+      const userCurrency = 'USD';
+
       if (actionType === 'deposit') {
-        amountLabel.textContent = `Amount (Ksh)`;
-        amountInput.placeholder = 'Enter amount in Ksh (e.g. 10)';
+        amountLabel.textContent = `Amount (${userCurrency})`;
+        amountInput.placeholder = `Enter amount in ${userCurrency} (e.g. 10)`;
         titleElem.innerHTML = `<i class="fa-solid fa-mobile-screen-button" style="color: #a3e635;"></i> M-Pesa Instant Deposit`;
         submitBtn.textContent = `Deposit`;
         loadingTitle.textContent = `Check Your Phone`;
         loadingDesc.innerHTML = `An M-Pesa STK prompt has been sent to <span id="displayMpesaPhone" style="font-weight: 600; color: #0f172a;"></span>. Enter your PIN to complete the deposit.`;
         successDesc.textContent = `Your STK push was successfully dispatched. Once you enter your PIN, your balance will update automatically.`;
       } else {
-        amountLabel.textContent = `Amount (USD)`;
-        amountInput.placeholder = 'Enter amount in USD (e.g. 10)';
+        amountLabel.textContent = `Amount (${userCurrency})`;
+        amountInput.placeholder = `Enter amount in ${userCurrency} (e.g. 10)`;
         titleElem.innerHTML = `<i class="fa-solid fa-mobile-screen-button" style="color: #a3e635;"></i> M-Pesa Withdrawal`;
         submitBtn.textContent = `Withdraw Funds`;
         loadingTitle.textContent = `Processing Withdrawal`;
@@ -1411,9 +1331,11 @@
     const token = localStorage.getItem('token') || localStorage.getItem('authToken') || localStorage.getItem('srcb_token');
     const apiEndpoint = currentActionType === 'deposit' ? '/api/payment/stk-push' : '/api/payment/withdraw';
 
-    const payload = currentActionType === 'deposit' 
-      ? { phone: phone, amount: rawAmount, currency: 'USD' }
-      : { phone: phone, amount: rawAmount, currency: activeUser?.currency || 'KES' };
+    const payload = { 
+      phone: phone, 
+      amount: rawAmount, 
+      currency: 'USD' 
+    };
 
     try {
       const response = await fetch(apiEndpoint, {

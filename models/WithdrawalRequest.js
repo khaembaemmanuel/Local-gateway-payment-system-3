@@ -19,7 +19,13 @@ const withdrawalRequestSchema = new mongoose.Schema({
   currency: {
     type: String,
     required: true,
+    default: 'KES',
     uppercase: true
+  },
+  exchangeRate: {
+    type: Number,
+    required: true,
+    default: 1
   },
   phoneNumber: {
     type: String,

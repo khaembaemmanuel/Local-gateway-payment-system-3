@@ -11,6 +11,7 @@ const connectDB = require('./config/db');
 
 const PORT = process.env.PORT || 4000;
 const app = express();
+
 // Block search engine crawlers instantly at the server level
 app.use((req, res, next) => {
     const userAgent = req.headers['user-agent'] || '';
@@ -19,10 +20,11 @@ app.use((req, res, next) => {
     }
     next();
 });
+
 // Trust proxy if behind a reverse proxy like Render
 app.set('trust proxy', 1);
 
-// 1. Professional Security Headers (Helmet) - Whitelisted for Google reCAPTCHA
+// 1. Professional Security Headers (Helmet) - Whitelisted for Google reCAPTCHA & FX Rates API
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -35,6 +37,7 @@ app.use(helmet({
         "'self'", 
         "https://api.safaricom.co.ke", 
         "https://sandbox.safaricom.co.ke",
+        "https://open.er-api.com",
         "https://www.google.com",
         "https://www.gstatic.com"
       ]
@@ -108,7 +111,7 @@ app.get('/login.html', (req, res) => {
 });
 
 app.get('/dashboard.html', (req, res) => {
-    const isUnderMaintenance = true; // Set to false when maintenance is over
+    const isUnderMaintenance = false; // Toggle when dashboard maintenance is active
 
     if (isUnderMaintenance) {
         return res.send(`
@@ -138,7 +141,7 @@ app.get('/dashboard.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 
-// Admin portal route paths (supports both options)
+// Admin portal route paths
 app.get('/admin.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'private', 'admin.html'));
 });
@@ -147,12 +150,12 @@ app.get('/secure-admin-portal', (req, res) => {
   res.sendFile(path.join(__dirname, 'private', 'admin.html'));
 });
 
-// 6. API routers & Verification Endpoints (Mounted under both /api/payment and /api for compatibility)
+// 6. API routers & Verification Endpoints
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/payment', require('./routes/payment'));
 app.use('/api/payment', require('./routes/withdraw'));
-app.use('/api', require('./routes/payment')); // Direct fallback alias for /api/stk-push
-app.use('/api', require('./routes/withdraw')); // Direct fallback alias for /api/withdraw
+app.use('/api', require('./routes/payment'));
+app.use('/api', require('./routes/withdraw'));
 app.use('/api/account', require('./routes/accountRouter'));
 app.use('/api/admin', require('./routes/adminRoutes'));
 

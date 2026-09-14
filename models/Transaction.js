@@ -21,10 +21,10 @@ const transactionSchema = new mongoose.Schema({
   },
   currency: {
     type: String,
-    default: 'KES',
+    default: 'USD', // System default currency
     uppercase: true
   },
-  amountUSD: {
+  amountLocal: {
     type: Number,
     required: true,
     default: 0
@@ -40,7 +40,7 @@ const transactionSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    default: 'Completed',
+    default: 'Pending',
     index: true
   },
   reference: {
