@@ -149,12 +149,6 @@
       color: #a3e635;
     }
 
-    .card-top .card-balance-display {
-      font-size: 22px;
-      font-weight: 700;
-      color: #ffffff;
-    }
-
     .card-info-row {
       display: flex;
       justify-content: space-between;
@@ -830,7 +824,6 @@
               <span class="bank-title">Swift Royal</span>
               <span class="bank-subtitle">Investment Bank</span>
             </div>
-            <div class="card-balance-display" id="cardTopBalance">$0.00</div>
           </div>
 
           <div class="card-info-row">
@@ -1145,7 +1138,6 @@
     const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username || 'Client';
 
     setTextContent('navUserName', fullName);
-    setTextContent('cardTopBalance', formattedBalance);
     setTextContent('cardHolderName', fullName.toUpperCase());
     setTextContent('cardAccountNumber', user.accountNumber || '--');
 
