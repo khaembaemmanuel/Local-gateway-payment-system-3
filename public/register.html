@@ -362,6 +362,7 @@
           <option value="Checking">Escrow Account</option>
           <option value="Business">Business Account</option>
           <option value="Checking">Personal Account</option>
+            <option value="Checking">checling account</option>
         </select>
       </div>
 
@@ -674,23 +675,8 @@
       phoneInput.setAttribute('placeholder', c.placeholder);
       phoneInput.value = '';
 
-      if (c.currency) {
-        let currencyOptionExists = false;
-        for (let i = 0; i < currencySelect.options.length; i++) {
-          if (currencySelect.options[i].value === c.currency) {
-            currencySelect.value = c.currency;
-            currencyOptionExists = true;
-            break;
-          }
-        }
-        if (!currencyOptionExists) {
-          const newOpt = document.createElement('option');
-          newOpt.value = c.currency;
-          newOpt.textContent = c.currency;
-          currencySelect.appendChild(newOpt);
-          currencySelect.value = c.currency;
-        }
-      }
+      // Automatically select and enforce USD currency upon picking a country
+      currencySelect.value = "USD";
     }
 
     countrySearch.addEventListener('focus', () => {
