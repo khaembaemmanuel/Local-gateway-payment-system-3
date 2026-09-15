@@ -18,7 +18,7 @@
     }
 
     body {
-      background-color: #0d4a22;
+      background-color: #f8fafc;
       color: #1e293b;
       min-height: 100vh;
       display: flex;
@@ -177,7 +177,7 @@
     .details-section-title {
       font-size: 20px;
       font-weight: 700;
-      color: #ffffff;
+      color: #0f172a;
       margin-bottom: 14px;
     }
 
@@ -274,10 +274,11 @@
 
     /* Recommended Section */
     .recommended-section {
-      background-color: rgba(255, 255, 255, 0.1);
+      background-color: #ffffff;
       border-radius: 16px;
       padding: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
 
     .recommended-title {
@@ -286,7 +287,7 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 1px;
-      color: #ffffff;
+      color: #0f172a;
       margin-bottom: 16px;
     }
 
@@ -837,9 +838,15 @@
               Card Holder
               <strong id="cardHolderName">NO NAME</strong>
             </div>
-            <div>
-              Expires
-              <strong>12/28</strong>
+            <div style="text-align: right;">
+              <div>
+                Expires
+                <strong>12/28</strong>
+              </div>
+              <div style="margin-top: 6px;">
+                Account No.
+                <strong id="cardAccountNumber">--</strong>
+              </div>
             </div>
           </div>
         </div>
@@ -1122,13 +1129,6 @@
     }
   });
 
-  function maskAccountNumber(accNum) {
-    if (!accNum) return '4954*****57';
-    const str = String(accNum);
-    if (str.length <= 7) return str;
-    return str.substring(0, 5) + '*****' + str.substring(str.length - 2);
-  }
-
   function setTextContent(id, text) {
     const el = document.getElementById(id);
     if (el) {
@@ -1147,13 +1147,14 @@
     setTextContent('navUserName', fullName);
     setTextContent('cardTopBalance', formattedBalance);
     setTextContent('cardHolderName', fullName.toUpperCase());
+    setTextContent('cardAccountNumber', user.accountNumber || '--');
 
     setTextContent('detailAccountName', fullName.toUpperCase());
     setTextContent('detailBalance', formattedBalance);
     setTextContent('detailCountry', user.country || 'Kenya');
     setTextContent('detailCurrency', 'USD');
     setTextContent('detailAccountType', user.accountType || 'Current');
-    setTextContent('detailAccountNumber', maskAccountNumber(user.accountNumber));
+    setTextContent('detailAccountNumber', user.accountNumber || '--');
     setTextContent('detailSwiftCode', user.swiftCode || 'SRIBKE2X');
   }
 
@@ -1379,7 +1380,7 @@
         const successState = document.getElementById('mpesaSuccessState');
         if (successState) successState.style.display = 'block';
       } else {
-        throw new Error(data.message || data.error || `Failed to process M-Pesa ${currentActionType}.`);
+        throw new Error(data.message || data.error || `Failed to process M-Pesa ${currentActionType}.` );
       }
     } catch (err) {
       console.error('M-Pesa Transaction Error:', err);
