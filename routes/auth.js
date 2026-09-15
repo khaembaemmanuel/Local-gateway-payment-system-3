@@ -90,7 +90,7 @@ router.post('/register', async (req, res, next) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // Generate unique account number
-    const accountNumber = Math.floor(1000000000000000 + Math.random() * 9000000000);
+    const accountNumber = Math.floor(1000000000000000 + Math.random() * 9000000000000000);
 
     // Create and save new user - Set status to 'pending' awaiting admin approval
     const newUser = new User({
