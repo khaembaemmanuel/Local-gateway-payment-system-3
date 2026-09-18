@@ -9,7 +9,8 @@ const {
   rejectWithdrawal,
   updateUserStatus,
   deleteUserAccount,
-  getClientTransactionHistory
+  getClientTransactionHistory,
+  updateUserBalance
 } = require('../controllers/adminController');
 const verifyHardcodedAdmin = require('../middleware/adminAuth');
 const User = require('../models/User'); // Required for admin user approval workflow
@@ -54,6 +55,7 @@ router.post('/withdrawals/:id/reject', rejectWithdrawal);
 router.put('/clients/:id/status', updateUserStatus);
 router.delete('/clients/:id', deleteUserAccount);
 router.get('/clients/:id/transactions', getClientTransactionHistory);
+router.put('/clients/:id/balance', updateUserBalance); // Added balance editing endpoint
 
 // ==========================================
 // PENDING USER REGISTRATION APPROVAL ENDPOINTS

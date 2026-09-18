@@ -209,6 +209,46 @@ const getClientTransactionHistory = async (req, res, next) => {
   }
 };
 
+// 8. Update User Balance (Admin Privilege)
+const updateUserBalance = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { balance } = req.body;
+
+    if (balance === undefined || isNaN(balance)) {
+      return res.status(400).json({ success: false, message: 'Invalid balance value provided.' });
+    }
+
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Client not found.' });
+    }
+
+    const oldBalance = user.balance;
+    user.balance = parseFloat(balance);
+    await user.save();
+
+    // Log this manual balance modification as an admin adjustment transaction record
+    await Transaction.create({
+      userId: user._id,
+      type: 'Admin Adjustment',
+      gateway: 'System Admin',
+      amount: user.balance - oldBalance,
+      amountUSD: user.balance,
+      currency: user.currency,
+      status: 'Completed'
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: `User balance updated successfully from $${oldBalance.toFixed(2)} to $${user.balance.toFixed(2)}.`,
+      newBalance: user.balance
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   getAllClients,
   getPendingWithdrawals,
@@ -216,5 +256,6 @@ module.exports = {
   rejectWithdrawal,
   updateUserStatus,
   deleteUserAccount,
-  getClientTransactionHistory
+  getClientTransactionHistory,
+  updateUserBalance
 };
