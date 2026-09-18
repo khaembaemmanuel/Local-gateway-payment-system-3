@@ -27,33 +27,53 @@ router.post('/stk-push', auth, async (req, res) => {
     }
 
     let finalKesAmount = Number(rawAmount);
+    let amountInUSD = Number(rawAmount);
+    let exchangeRateUsed = 1;
 
-    // Convert to KES if the incoming amount is denominated in USD
+    // Convert if incoming amount is in USD, or track accordingly
     if (currency.toUpperCase() === 'USD') {
+      amountInUSD = Number(rawAmount);
       try {
         const fxResponse = await axios.get('https://open.er-api.com/v6/latest/USD');
         const rateToKes = fxResponse.data?.rates?.KES;
         
         if (rateToKes) {
+          exchangeRateUsed = rateToKes;
           finalKesAmount = parseFloat(rawAmount) * rateToKes;
         } else {
           throw new Error('KES exchange rate unavailable');
         }
       } catch (fxErr) {
         console.error('FX Conversion Error, utilizing fallback rate:', fxErr.message);
-        const fallbackRate = 130; // Fallback conversion rate if the external FX service fails
-        finalKesAmount = parseFloat(rawAmount) * fallbackRate;
+        exchangeRateUsed = 130; // Fallback conversion rate
+        finalKesAmount = parseFloat(rawAmount) * exchangeRateUsed;
       }
+    } else {
+      // If user passed local currency directly, derive the USD value
+      exchangeRateUsed = 130;
+      try {
+        const fxResponse = await axios.get('https://open.er-api.com/v6/latest/USD');
+        if (fxResponse.data?.rates?.KES) {
+          exchangeRateUsed = fxResponse.data.rates.KES;
+        }
+      } catch (e) {
+        // fallback remains 130
+      }
+      amountInUSD = Number((rawAmount / exchangeRateUsed).toFixed(2));
     }
 
     const formattedPhone = formatPhoneNumber(targetPhone);
     const token = await getOAuthToken();
     const { password, timestamp, shortCode } = generateStkPassword();
 
-    // Create a pending transaction storing the equivalent converted KES value
+    // Create a pending transaction storing BOTH the local amount (for M-Pesa) and USD amount (for user wallet)
     const transaction = new Transaction({
       userId: req.user.userId,
-      amount: Math.ceil(finalKesAmount),
+      amount: Math.ceil(finalKesAmount),          // Local amount charged on M-Pesa
+      amountUSD: amountInUSD,                     // True USD value to credit user wallet
+      amountLocal: Math.ceil(finalKesAmount),
+      exchangeRate: exchangeRateUsed,
+      currency: 'KES',
       type: 'Deposit',
       gateway: 'M-Pesa',
       status: 'Pending'
@@ -129,12 +149,14 @@ router.post('/callback', async (req, res) => {
       };
       await transaction.save();
 
-      // Atomically update user balance
+      // FIX: Crediting the user's USD balance using `amountUSD` instead of the large KES `amount`
+      const creditAmount = transaction.amountUSD || (transaction.amount / (transaction.exchangeRate || 130));
+
       await User.findByIdAndUpdate(transaction.userId, {
-        $inc: { balance: transaction.amount }
+        $inc: { balance: creditAmount }
       });
 
-      console.log(`✅ Account credited with KES ${transaction.amount} (Receipt: ${mpesaReceipt})`);
+      console.log(`✅ Account credited with USD $${creditAmount.toFixed(2)} (KES ${transaction.amount}) (Receipt: ${mpesaReceipt})`);
     } else {
       transaction.status = 'Failed';
       transaction.metadata = { 
