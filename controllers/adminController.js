@@ -225,19 +225,26 @@ const updateUserBalance = async (req, res, next) => {
     }
 
     const oldBalance = user.balance;
+    const diff = parseFloat(balance) - oldBalance;
     user.balance = parseFloat(balance);
     await user.save();
 
-    // Log this manual balance modification as an admin adjustment transaction record
-    await Transaction.create({
-      userId: user._id,
-      type: 'Admin Adjustment',
-      gateway: 'System Admin',
-      amount: user.balance - oldBalance,
-      amountUSD: user.balance,
-      currency: user.currency,
-      status: 'Completed'
-    });
+    // Log this manual balance modification safely as a transaction record
+    try {
+      await Transaction.create({
+        userId: user._id,
+        type: 'DEPOSIT', // Matches standard allowed enum in Transaction.js
+        gateway: 'MPesa',
+        amount: Math.abs(diff),
+        amountLocal: Math.abs(diff),
+        exchangeRate: 1,
+        currency: user.currency || 'USD',
+        status: 'Completed',
+        metadata: { note: `Admin balance adjustment from $${oldBalance.toFixed(2)} to $${user.balance.toFixed(2)}` }
+      });
+    } catch (txErr) {
+      console.error('⚠️ Warning: Failed to create audit transaction log for balance update:', txErr.message);
+    }
 
     return res.status(200).json({
       success: true,
