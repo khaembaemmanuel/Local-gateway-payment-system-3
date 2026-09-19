@@ -60,11 +60,18 @@ router.get('/lookup/:accountNumber', authenticateToken, async (req, res, next) =
 router.post('/internal', authenticateToken, async (req, res, next) => {
   let session = null;
   try {
-    // Safely fallback if req.body is undefined
+    // Debug incoming payload in your terminal console
+    console.log('📥 Incoming Transfer Request Body:', req.body);
+
     const body = req.body || {};
     
-    // Accept both property name variants sent from frontends seamlessly
-    const recipientAccountNumber = body.recipientAccountNumber || body.recipientAccount;
+    // Fallback across all potential field name variants
+    const recipientAccountNumber = body.recipientAccountNumber || 
+                                   body.recipientAccount || 
+                                   body.accountNumber || 
+                                   body.account || 
+                                   (req.query ? req.query.recipientAccountNumber : null);
+                                   
     const amount = body.amount;
     const note = body.note;
     const transferAmount = parseFloat(amount);
@@ -98,7 +105,7 @@ router.post('/internal', authenticateToken, async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Insufficient account balance for this transfer.' });
     }
 
-    const recipientQuery = User.findOne({ accountNumber: recipientAccountNumber.trim() });
+    const recipientQuery = User.findOne({ accountNumber: String(recipientAccountNumber).trim() });
     const recipient = session ? await recipientQuery.session(session) : await recipientQuery;
     
     if (!recipient) {
