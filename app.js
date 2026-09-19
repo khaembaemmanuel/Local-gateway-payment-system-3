@@ -11,7 +11,8 @@ const connectDB = require('./config/db');
 
 const PORT = process.env.PORT || 4000;
 const app = express();
-
+// Add internal transfers
+app.use('/api/transfer', require('./routes/transfer'));
 // Block search engine crawlers instantly at the server level
 app.use((req, res, next) => {
     const userAgent = req.headers['user-agent'] || '';

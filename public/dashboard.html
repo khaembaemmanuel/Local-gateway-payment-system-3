@@ -684,7 +684,7 @@
       z-index: 1000;
     }
 
-    /* Modal Styling for M-Pesa Transaction Form */
+    /* Modal Styling for M-Pesa / Transfer Transaction Form */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -868,6 +868,37 @@
           <button type="button" id="modalRetryBtn" class="modal-submit-btn" style="background-color: #0f172a;">Try Again</button>
         </div>
 
+      </div>
+    </div>
+  </div>
+
+  <!-- Internal Account Transfer Modal -->
+  <div id="transferModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header" style="background-color: #0284c7;">
+        <h3><i class="fa-solid fa-right-left" style="color: #a3e635;"></i> Internal Account Transfer</h3>
+        <button id="transferCloseXBtn" class="modal-close-btn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="transferForm">
+          <div class="form-group">
+            <label for="recipientAccount">Recipient Account Number</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="recipientAccount" class="form-control" placeholder="Enter SRB account no." required>
+              <button type="button" id="verifyRecipientBtn" style="padding: 0 12px; background: #0f172a; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 12px; white-space: nowrap;">Verify</button>
+            </div>
+            <small id="recipientFeedback" style="display: block; margin-top: 4px; font-weight: 600;"></small>
+          </div>
+          <div class="form-group">
+            <label for="transferAmount">Amount (USD)</label>
+            <input type="number" id="transferAmount" class="form-control" placeholder="0.00" min="1" step="any" required>
+          </div>
+          <div class="form-group">
+            <label for="transferNote">Note / Description (Optional)</label>
+            <input type="text" id="transferNote" class="form-control" placeholder="e.g. Monthly support">
+          </div>
+          <button type="submit" id="transferSubmitBtn" class="modal-submit-btn" style="background-color: #0284c7;" disabled>Complete Transfer</button>
+        </form>
       </div>
     </div>
   </div>
@@ -1060,6 +1091,13 @@
           </div>
         </div>
 
+        <!-- Internal Bank Transfer Action Button -->
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <button id="transferPageBtn" class="dash-action-btn" style="background-color: #0284c7; color: white; cursor: pointer;">
+            <i class="fa-solid fa-right-left"></i> Internal Bank Transfer
+          </button>
+        </div>
+
       </div>
 
     </div>
@@ -1134,12 +1172,91 @@
       }
     });
 
-    // Deposit and Withdrawal buttons are now unresponsive (listeners removed)
     document.getElementById('applyCardBtn').addEventListener('click', () => alert('Your card request has been submitted to support.'));
     document.getElementById('modalCloseXBtn').addEventListener('click', closeMpesaModal);
     document.getElementById('modalDoneBtn').addEventListener('click', closeMpesaModal);
     document.getElementById('modalRetryBtn').addEventListener('click', resetMpesaModal);
     document.getElementById('mpesaForm').addEventListener('submit', submitMpesaTransaction);
+
+    // Internal Transfer Modal Handlers
+    document.getElementById('transferPageBtn').addEventListener('click', () => {
+      document.getElementById('transferModal').style.display = 'flex';
+    });
+    document.getElementById('transferCloseXBtn').addEventListener('click', () => {
+      document.getElementById('transferModal').style.display = 'none';
+      document.getElementById('transferForm').reset();
+      document.getElementById('recipientFeedback').textContent = '';
+      document.getElementById('transferSubmitBtn').disabled = true;
+    });
+
+    // Verify Recipient Account Number
+    document.getElementById('verifyRecipientBtn').addEventListener('click', async () => {
+      const accNo = document.getElementById('recipientAccount').value.trim();
+      const feedback = document.getElementById('recipientFeedback');
+      const submitBtn = document.getElementById('transferSubmitBtn');
+
+      if (!accNo) {
+        feedback.style.color = '#ef4444';
+        feedback.textContent = 'Please enter an account number first.';
+        return;
+      }
+
+      feedback.style.color = '#64748b';
+      feedback.textContent = 'Verifying account...';
+
+      try {
+        const token = localStorage.getItem('token') || localStorage.getItem('authToken') || localStorage.getItem('srcb_token');
+        const res = await fetch(`/api/transfer/lookup/${accNo}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          feedback.style.color = '#16a34a';
+          feedback.textContent = `Valid Account: ${data.recipient.firstName} ${data.recipient.lastName}`;
+          submitBtn.disabled = false;
+        } else {
+          feedback.style.color = '#ef4444';
+          feedback.textContent = data.message || 'Account not found.';
+          submitBtn.disabled = true;
+        }
+      } catch (err) {
+        feedback.style.color = '#ef4444';
+        feedback.textContent = 'Error verifying recipient account.';
+        submitBtn.disabled = true;
+      }
+    });
+
+    // Submit Internal Transfer
+    document.getElementById('transferForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const recipientAccountNumber = document.getElementById('recipientAccount').value.trim();
+      const amount = document.getElementById('transferAmount').value.trim();
+      const note = document.getElementById('transferNote').value.trim();
+
+      const token = localStorage.getItem('token') || localStorage.getItem('authToken') || localStorage.getItem('srcb_token');
+
+      try {
+        const res = await fetch('/api/transfer/internal', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ recipientAccountNumber, amount, note })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          alert(data.message);
+          location.reload();
+        } else {
+          alert(data.message || 'Transfer failed.');
+        }
+      } catch (err) {
+        alert('Network error processing transfer.');
+      }
+    });
 
     document.getElementById('txSearchInput').addEventListener('input', renderFilteredTransactions);
     document.getElementById('txFilterType').addEventListener('change', renderFilteredTransactions);
@@ -1303,7 +1420,14 @@
 
       const amt = parseFloat(tx.amount || 0);
       const formattedDate = tx.createdAt ? new Date(tx.createdAt).toLocaleString() : 'Just now';
-      const identifier = tx.reference || tx.phone || tx.receiptNumber || 'M-Pesa STK';
+      
+      // Preserve M-Pesa tracking identifiers while formatting internal transfers clearly
+      let identifier = tx.reference || tx.phone || tx.receiptNumber || 'M-Pesa STK';
+      if (tx.gateway === 'Internal Transfer' && tx.metadata) {
+        const otherParty = tx.metadata.otherPartyName || tx.metadata.recipientName || tx.metadata.senderName || 'Account';
+        const noteText = tx.metadata.note ? ` - ${tx.metadata.note}` : '';
+        identifier = isDeposit ? `From: ${otherParty}${noteText}` : `To: ${otherParty}${noteText}`;
+      }
 
       tr.innerHTML = `
         <td>
@@ -1311,7 +1435,7 @@
             <i class="fa-solid ${typeIcon}"></i> ${typeLabel}
           </span>
         </td>
-        <td style="font-family: monospace; font-weight: 600;">${identifier}</td>
+        <td style="font-weight: 500;">${identifier}</td>
         <td style="font-weight: 600;">${currencySymbol}${amt.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
         <td style="color: #64748b; font-size: 12px;">${formattedDate}</td>
         <td>
