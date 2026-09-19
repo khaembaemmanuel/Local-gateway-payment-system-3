@@ -60,20 +60,25 @@ router.get('/lookup/:accountNumber', authenticateToken, async (req, res, next) =
 router.post('/internal', authenticateToken, async (req, res, next) => {
   let session = null;
   try {
+    // Safely fallback if req.body is undefined
+    const body = req.body || {};
+    const { recipientAccountNumber, amount, note } = body;
+    const transferAmount = parseFloat(amount);
+
+    if (!recipientAccountNumber) {
+      return res.status(400).json({ success: false, message: 'Recipient account number is required.' });
+    }
+
+    if (isNaN(transferAmount) || transferAmount <= 0) {
+      return res.status(400).json({ success: false, message: 'Please provide a valid transfer amount.' });
+    }
+
     // Attempt session start (safely falls back if MongoDB is standalone)
     try {
       session = await mongoose.startSession();
       session.startTransaction();
     } catch (sessionErr) {
       console.warn('⚠️ Replica set not configured; executing transfer without session transaction.');
-    }
-
-    const { recipientAccountNumber, amount, note } = req.body;
-    const transferAmount = parseFloat(amount);
-
-    if (isNaN(transferAmount) || transferAmount <= 0) {
-      if (session) { await session.abortTransaction(); session.endSession(); }
-      return res.status(400).json({ success: false, message: 'Please provide a valid transfer amount.' });
     }
 
     const senderQuery = User.findById(req.userId);
