@@ -4,8 +4,6 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const User = require('../models/User');
 const Transaction = require('../models/Transaction');
-
-// Middleware to authenticate JWT token (matching your existing auth guard pattern)
 const jwt = require('jsonwebtoken');
 const env = require('../config/env');
 
@@ -32,14 +30,12 @@ const authenticateToken = (req, res, next) => {
 router.get('/lookup/:accountNumber', authenticateToken, async (req, res, next) => {
   try {
     const { accountNumber } = req.params;
-    
     const recipient = await User.findOne({ accountNumber: accountNumber.trim() }).select('firstName lastName accountNumber username');
     
     if (!recipient) {
       return res.status(404).json({ success: false, message: 'Recipient account number not found.' });
     }
 
-    // Prevent transferring to self
     if (recipient._id.toString() === req.userId.toString()) {
       return res.status(400).json({ success: false, message: 'You cannot transfer funds to your own account.' });
     }
@@ -59,66 +55,71 @@ router.get('/lookup/:accountNumber', authenticateToken, async (req, res, next) =
 });
 
 // ==========================================
-// 2. INITIATE INTERNAL TRANSFER (Atomic Session)
+// 2. INITIATE INTERNAL TRANSFER
 // ==========================================
 router.post('/internal', authenticateToken, async (req, res, next) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
+  let session = null;
   try {
+    // Attempt session start (safely falls back if MongoDB is standalone)
+    try {
+      session = await mongoose.startSession();
+      session.startTransaction();
+    } catch (sessionErr) {
+      console.warn('⚠️ Replica set not configured; executing transfer without session transaction.');
+    }
+
     const { recipientAccountNumber, amount, note } = req.body;
     const transferAmount = parseFloat(amount);
 
     if (isNaN(transferAmount) || transferAmount <= 0) {
-      await session.abortTransaction();
-      session.endSession();
+      if (session) { await session.abortTransaction(); session.endSession(); }
       return res.status(400).json({ success: false, message: 'Please provide a valid transfer amount.' });
     }
 
-    // Fetch sender and lock session
-    const sender = await User.findById(req.userId).session(session);
+    const senderQuery = User.findById(req.userId);
+    const sender = session ? await senderQuery.session(session) : await senderQuery;
+    
     if (!sender) {
-      await session.abortTransaction();
-      session.endSession();
+      if (session) { await session.abortTransaction(); session.endSession(); }
       return res.status(404).json({ success: false, message: 'Sender account not found.' });
     }
 
-    // Check if sender has enough balance
     if (sender.balance < transferAmount) {
-      await session.abortTransaction();
-      session.endSession();
+      if (session) { await session.abortTransaction(); session.endSession(); }
       return res.status(400).json({ success: false, message: 'Insufficient account balance for this transfer.' });
     }
 
-    // Fetch recipient and lock session
-    const recipient = await User.findOne({ accountNumber: recipientAccountNumber.trim() }).session(session);
+    const recipientQuery = User.findOne({ accountNumber: recipientAccountNumber.trim() });
+    const recipient = session ? await recipientQuery.session(session) : await recipientQuery;
+    
     if (!recipient) {
-      await session.abortTransaction();
-      session.endSession();
+      if (session) { await session.abortTransaction(); session.endSession(); }
       return res.status(404).json({ success: false, message: 'Recipient account number does not exist.' });
     }
 
     if (sender._id.toString() === recipient._id.toString()) {
-      await session.abortTransaction();
-      session.endSession();
+      if (session) { await session.abortTransaction(); session.endSession(); }
       return res.status(400).json({ success: false, message: 'Cannot transfer funds to the same account.' });
     }
 
-    // 1. Deduct from sender
+    // Update balances
     sender.balance -= transferAmount;
-    await sender.save({ session });
-
-    // 2. Add to recipient
     recipient.balance += transferAmount;
-    await recipient.save({ session });
 
-    // 3. Generate unique reference ID
+    if (session) {
+      await sender.save({ session });
+      await recipient.save({ session });
+    } else {
+      await sender.save();
+      await recipient.save();
+    }
+
     const transferRef = 'TRF-' + Date.now() + '-' + Math.floor(1000 + Math.random() * 9000);
 
-    // 4. Create transaction log for SENDER (Outgoing Transfer)
+    // Save transaction logs
     const senderTransaction = new Transaction({
       userId: sender._id,
-      type: 'WITHDRAWAL',
+      type: 'Withdrawal',
       amount: transferAmount,
       amountLocal: transferAmount,
       currency: sender.currency || 'USD',
@@ -130,17 +131,14 @@ router.post('/internal', authenticateToken, async (req, res, next) => {
       metadata: { 
         direction: 'OUT',
         note: note || 'Internal Transfer Out', 
-        recipientName: `${recipient.firstName} ${recipient.lastName}`,
         otherPartyName: `${recipient.firstName} ${recipient.lastName}`,
         otherPartyAccount: recipient.accountNumber
       }
     });
-    await senderTransaction.save({ session });
 
-    // 5. Create transaction log for RECIPIENT (Incoming Transfer)
     const recipientTransaction = new Transaction({
       userId: recipient._id,
-      type: 'DEPOSIT',
+      type: 'Deposit',
       amount: transferAmount,
       amountLocal: transferAmount,
       currency: recipient.currency || 'USD',
@@ -152,16 +150,20 @@ router.post('/internal', authenticateToken, async (req, res, next) => {
       metadata: { 
         direction: 'IN',
         note: note || 'Internal Transfer In', 
-        senderName: `${sender.firstName} ${sender.lastName}`,
         otherPartyName: `${sender.firstName} ${sender.lastName}`,
         otherPartyAccount: sender.accountNumber
       }
     });
-    await recipientTransaction.save({ session });
 
-    // Commit the transaction atomically
-    await session.commitTransaction();
-    session.endSession();
+    if (session) {
+      await senderTransaction.save({ session });
+      await recipientTransaction.save({ session });
+      await session.commitTransaction();
+      session.endSession();
+    } else {
+      await senderTransaction.save();
+      await recipientTransaction.save();
+    }
 
     return res.status(200).json({
       success: true,
@@ -171,9 +173,14 @@ router.post('/internal', authenticateToken, async (req, res, next) => {
     });
 
   } catch (err) {
-    await session.abortTransaction();
-    session.endSession();
-    next(err);
+    if (session) {
+      try {
+        await session.abortTransaction();
+        session.endSession();
+      } catch (e) {}
+    }
+    console.error('Transfer Error Stack:', err);
+    return res.status(500).json({ success: false, message: err.message || 'Internal server error during transfer.' });
   }
 });
 
