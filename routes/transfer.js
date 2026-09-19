@@ -62,7 +62,11 @@ router.post('/internal', authenticateToken, async (req, res, next) => {
   try {
     // Safely fallback if req.body is undefined
     const body = req.body || {};
-    const { recipientAccountNumber, amount, note } = body;
+    
+    // Accept both property name variants sent from frontends seamlessly
+    const recipientAccountNumber = body.recipientAccountNumber || body.recipientAccount;
+    const amount = body.amount;
+    const note = body.note;
     const transferAmount = parseFloat(amount);
 
     if (!recipientAccountNumber) {

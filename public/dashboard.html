@@ -1227,7 +1227,7 @@
       }
     });
 
-    // Submit Internal Transfer
+    // Submit Internal Transfer with both key variants to prevent mismatch errors
     document.getElementById('transferForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const recipientAccountNumber = document.getElementById('recipientAccount').value.trim();
@@ -1243,7 +1243,12 @@
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify({ recipientAccountNumber, amount, note })
+          body: JSON.stringify({ 
+            recipientAccountNumber: recipientAccountNumber, 
+            recipientAccount: recipientAccountNumber, // Sending both variants safely
+            amount: amount, 
+            note: note 
+          })
         });
         const data = await res.json();
 
