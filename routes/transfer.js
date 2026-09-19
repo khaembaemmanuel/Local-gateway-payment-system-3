@@ -60,12 +60,10 @@ router.get('/lookup/:accountNumber', authenticateToken, async (req, res, next) =
 router.post('/internal', authenticateToken, async (req, res, next) => {
   let session = null;
   try {
-    // Debug incoming payload in your terminal console
-    console.log('📥 Incoming Transfer Request Body:', req.body);
-
+    // Robust safety fallback if req.body is undefined
     const body = req.body || {};
+    console.log('📥 Incoming Transfer Request Body:', body);
     
-    // Fallback across all potential field name variants
     const recipientAccountNumber = body.recipientAccountNumber || 
                                    body.recipientAccount || 
                                    body.accountNumber || 

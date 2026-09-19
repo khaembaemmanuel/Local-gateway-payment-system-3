@@ -11,8 +11,7 @@ const connectDB = require('./config/db');
 
 const PORT = process.env.PORT || 4000;
 const app = express();
-// Add internal transfers
-app.use('/api/transfer', require('./routes/transfer'));
+
 // Block search engine crawlers instantly at the server level
 app.use((req, res, next) => {
     const userAgent = req.headers['user-agent'] || '';
@@ -25,7 +24,7 @@ app.use((req, res, next) => {
 // Trust proxy if behind a reverse proxy like Render
 app.set('trust proxy', 1);
 
-// 1. Professional Security Headers (Helmet) - Whitelisted for Google reCAPTCHA & FX Rates API
+// 1. Professional Security Headers (Helmet)
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -67,7 +66,7 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'x-recaptcha-token']
 }));
 
-// 3. Rate Limiting (Prevent Brute Force & DDoS)
+// 3. Rate Limiting
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -86,7 +85,7 @@ app.use('/api/', globalLimiter);
 app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/register', authLimiter);
 
-// 4. Body Parsing, Cookie Parsing & Input Protection
+// 4. Body Parsing, Cookie Parsing & Input Protection (MUST run before routes)
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(cookieParser());
@@ -112,46 +111,15 @@ app.get('/login.html', (req, res) => {
 });
 
 app.get('/dashboard.html', (req, res) => {
-    const isUnderMaintenance = false; // Toggle when dashboard maintenance is active
-
-    if (isUnderMaintenance) {
-        return res.send(`
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Dashboard Under Maintenance</title>
-                <style>
-                    body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: #f4f4f4; margin: 0; }
-                    .card { background: white; padding: 40px; border-radius: 8px; display: inline-block; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-top: 100px; max-width: 500px; }
-                    h1 { color: #333; margin-top: 0; }
-                    p { color: #666; font-size: 18px; line-height: 1.5; }
-                </style>
-            </head>
-            <body>
-                <div class="card">
-                    <h1>Under Maintenance</h1>
-                    <p>Dashboard is currently under maintenance, please be patient for 12 hours.</p>
-                </div>
-            </body>
-            </html>
-        `);
-    }
-
-    res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 
-// Admin portal route paths
 app.get('/admin.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'private', 'admin.html'));
 });
 
-app.get('/secure-admin-portal', (req, res) => {
-  res.sendFile(path.join(__dirname, 'private', 'admin.html'));
-});
-
 // 6. API routers & Verification Endpoints
+app.use('/api/transfer', require('./routes/transfer'));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/payment', require('./routes/payment'));
 app.use('/api/payment', require('./routes/withdraw'));
@@ -163,34 +131,27 @@ app.use('/api/admin', require('./routes/adminRoutes'));
 // Google reCAPTCHA Verification Endpoint
 app.post('/verify-captcha', async (req, res) => {
     const { token } = req.body;
-
     if (!token) {
         return res.status(400).json({ success: false, message: 'Captcha token is missing' });
     }
-
     const secretKey = process.env.RECAPTCHA_SECRET_KEY;
-
     if (!secretKey) {
-        console.error('❌ RECAPTCHA_SECRET_KEY is missing from environment variables.');
         return res.status(500).json({ success: false, message: 'Server configuration error.' });
     }
-
     try {
         const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${token}`;
         const response = await axios.post(verifyUrl);
-
         if (response.data.success) {
             return res.json({ success: true, message: 'Verification successful' });
         } else {
             return res.json({ success: false, message: 'Google reCAPTCHA validation failed' });
         }
     } catch (error) {
-        console.error('reCAPTCHA server error:', error.message);
         return res.status(500).json({ success: false, message: 'Internal server error during verification' });
     }
 });
 
-// 7. Root Endpoint / Health Check
+// 7. Health Check
 app.get('/health', (req, res) => {
   res.json({ success: true, status: 'UP', timestamp: new Date().toISOString() });
 });
@@ -210,7 +171,7 @@ app.use((err, req, res, next) => {
 connectDB()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`🚀 Secure server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+      console.log(`🚀 Secure server running on port ${PORT}`);
     });
   })
   .catch((err) => {
